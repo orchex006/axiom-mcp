@@ -15,7 +15,7 @@ Take only tasks whose `repo` is `axiom-mcp`. Public commands, schema/layout vers
 
 Canonical workflow คือ `Development.md` ใน `axiom-specs` ณ revision ที่ `spec.lock.json` pin ไว้
 
-สถานะปัจจุบัน: repository นี้ยังไม่มี implementation, ไม่มี `spec.lock.json` และไม่มี `AGENTS.md` ของตัวเอง ดังนั้นงาน implementation MUST ถือว่า blocked จนกว่า canonical pin จะถูกสร้างและ verify; งานที่ทำได้ตอนนี้คืองาน governance/documentation ของ repository เองเท่านั้น
+สถานะปัจจุบัน: repository นี้ยังไม่มี implementation แต่มี `AGENTS.md` และ `spec.lock.json` ที่ verify แล้ว (immutable revision และ contract digests ผ่าน `tools/spec-lock-check.py` ด้วย exit code 0) งาน implementation จึงไม่ถูก block ด้วย governance pin อีก งานชิ้นแรกที่เข้า repository นี้ MUST สร้าง required check `python -m pytest tests -q` และ MUST บันทึก check ที่ยังไม่ได้รันเป็น unverified
 
 ## Preflight — ก่อนเริ่มทุก task
 
