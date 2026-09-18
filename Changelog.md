@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+- **C-010** Implement the Python POSIX side of the frozen native reader/writer guard. Add
+  `src/axiom_mcp/guard/` and `tests/test_guard_posix.py`. `protocol.py` consumes the contract
+  rather than restating it: it pins the contract id and digest, names the same two lock files
+  (`admission.lock`, `data.lock`), the same acquisition order and reverse release order, the
+  same bounded-wait budget (default 5000 ms, maximum 60000 ms, 25 ms doubling to a 250 ms cap)
+  and the same Windows byte range, so the Python side joins the existing protocol instead of
+  inventing a parallel one. `engine.py` is the platform-independent part: admission is taken
+  before data, a failing or cancelled wait releases every guard already taken and never
+  leaves a partial acquisition, an upgrade of a held lock and a recursive acquisition in one
+  execution path are both refused, the ordered primitive is never re-entered, and a handle is
+  re-opened when the file behind the path changes identity between open and lock. `locks_posix.py`
+  is the one platform primitive: `flock` on whole files, `LOCK_SH`/`LOCK_EX` with `LOCK_NB`,
+  `O_CLOEXEC`, the guard file created without truncation, contention (`EACCES`/`EAGAIN`) treated
+  as a retry rather than an error the caller sees. `interop.py` is a process-level probe so that
+  exclusion is observed between two independent processes, not between two objects in one
+  interpreter. Cross-language exclusion is proven against a crate-free Rust `flock` probe over
+  the same files: a Rust exclusive holder times out a Python shared reader, a Python exclusive
+  holder times out a Rust shared acquirer, a Rust exclusive holder also excludes a Python
+  exclusive acquirer, two shared holders coexist, and the same file is acquirable after every
+  holder has exited. The engine holds no content-based ownership and needs no cleanup handler:
+  the process dying releases the primitive, and the lock files remain as stable empty files.
+
 - **C-006** Implement structured MCP error mapping. Add `src/axiom_mcp/errors.py`,
   `tests/test_errors.py`, `docs/errors-and-redaction.md` and `release/errors_spike.py`. The
   module separates a **protocol** failure (the request never became a call, rendered as a
