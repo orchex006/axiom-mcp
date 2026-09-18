@@ -1,0 +1,1 @@
+[{"attributes":{},"id":"7ff3a347ce2f66d59e181e6658f5c3786a98e865988a965e8e92f0c6fd07ceca","identity_quality":"syntax_key","kind":"ApiEndpoint","language":"csharp","name":"POST /api/auth/login","project_id":"auth-api","qualified_name":"POST /api/auth/login","source":{"end_line":12,"file":"src/Auth.Api/AuthController.cs","start_line":10}}]

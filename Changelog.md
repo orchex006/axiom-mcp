@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+- **C-013** Validate manifest digests and canonical JSON. Add
+  `src/axiom_mcp/manifest.py`, `tests/test_manifest.py`, `docs/manifest-validation.md` and
+  vendored pinned test fixtures under `tests/fixtures/`. A published generation is three
+  nested integrity claims and this module is where each becomes executable: the pointer
+  names one generation and carries the manifest digest, the manifest lists every shard with
+  its path, role, SHA-256, byte size and record count, and each shard is pinned by the entry
+  that names it. Canonical bytes follow `docs/11-GRAPH-DATA-CONTRACT.md` section 5 - UTF-8
+  without a BOM, LF newlines, lexicographically sorted keys, compact separators, one
+  trailing LF, no floats and no non-string keys, Unicode preserved as supplied - so a
+  document that is valid JSON but not canonical is refused instead of silently
+  re-serialized, because the digest identifying a generation is a digest over those bytes.
+  AC1 is the refusal set: altered manifest bytes fail the pointer closure as
+  `DigestMismatch`, an unknown schema major fails as `UnsupportedSchemaMajor` before any
+  formatting complaint, and a duplicate file path or duplicate role fails as
+  `DuplicateManifestEntry`; a canonical example passes, including one shipped example
+  generation whose `manifest.json` hashes to its own directory name. Shard verification
+  checks length, then digest, then parse, then record count, so a truncated shard is
+  reported as truncated and unparsable bytes never reach the JSON parser before they are
+  known to be the published ones; `verify_closure` applies that to every declared shard
+  through a caller-supplied read function. The two canonical test corpora are vendored with
+  their pinned SHA-256 asserted in the test, and the portable-relative path pattern is
+  asserted equal to the registry's, so neither the fixture bytes nor the two copies of that
+  rule can drift apart unnoticed.
 - **C-009** Resolve registered snapshot locations. Add `src/axiom_mcp/registry.py`,
   `tests/test_registry.py` and `docs/snapshot-registry.md`. A query names a **logical** target - a
   solution id, a project id, a lane, a generation id and a generation-relative reference - and this
