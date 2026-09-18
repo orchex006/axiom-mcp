@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- **C-007** Implement the `axiom-mcp version` and `axiom-mcp doctor` commands. Add
+  `src/axiom_mcp/cli.py`, `tests/test_cli.py`, `docs/cli-version-and-doctor.md` and
+  `release/cli_spike.py`. `version` renders exactly the eight fields
+  `contracts/schemas/version-report.schema.json` requires and adds no key of its own.
+  `doctor` reports six sections - runtime pins, the locked SDK surface, the advertised
+  protocol revisions, the canonical version dimensions including the accepted graph schema
+  major, the credential scope the gateway enforces, and data-plane readiness - and keeps
+  two states apart that are easy to conflate: a runtime that is not the pinned one exits
+  `9` as incompatible, while a healthy runtime with an unwired data plane exits `4` as not
+  ready. Readiness never consults `/healthz`: the report states its basis and carries
+  `process_health_is_readiness: false`, because a listening socket is not a gateway that can
+  answer a query. The credential section names a reference rather than a value (configuration
+  carrying a literal token is refused), distinguishes an unconfigured machine from an
+  unresolvable reference from a resolvable-but-unregistered credential, reports the granted
+  scope through the C-005 registry, and never prints a token - an out-of-root credential path
+  is redacted by the C-006 policy. An invalid flag or an unregistered subcommand exits `2`
+  instead of being silently ignored, and `--json` writes a single object to stdout with
+  diagnostics on stderr.
+
 - **C-006** Implement structured MCP error mapping. Add `src/axiom_mcp/errors.py`,
   `tests/test_errors.py`, `docs/errors-and-redaction.md` and `release/errors_spike.py`. The
   module separates a **protocol** failure (the request never became a call, rendered as a
