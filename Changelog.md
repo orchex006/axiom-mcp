@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- **C-009** Resolve registered snapshot locations. Add `src/axiom_mcp/registry.py`,
+  `tests/test_registry.py` and `docs/snapshot-registry.md`. A query names a **logical** target - a
+  solution id, a project id, a lane, a generation id and a generation-relative reference - and this
+  module is the only place that becomes a filesystem path, by looking up a binding the owner registered
+  under `AXIOM_HOME`. A caller-supplied string can therefore not choose a JSON file: an absolute POSIX
+  path, a drive-qualified Windows path, a UNC path, a backslash, an empty reference and any `..` segment
+  are refused as `UntrustedPath` before any join, and `SnapshotLocation.resolve` re-checks containment
+  after symbolic links are resolved so a symlink planted inside a lane cannot escape it. The three
+  consumed contracts are not re-defined here: the `AXIOM_HOME` defaults and the
+  `config/registry.json` / `instances/<id>/solution.guard` layout come from `SOURCE-OF-TRUST.md` section
+  5 and the native guard ABI, the `P`/`C` path contract comes from
+  `docs/12-SNAPSHOT-READ-WRITE-PROTOCOL.md` section 2, and the portable-relative rule is the one
+  `project-manifest.schema.json` applies to a manifest file entry. The parser is strict where the
+  resolution would otherwise be ambiguous or untrusted - an unknown registry major, a duplicate
+  solution/repository/project id, a relative `repo_root` or `axiom_home`, a `repo_root` inside
+  `AXIOM_HOME` and a declared `guard_directory` that is not the ABI path are all refused - while a
+  missing registry file is honestly an empty registry that resolves nothing instead of a disk scan.
+
 - **C-006** Implement structured MCP error mapping. Add `src/axiom_mcp/errors.py`,
   `tests/test_errors.py`, `docs/errors-and-redaction.md` and `release/errors_spike.py`. The
   module separates a **protocol** failure (the request never became a call, rendered as a
