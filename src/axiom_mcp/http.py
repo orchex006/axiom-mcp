@@ -197,6 +197,7 @@ class GatewayApp:
     mounted: sdk_compat.MountedMcp
     settings: HttpTransportSettings
     readiness: Callable[[], ReadinessReport]
+    security: Any | None = None
 
 
 def build_gateway(
@@ -204,12 +205,19 @@ def build_gateway(
     *,
     settings: HttpTransportSettings | None = None,
     readiness: Callable[[], ReadinessReport] | None = None,
+    security: Any | None = None,
+    authenticator: Any | None = None,
 ) -> GatewayApp:
     """Compose the MCP transport and the probes into one ASGI application.
 
     The MCP endpoint is registered by :mod:`axiom_mcp.sdk_compat`, so the
     endpoint path, the lifespan composition and the handler identity are the
-    same ones C-002 verified. This function adds only the probes.
+    same ones C-002 verified. This function adds only the probes and, when a
+    policy is supplied, the :mod:`axiom_mcp.security` middleware.
+
+    The security policy is optional so the transport can be exercised on its own;
+    when it is omitted no allowlist is invented here, because a transport-level
+    default would silently widen the policy that C-005 owns.
     """
     settings = settings if settings is not None else HttpTransportSettings()
     probe = readiness if readiness is not None else default_readiness
@@ -227,7 +235,24 @@ def build_gateway(
         return JSONResponse(report.as_dict(), status_code=200 if report.ready else 503)
 
     mounted = sdk_compat.mount_streamable_http(app, server, path=settings.path)
-    return GatewayApp(app=app, mounted=mounted, settings=settings, readiness=probe)
+
+    if security is not None:
+        from axiom_mcp import security as security_module
+
+        security_module.install_security(
+            app,
+            policy=security,
+            authenticator=authenticator,
+            protected_path=settings.path,
+        )
+
+    return GatewayApp(
+        app=app,
+        mounted=mounted,
+        settings=settings,
+        readiness=probe,
+        security=security,
+    )
 
 
 def parse_sse_events(text: str) -> tuple[tuple[str, str], ...]:

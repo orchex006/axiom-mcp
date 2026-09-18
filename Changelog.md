@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+- **C-005** Implement the Host/Origin and scoped-authentication policy. Add
+  `src/axiom_mcp/security.py` (an explicit `SecurityPolicy` that refuses an empty or
+  wildcarded `Host`/`Origin` allowlist and admits a bare host entry only for any port on
+  that host; `ScopedToken` plus `TokenRegistry` with the canonical `read`, `reconcile` and
+  `checkpoint` capabilities, per-solution and per-project scope, and audience separation
+  between `axiom-mcp` and `axiom-graphd-control`; `EnvTokenReference`/`FileTokenReference`
+  so configuration names a credential instead of carrying a literal; a digest-only registry
+  so a presented token is never retained or echoed; a pure-ASGI `SecurityMiddleware` that
+  classifies a bounded JSON-RPC body to require the capability a tool call needs without
+  buffering the `text/event-stream` response; and `build_gateway(security=..., authenticator=...)`
+  wiring), `tests/test_security.py`, `docs/security-host-origin-auth.md` and the
+  `release/security_spike.py` verification artifact. A loopback bind is proven not to be
+  authentication: the same gateway that serves an authenticated handshake refuses a
+  disallowed Host, a second-port Origin, a missing token, a graphd control token, a read
+  token requesting reconciliation and a read token naming another solution.
+
 - **C-004** Implement the Streamable HTTP transport assembly. Add
   `src/axiom_mcp/http.py` (`build_gateway`, which registers the one MCP endpoint at `/mcp`
   through the C-002 mount and adds `/healthz` as minimal process health that makes no
