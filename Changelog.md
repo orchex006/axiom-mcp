@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **C-003** Implement the JSON-only stdio transport. Add `src/axiom_mcp/stdio.py`
+  (a `StdoutGuard` that replaces `sys.stdout` for the session, diverts every text write to
+  the diagnostics stream while counting it as a violation, and exposes only a counted binary
+  `ProtocolBuffer` as the real stdout path; `Diagnostics` and `banner_lines` that always
+  target stderr; `serve_stdio`, which installs the guard, runs the SDK's `run_stdio_async`,
+  restores the original stdout in a `finally` block and reports the real
+  violations/protocol-writes/protocol-bytes counts), `tests/test_stdio_transport.py`,
+  `docs/stdio-transport.md` and the `release/stdio_spike.py` verification artifact. A stray
+  text write cannot break `initialize`: it is recorded instead of corrupting the stream. The
+  spike records a real handshake with `violations=0`, one parseable protocol frame on stdout
+  and the banner on stderr.
+
 - **C-002** Mount a real MCP Streamable HTTP server in FastAPI. Add
   `src/axiom_mcp/sdk_compat.py` (explicit lifespan composition so the SDK session
   manager starts and stops exactly once, re-parenting the SDK's own Streamable HTTP
