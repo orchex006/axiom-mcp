@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+- **C-012** Pin one catalog vector per query and never fall back to a project's latest
+  generation. Add `src/axiom_mcp/catalog.py`, `tests/test_catalog.py` and vendored pinned
+  fixtures under `tests/fixtures/solution/demo-solution/` (byte-for-byte from
+  `axiom-specs/examples/snapshots/.axiom/graph/demo-solution`), plus a catalog section in
+  `docs/snapshot-reader-core.md`. `load_solution_catalog` reads the lane pointer once, requires
+  the generation directory name to equal the digest of the catalog bytes inside it and the
+  pointer's `generation_id` to match those same bytes, then validates a member as exactly
+  `(project_id, generation_id, source_fingerprint)`. A member carrying `name`, `project_name`,
+  `path` or `directory`, a duplicate member, a non-canonical byte form and an unknown schema
+  major are refused; the major is reported before the byte form. `pin_catalog` resolves each
+  member through its pinned `generation_id` - never through the project lane's `current.json` -
+  and requires the member manifest to hash to that generation and carry the pinned source
+  fingerprint. An absent, unreadable or mismatched member is recorded `missing` with a reason
+  and the vector is reported `partial` rather than substituted; `require_complete()` raises
+  `CatalogMemberMissing` so a caller under `require_complete_solution` rejects a partial answer
+  instead of receiving one that looks complete. AC1 is observed by the regression that
+  publishes a newer valid generation into a project lane and repoints that lane's
+  `current.json` at it: the answer stays on the catalog's generation. The negative and
+  boundary cases are a member with no pinned generation, a name-only member, a duplicate
+  member, an altered pinned generation, an unknown major, non-canonical bytes, a renamed
+  generation directory and an absent catalog pointer.
 - **C-011** Add the Python Windows shared guard. Add `src/axiom_mcp/guard/locks_windows.py`,
   `tests/test_guard_windows.py` and a Windows section in `docs/snapshot-reader-core.md`. The
   card proposes `src/axiom_mcp/locks_windows.py`, but C-010 landed the guard as the package

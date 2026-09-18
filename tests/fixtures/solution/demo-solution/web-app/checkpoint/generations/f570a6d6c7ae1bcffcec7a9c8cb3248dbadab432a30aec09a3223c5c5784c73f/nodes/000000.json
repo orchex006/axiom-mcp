@@ -1,0 +1,1 @@
+[{"attributes":{},"id":"8401d98ce5207c31bdfaf1621785475ac8a0707d0a3ee1f9b160f89c6c313904","identity_quality":"syntax_key","kind":"Method","language":"typescript","name":"AuthService.login","project_id":"web-app","qualified_name":"AuthService.login","source":{"end_line":9,"file":"src/app/auth.service.ts","start_line":7}}]

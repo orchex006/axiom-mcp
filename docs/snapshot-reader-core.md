@@ -67,3 +67,44 @@ Consequences worth knowing when reading the code:
 the Windows half of the slice is never inferred from a POSIX run. Two-process exclusion is
 observed by launching `python -m axiom_mcp.guard.interop` as a child rather than by comparing
 two objects in one interpreter, because a lock that only excludes itself proves nothing.
+
+## C-012 — Pinned catalog vector (`src/axiom_mcp/catalog.py`)
+
+The catalog is the read-model commit point, so a query resolves it once and then reads every
+member from the exact generation that vector names. `load_solution_catalog(location)` reads the
+lane pointer a single time, loads `generations/<generation_id>/manifest.json`, and refuses a
+directory whose name does not equal the digest of the catalog bytes inside it. The pointer's
+`generation_id` is checked against those same bytes, so a catalog renamed under an unchanged
+directory, or a pointer that quotes a digest the bytes do not have, is rejected rather than
+read.
+
+A member is exactly `(project_id, generation_id, source_fingerprint)`. The reader enforces the
+exact key set and rejects a member that carries `name`, `project_name`, `path` or `directory`,
+because a member resolved by name has no pinned generation and would have to be matched to a
+project's newest generation - which is the latest-per-project fallback
+`docs/14-MULTI-PROJECT-SOLUTIONS.md` section 4 and `tools/catalog_contract.py` prohibit.
+Duplicate `project_id` members, a non-canonical byte form and an unknown schema major are all
+refused, the major before the byte form so a document that is both wrong reports its version.
+
+`pin_catalog(catalog, open_member=...)` turns the validated catalog into a `CatalogVector`.
+The default opener `project_member_opener(location_for)` reads
+`generations/<generation_id>/manifest.json` for the member - never the project lane's
+`current.json` - and requires the manifest to hash to the pinned `generation_id` and to declare
+the pinned `source_fingerprint`. A member whose generation is absent, unreadable or not the
+pinned one is recorded as `missing` with a reason; it does not fail the whole read and it is
+never silently substituted. The vector is then reported `partial`, and
+`require_complete()` raises `CatalogMemberMissing` so a caller under `require_complete_solution`
+rejects the answer explicitly instead of receiving a partial graph that looks complete.
+
+The regression that matters most is
+`test_pinned_vector_ignores_a_newer_project_generation`: a newer, fully valid generation is
+published into a project lane and that lane's `current.json` is repointed at it, yet the answer
+stays on the catalog's generation. A reader that consulted the lane pointer would break both
+the query's identity and SNP-03's single-vector rule. The negative slices cover a member with
+no `generation_id`, a member resolved by name, a duplicate member, an altered pinned
+generation (reported `partial`, not substituted), an unknown major, non-canonical bytes, a
+renamed generation directory and an absent catalog pointer.
+
+`tests/fixtures/solution/demo-solution/` is vendored byte-for-byte from
+`axiom-specs/examples/snapshots/.axiom/graph/demo-solution`; the test asserts each vendored
+manifest still hashes to the generation directory that holds it.
