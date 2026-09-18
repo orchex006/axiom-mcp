@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+- **C-011** Add the Python Windows shared guard. Add `src/axiom_mcp/guard/locks_windows.py`,
+  `tests/test_guard_windows.py` and a Windows section in `docs/snapshot-reader-core.md`. The
+  card proposes `src/axiom_mcp/locks_windows.py`, but C-010 landed the guard as the package
+  `src/axiom_mcp/guard/`, so the Windows primitive is the sibling of `locks_posix.py` inside
+  that package rather than a second top-level module; the justified path change is recorded in
+  the task evidence. The module implements exactly the frozen block and nothing more: it opens
+  each lock file with read/write access, `OPEN_ALWAYS` and share mode
+  `FILE_SHARE_READ | FILE_SHARE_WRITE`, which excludes `FILE_SHARE_DELETE`, tries one
+  non-blocking `LockFileEx` over byte range offset 0 length 1 carrying
+  `LOCKFILE_FAIL_IMMEDIATELY`, and releases with a matching `UnlockFileEx` before closing. The
+  acquisition order, the bounded wait, the refusal to upgrade and the release of every acquired
+  guard remain in `src/axiom_mcp/guard/engine.py` and are therefore identical on both platforms;
+  only the primitive is different, because Windows has no `flock`. Contention is reported as
+  `GuardBusy` from `ERROR_LOCK_VIOLATION` or `ERROR_SHARING_VIOLATION`, so the engine retries
+  inside its deadline instead of surfacing either as a caller-visible error. Identity is read from
+  the open descriptor with `os.fstat` and compared against the path, so the engine still detects a
+  file replaced between open and lock and never locks an unrelated file. `ctypes` over `kernel32`
+  is used rather than a wrapper package: the primitive is four calls, and a dependency for them
+  would put the guard behind a package registry the release path does not need. AC1 is observed on
+  an actual Windows host: an exclusive `LockFileEx` holder in a real second process makes both a
+  shared and an exclusive attempt in this process time out, two shared holders coexist, the file is
+  acquirable again after release, an open guard handle refuses a deny-everything opener with
+  `ERROR_SHARING_VIOLATION`, the held file cannot be removed while the handle is open because
+  delete is not shared, and the frozen byte range, open mode and share mode are asserted against
+  the contract constants. The negative and boundary cases are a second handle conflicting inside
+  one process, an upgrade attempt and a recursive acquisition being refused with deterministic
+  reasons, an identity read after close failing as `identity_unreadable`, and a reader denied on
+  `data.lock` releasing the admission it already held.
 - **C-013** Validate manifest digests and canonical JSON. Add
   `src/axiom_mcp/manifest.py`, `tests/test_manifest.py`, `docs/manifest-validation.md` and
   vendored pinned test fixtures under `tests/fixtures/`. A published generation is three
