@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- **C-008** Implement the `axiom-mcp update check` and `axiom-mcp update apply --plan`
+  commands. Add `src/axiom_mcp/update.py`, `tests/test_update.py`,
+  `docs/update-plan-delegation.md` and `release/update_spike.py`, and register the two
+  subcommands in `src/axiom_mcp/cli.py`. `check` reports the canonical fields - installed,
+  available, compatible, channel, schema_range, update_policy, source_origin and
+  needs_restart - and keeps one rule: an unknown answer is never rendered as up to date, so
+  an unconfigured, offline or unreadable source leaves `available` null and names the reason
+  instead of reporting `current`. An origin is trusted only when it is the canonical
+  repository or when the owner added it to `AXIOM_MCP_UPDATE_ALLOWED_ORIGINS`; an unlisted
+  origin is blocked and never contacted. `apply` validates one plan with the pinned
+  specification's own evaluator (`tools/update_plan_contract.py`), reporting its reasons and
+  digest verbatim, and refuses an unverifiable document rather than assuming acceptance. It
+  then requires an approved state, a target of this component, and an absolute install root
+  outside the running interpreter, its site-packages and this package: a plan that would
+  rewrite the running installation is refused as `in_place_upgrade_prohibited`, and the
+  delegated command is guarded against `pip`, `pip3`, `uv`, `easy_install`, `python -m pip`
+  and self-invocation. An accepted plan is reported as the exact argument list
+  `axiom update apply --plan PATH` for the external updater; the running process performs no
+  install, download or environment mutation.
 - **C-007** Implement the `axiom-mcp version` and `axiom-mcp doctor` commands. Add
   `src/axiom_mcp/cli.py`, `tests/test_cli.py`, `docs/cli-version-and-doctor.md` and
   `release/cli_spike.py`. `version` renders exactly the eight fields

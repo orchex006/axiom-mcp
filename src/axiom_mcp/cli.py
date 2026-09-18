@@ -35,7 +35,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
-from axiom_mcp import errors, http, security, version
+from axiom_mcp import errors, http, security, update, version
 
 # Canonical CLI exit codes from docs/16-CLI-AND-CONTROL-API.md section 6.
 EXIT_SUCCESS = 0
@@ -589,6 +589,37 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="PATH",
         help="Credential registry that names token references; no token value is read.",
     )
+
+    update_parser = subcommands.add_parser(
+        "update", help="Check for updates and delegate one approved plan."
+    )
+    update_commands = update_parser.add_subparsers(dest="update_command", metavar="COMMAND")
+
+    check_parser = update_commands.add_parser(
+        "check", help="Report installed, available, channel and policy facts."
+    )
+    check_parser.add_argument(
+        "--json", action="store_true", help="Emit a single JSON object on stdout."
+    )
+    check_parser.add_argument(
+        "--offline", action="store_true", help="Answer without consulting any network."
+    )
+    check_parser.add_argument(
+        "--metadata",
+        default=None,
+        metavar="PATH",
+        help="Verified metadata document naming the available version.",
+    )
+
+    apply_parser = update_commands.add_parser(
+        "apply", help="Validate an approved plan and hand it to the external updater."
+    )
+    apply_parser.add_argument(
+        "--plan", required=True, metavar="PATH", help="Approved update plan document."
+    )
+    apply_parser.add_argument(
+        "--json", action="store_true", help="Emit a single JSON object on stdout."
+    )
     return parser
 
 
@@ -616,6 +647,68 @@ def _run_doctor(
     return int(report["exit_code"])
 
 
+def format_check_text(check: update.UpdateCheck) -> str:
+    """Render one update check without hiding an unknown answer."""
+    report = check.as_report()
+    lines = [
+        f"component: {report['component']}",
+        f"installed: {report['installed']}",
+        f"available: {report['available'] if report['available'] is not None else 'unknown'}",
+        f"compatible: {report['compatible'] if report['compatible'] is not None else 'unknown'}",
+        f"channel: {report['channel']}",
+        f"source_origin: {report['source_origin'] if report['source_origin'] else 'unconfigured'}",
+        f"needs_restart: {report['needs_restart']}",
+        f"status: {report['status']}",
+    ]
+    if report["reasons"]:
+        lines.append("reasons: " + ", ".join(report["reasons"]))
+    return "\n".join(lines)
+
+
+def _run_update_check(
+    *,
+    as_json: bool,
+    environ: Mapping[str, str] | None = None,
+    offline: bool = False,
+    metadata_path: str | None = None,
+) -> int:
+    env = dict(os.environ if environ is None else environ)
+    if offline:
+        env[update.OFFLINE_ENV] = "1"
+    check = update.check_update(env, metadata_path=metadata_path)
+    if as_json:
+        print(json.dumps(check.as_report(), ensure_ascii=False))
+    else:
+        print(format_check_text(check))
+    return update.check_exit_code(check)
+
+
+def _run_update_apply(*, as_json: bool, plan_path: str) -> int:
+    try:
+        document = json.loads(pathlib.Path(plan_path).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        problem = f"{version.COMPONENT}: cannot read plan {plan_path}: {type(exc).__name__}"
+        print(problem, file=sys.stderr)
+        return EXIT_VALIDATION
+    try:
+        decision = update.apply_plan(document, plan_path=plan_path)
+    except update.UpdateUnavailable as exc:
+        print(f"{version.COMPONENT}: {exc}", file=sys.stderr)
+        return EXIT_NOT_FOUND
+    except update.PlanRejected as exc:
+        for reason in exc.reasons:
+            print(f"  {reason}", file=sys.stderr)
+        return update.apply_exit_code(exc)
+    if as_json:
+        print(json.dumps(decision.as_report(), ensure_ascii=False))
+    else:
+        print(f"plan: {decision.plan_id} ({decision.plan_digest})")
+        print(f"target: {decision.target_component} -> {decision.install_root}")
+        print(f"outcome: {decision.outcome}")
+        print("delegate: " + " ".join(decision.argv))
+    return EXIT_SUCCESS
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Run the ``axiom-mcp`` command line and return its canonical exit code."""
     parser = build_parser()
@@ -630,6 +723,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _run_version(as_json=args.json)
     if args.command == "doctor":
         return _run_doctor(as_json=args.json, registry_path=args.registry)
+    if args.command == "update":
+        if args.update_command == "check":
+            return _run_update_check(
+                as_json=args.json, offline=args.offline, metadata_path=args.metadata
+            )
+        if args.update_command == "apply":
+            return _run_update_apply(as_json=args.json, plan_path=args.plan)
+        print("usage: axiom-mcp update {check,apply}", file=sys.stderr)
+        return EXIT_VALIDATION
     parser.print_help(sys.stderr)
     return EXIT_VALIDATION
 
