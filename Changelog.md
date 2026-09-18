@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **C-004** Implement the Streamable HTTP transport assembly. Add
+  `src/axiom_mcp/http.py` (`build_gateway`, which registers the one MCP endpoint at `/mcp`
+  through the C-002 mount and adds `/healthz` as minimal process health that makes no
+  readiness claim and `/readyz` as a separate query/control availability report returning
+  `NOT_READY` while a plane is down; `observe_streamable_http` and `parse_sse_events`, which
+  record the real wire result instead of assuming streaming; `HttpTransportSettings`, which
+  defaults to a loopback bind and refuses an unacknowledged non-loopback bind; and the
+  `uvicorn` serving path), `tests/test_http_transport.py`, `docs/http-transport.md` and the
+  `release/http_transport_spike.py` verification artifact. A plain REST route that returns a
+  hand-written `initialize`-shaped JSON body is proven non-conformant in the same test that
+  proves the real gateway conforms.
+
 - **C-003** Implement the JSON-only stdio transport. Add `src/axiom_mcp/stdio.py`
   (a `StdoutGuard` that replaces `sys.stdout` for the session, diverts every text write to
   the diagnostics stream while counting it as a violation, and exposes only a counted binary
