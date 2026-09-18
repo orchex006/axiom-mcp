@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **C-002** Mount a real MCP Streamable HTTP server in FastAPI. Add
+  `src/axiom_mcp/sdk_compat.py` (explicit lifespan composition so the SDK session
+  manager starts and stops exactly once, re-parenting the SDK's own Streamable HTTP
+  handler onto the contract path `/mcp` so the endpoint is an exact match with no
+  redirect and nothing is mounted at `/`, an exact-match `LifecycleRecorder`, and a
+  real in-process `initialize` handshake that reports the negotiated protocol),
+  `tests/test_sdk_mount.py` and `docs/sdk-mount-lifecycle.md`, plus the
+  `release/mcp_mount_spike.py` verification artifact. The spike records the failure
+  this task exists to prevent: a plain Starlette mount serves HTTP but answers
+  `initialize` with HTTP 500 because mounting does not run the sub-application
+  lifespan.
+
 - **C-001** Pin the Python runtime and the official MCP SDK. Add `pyproject.toml`
   (`requires-python >=3.13,<3.14`, `mcp==1.28.1` plus exact FastAPI/Uvicorn/Starlette/
   Pydantic/anyio/httpx pins, the `axiom-mcp` console entry point, pytest and ruff
