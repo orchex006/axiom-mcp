@@ -20,14 +20,14 @@ pointer = location.pointer                             # .../live/current.json
 shard = location.resolve("nodes.json")                 # validated, contained
 ```
 
-A caller that supplies `"C:/tmp/anything.json"`, `"..\\..\\secret.json"` or
+A caller that supplies `"C:/tmp/anything.json"`, `"..\..\secret.json"` or
 `"/etc/passwd"` gets `UntrustedPath`, not a file handle.
 
 ## AXIOM_HOME
 
 | OS | Default |
 | --- | --- |
-| Windows | `%LOCALAPPDATA%\\Axiom` |
+| Windows | `%LOCALAPPDATA%\Axiom` |
 | Linux | `${XDG_STATE_HOME:-$HOME/.local/state}/axiom` |
 | macOS | `$HOME/Library/Application Support/Axiom` |
 
