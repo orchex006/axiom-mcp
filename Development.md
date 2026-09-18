@@ -39,15 +39,16 @@ Canonical workflow คือ `Development.md` ใน `axiom-specs` ณ revision 
 
 ## Required checks
 
-ยังไม่มี code หรือ test harness ใน repository นี้ จึงยังไม่มี required check ที่รันได้
-
-เมื่อ implementation แรกเข้า repository นี้ MUST เพิ่มอย่างน้อย:
+C-001 established this repository's required checks (stack: Python 3.13 + official MCP SDK `mcp==1.28.1` + FastAPI):
 
 ```text
 python -m pytest tests -q
+python -m ruff check .
+python -m ruff format --check .
 ```
 
-พร้อม format/lint ของ stack ที่เลือก และ MUST บันทึกคำสั่งกับ exit code จริงลง evidence ทุกครั้ง ห้ามรายงานว่า check ผ่านโดยไม่มี output จริง
+All later tasks MUST run these against the final bytes and record the real command and exit code in
+evidence. A check that did not run MUST be recorded as unverified, never reported as passing.
 
 ## Evidence และ completion
 
