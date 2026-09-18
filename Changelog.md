@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- **C-006** Implement structured MCP error mapping. Add `src/axiom_mcp/errors.py`,
+  `tests/test_errors.py`, `docs/errors-and-redaction.md` and `release/errors_spike.py`. The
+  module separates a **protocol** failure (the request never became a call, rendered as a
+  JSON-RPC error carrying the canonical code in `error.data.code`) from a **tool-result**
+  failure (the call ran and failed for a domain reason, rendered with `isError: true` and a
+  structured body), so a host can retry a rate limit and still refuse to retry a malformed
+  request. The canonical code set is `query-response.schema.json`'s `queryError` enum plus
+  `PROJECT_UNAVAILABLE`, `SNAPSHOT_UNAVAILABLE` and `SNAPSHOT_CORRUPT`, and a code outside it
+  raises instead of rendering. Redaction is consumed rather than re-derived: the detection
+  table, the `<redacted:{category}>` placeholder, the metadata allowlist and the path
+  relativisation rule come from `contracts/redaction-policy.md`, and the conformance test
+  loads that policy's executable reference evaluator by path and asserts agreement over every
+  canonical fixture, so a policy change this module does not follow fails the build rather
+  than drifting silently. `AxiomError` redacts the message and the whole detail tree on
+  construction, before any depth/width/length bound is applied, and records only the *type*
+  of a cause - there is no field that can hold a formatted traceback.
+
 - **C-005** Implement the Host/Origin and scoped-authentication policy. Add
   `src/axiom_mcp/security.py` (an explicit `SecurityPolicy` that refuses an empty or
   wildcarded `Host`/`Origin` allowlist and admits a bare host entry only for any port on
