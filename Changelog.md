@@ -2,27 +2,84 @@
 
 ## Unreleased
 
-- **C-010** Implement the Python POSIX side of the frozen native reader/writer guard. Add
-  `src/axiom_mcp/guard/` and `tests/test_guard_posix.py`. `protocol.py` consumes the contract
-  rather than restating it: it pins the contract id and digest, names the same two lock files
-  (`admission.lock`, `data.lock`), the same acquisition order and reverse release order, the
-  same bounded-wait budget (default 5000 ms, maximum 60000 ms, 25 ms doubling to a 250 ms cap)
-  and the same Windows byte range, so the Python side joins the existing protocol instead of
-  inventing a parallel one. `engine.py` is the platform-independent part: admission is taken
-  before data, a failing or cancelled wait releases every guard already taken and never
-  leaves a partial acquisition, an upgrade of a held lock and a recursive acquisition in one
-  execution path are both refused, the ordered primitive is never re-entered, and a handle is
-  re-opened when the file behind the path changes identity between open and lock. `locks_posix.py`
-  is the one platform primitive: `flock` on whole files, `LOCK_SH`/`LOCK_EX` with `LOCK_NB`,
-  `O_CLOEXEC`, the guard file created without truncation, contention (`EACCES`/`EAGAIN`) treated
-  as a retry rather than an error the caller sees. `interop.py` is a process-level probe so that
-  exclusion is observed between two independent processes, not between two objects in one
-  interpreter. Cross-language exclusion is proven against a crate-free Rust `flock` probe over
-  the same files: a Rust exclusive holder times out a Python shared reader, a Python exclusive
-  holder times out a Rust shared acquirer, a Rust exclusive holder also excludes a Python
-  exclusive acquirer, two shared holders coexist, and the same file is acquirable after every
-  holder has exited. The engine holds no content-based ownership and needs no cleanup handler:
-  the process dying releases the primitive, and the lock files remain as stable empty files.
+- **C-013** Validate manifest digests and canonical JSON. Add
+  `src/axiom_mcp/manifest.py`, `tests/test_manifest.py`, `docs/manifest-validation.md` and
+  vendored pinned test fixtures under `tests/fixtures/`. A published generation is three
+  nested integrity claims and this module is where each becomes executable: the pointer
+  names one generation and carries the manifest digest, the manifest lists every shard with
+  its path, role, SHA-256, byte size and record count, and each shard is pinned by the entry
+  that names it. Canonical bytes follow `docs/11-GRAPH-DATA-CONTRACT.md` section 5 - UTF-8
+  without a BOM, LF newlines, lexicographically sorted keys, compact separators, one
+  trailing LF, no floats and no non-string keys, Unicode preserved as supplied - so a
+  document that is valid JSON but not canonical is refused instead of silently
+  re-serialized, because the digest identifying a generation is a digest over those bytes.
+  AC1 is the refusal set: altered manifest bytes fail the pointer closure as
+  `DigestMismatch`, an unknown schema major fails as `UnsupportedSchemaMajor` before any
+  formatting complaint, and a duplicate file path or duplicate role fails as
+  `DuplicateManifestEntry`; a canonical example passes, including one shipped example
+  generation whose `manifest.json` hashes to its own directory name. Shard verification
+  checks length, then digest, then parse, then record count, so a truncated shard is
+  reported as truncated and unparsable bytes never reach the JSON parser before they are
+  known to be the published ones; `verify_closure` applies that to every declared shard
+  through a caller-supplied read function. The two canonical test corpora are vendored with
+  their pinned SHA-256 asserted in the test, and the portable-relative path pattern is
+  asserted equal to the registry's, so neither the fixture bytes nor the two copies of that
+  rule can drift apart unnoticed.
+- **C-009** Resolve registered snapshot locations. Add `src/axiom_mcp/registry.py`,
+  `tests/test_registry.py` and `docs/snapshot-registry.md`. A query names a **logical** target - a
+  solution id, a project id, a lane, a generation id and a generation-relative reference - and this
+  module is the only place that becomes a filesystem path, by looking up a binding the owner registered
+  under `AXIOM_HOME`. A caller-supplied string can therefore not choose a JSON file: an absolute POSIX
+  path, a drive-qualified Windows path, a UNC path, a backslash, an empty reference and any `..` segment
+  are refused as `UntrustedPath` before any join, and `SnapshotLocation.resolve` re-checks containment
+  after symbolic links are resolved so a symlink planted inside a lane cannot escape it. The three
+  consumed contracts are not re-defined here: the `AXIOM_HOME` defaults and the
+  `config/registry.json` / `instances/<id>/solution.guard` layout come from `SOURCE-OF-TRUST.md` section
+  5 and the native guard ABI, the `P`/`C` path contract comes from
+  `docs/12-SNAPSHOT-READ-WRITE-PROTOCOL.md` section 2, and the portable-relative rule is the one
+  `project-manifest.schema.json` applies to a manifest file entry. The parser is strict where the
+  resolution would otherwise be ambiguous or untrusted - an unknown registry major, a duplicate
+  solution/repository/project id, a relative `repo_root` or `axiom_home`, a `repo_root` inside
+  `AXIOM_HOME` and a declared `guard_directory` that is not the ABI path are all refused - while a
+  missing registry file is honestly an empty registry that resolves nothing instead of a disk scan.
+- **C-008** Implement the `axiom-mcp update check` and `axiom-mcp update apply --plan`
+  commands. Add `src/axiom_mcp/update.py`, `tests/test_update.py`,
+  `docs/update-plan-delegation.md` and `release/update_spike.py`, and register the two
+  subcommands in `src/axiom_mcp/cli.py`. `check` reports the canonical fields - installed,
+  available, compatible, channel, schema_range, update_policy, source_origin and
+  needs_restart - and keeps one rule: an unknown answer is never rendered as up to date, so
+  an unconfigured, offline or unreadable source leaves `available` null and names the reason
+  instead of reporting `current`. An origin is trusted only when it is the canonical
+  repository or when the owner added it to `AXIOM_MCP_UPDATE_ALLOWED_ORIGINS`; an unlisted
+  origin is blocked and never contacted. `apply` validates one plan with the pinned
+  specification's own evaluator (`tools/update_plan_contract.py`), reporting its reasons and
+  digest verbatim, and refuses an unverifiable document rather than assuming acceptance. It
+  then requires an approved state, a target of this component, and an absolute install root
+  outside the running interpreter, its site-packages and this package: a plan that would
+  rewrite the running installation is refused as `in_place_upgrade_prohibited`, and the
+  delegated command is guarded against `pip`, `pip3`, `uv`, `easy_install`, `python -m pip`
+  and self-invocation. An accepted plan is reported as the exact argument list
+  `axiom update apply --plan PATH` for the external updater; the running process performs no
+  install, download or environment mutation.
+- **C-007** Implement the `axiom-mcp version` and `axiom-mcp doctor` commands. Add
+  `src/axiom_mcp/cli.py`, `tests/test_cli.py`, `docs/cli-version-and-doctor.md` and
+  `release/cli_spike.py`. `version` renders exactly the eight fields
+  `contracts/schemas/version-report.schema.json` requires and adds no key of its own.
+  `doctor` reports six sections - runtime pins, the locked SDK surface, the advertised
+  protocol revisions, the canonical version dimensions including the accepted graph schema
+  major, the credential scope the gateway enforces, and data-plane readiness - and keeps
+  two states apart that are easy to conflate: a runtime that is not the pinned one exits
+  `9` as incompatible, while a healthy runtime with an unwired data plane exits `4` as not
+  ready. Readiness never consults `/healthz`: the report states its basis and carries
+  `process_health_is_readiness: false`, because a listening socket is not a gateway that can
+  answer a query. The credential section names a reference rather than a value (configuration
+  carrying a literal token is refused), distinguishes an unconfigured machine from an
+  unresolvable reference from a resolvable-but-unregistered credential, reports the granted
+  scope through the C-005 registry, and never prints a token - an out-of-root credential path
+  is redacted by the C-006 policy. An invalid flag or an unregistered subcommand exits `2`
+  instead of being silently ignored, and `--json` writes a single object to stdout with
+  diagnostics on stderr.
+
 
 - **C-006** Implement structured MCP error mapping. Add `src/axiom_mcp/errors.py`,
   `tests/test_errors.py`, `docs/errors-and-redaction.md` and `release/errors_spike.py`. The
