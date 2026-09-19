@@ -142,6 +142,7 @@ generations looks like a fact and is not one:
 | `incompatible_schema` | the two sides declare different schema majors |
 
 Every refusal sets `comparable` false, returns no diff, and carries a warning naming the reason.
+
 ## Byte budget (C-025)
 
 `pack_response(document, max_bytes=...)` packs a response inside a hard byte cap. The measurement is
@@ -159,3 +160,24 @@ When the document does not fit, whole items are trimmed from the tail of `nodes`
   dropping facts, and an over-cap document would break the contract.
 
 An unmeasurable (non JSON-serialisable) document raises `BudgetInvalid`.
+
+## Cursor binding (C-026)
+
+A cursor is not a portable page number. `CursorStore.issue` binds an opaque token to the catalog
+generation, the operation and its parameters, the scope, the capability and an expiry, and
+`CursorStore.resolve` returns the record only for that binding. A request that does not match is
+refused with a named reason rather than silently served:
+
+| reason | meaning |
+| --- | --- |
+| `unknown` | this store never issued the cursor |
+| `expired` | the cursor was used after its expiry |
+| `generation` | issued against another catalog generation |
+| `scope` | the requested project set differs; authorization is part of the binding |
+| `query` | a different operation or parameters |
+| `capability` | the cursor was issued for another capability |
+
+Re-resolving the identical binding is paging, not reuse. Two issues never collide because the token
+includes a sequence, so the same request twice yields two distinct cursors. The query hash is
+key-order independent, `ttl_seconds` ranges 1..3600 (default 300), and an out-of-range ttl or an
+unparseable generation is refused, never clamped.

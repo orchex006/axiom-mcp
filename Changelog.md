@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **C-026** Bind cursors to snapshot and query. Add `src/axiom_mcp/query/cursor.py` and
+  `tests/test_query_cursor.py`. A cursor is only meaningful inside the request that produced it:
+  `CursorStore.issue` binds it to the catalog generation, the operation and its parameters, the
+  scope, the capability and an expiry, and `CursorStore.resolve` returns the record only for that
+  exact binding. Every mismatch is refused with a named reason - `unknown`, `expired`, `generation`,
+  `scope`, `query`, `capability` - so a cursor can never be replayed against another project,
+  another generation or another query and be misread as paging. Re-resolving the identical binding
+  is paging, not reuse; two issues never collide because the token includes a sequence; the query
+  hash is key-order independent; and an out-of-range ttl plus an unparseable generation are refused
+  rather than clamped.
 - **C-025** Implement response byte-budget packer. Add `src/axiom_mcp/query/budget.py` and
   `tests/test_query_budget.py`. `pack_response` measures the encoded compact JSON, UTF-8, of the
   whole document including every metadata key, so the cap cannot be spent separately from the
@@ -9,7 +19,9 @@
   `unresolved`, `candidates` and finally `warnings`, and `dropped` reports exactly what went; a
   single item too large to fit is recorded as `oversized_item` rather than partially serialised,
   and metadata that cannot fit at all raises `BudgetExceeded` instead of returning an over-cap
-  document. An unmeasurable document and an out-of-range `max_bytes` are refused explicitly.- **C-024** Implement generation change comparison. Add `src/axiom_mcp/query/changes.py` and
+  document. An unmeasurable document and an out-of-range `max_bytes` are refused explicitly.
+
+- **C-024** Implement generation change comparison. Add `src/axiom_mcp/query/changes.py` and
   `tests/test_query_changes.py`, plus an optional `schema_major` on `Graph` and
   `graph_from_documents` in `src/axiom_mcp/query/model.py`. `changes(head, baseline)` reports
   `added`/`removed`/`modified` node and edge facts per project, matching by pinned id so a rename
