@@ -75,3 +75,20 @@ An edge with `resolution="unresolved"` (no resolved target in this generation) i
 `unresolved` and is never followed: a list that silently omitted it would look complete when the
 generation cannot claim it is. `per_kind` counts the returned edges by kind, and an ambiguous
 target returns its candidates with `status="ambiguous_target"` and no invented neighbourhood.
+## Callers (C-021)
+
+`callers` returns the pinned nodes that reach a target. It is defined against the whole pinned
+scope, not the target's own project: `GraphSet` indexes each member's incoming edges under their
+target id regardless of which project holds the source, so the common case - an endpoint in one
+project called from another - is found. `searched_projects` names every member the answer actually
+read; `per_project` and `cross_project` say where the callers came from. The walk is
+incoming-only, so `direction` is not a parameter: by definition a caller is at the source of an
+edge that reaches the target.
+
+Absence needs care. `complete` is false - with a matching entry in `incomplete_reasons` and a
+warning - when the scope was *told* about a member it does not pin (`missing_projects`), when a
+budget stopped the walk, or when an unresolved edge names the target without a resolved source.
+An empty caller list with `complete` false reads "none found in what was searched", never "no
+callers exist". An unresolved edge names the target by text and so cannot be filed in the reverse
+index; it is reported in `unresolved` and never followed or counted. `edge_kinds` defaults to every
+pinned kind except `CONTAINS`, because a container is not a caller.

@@ -2,7 +2,16 @@
 
 ## Unreleased
 
-- **C-020** Implement dependency and neighbour traversal. Add `src/axiom_mcp/query/neighbors.py`
+- **C-021** Implement cross-project caller lookup. Add `src/axiom_mcp/query/callers.py` and
+  `tests/test_query_callers.py`, and record unpinned members on `GraphSet` (`missing_projects`,
+  `searched_projects`) in `src/axiom_mcp/query/model.py`. A caller is found by the *global*
+  reverse index `GraphSet` builds over every pinned member, so a call from another project is not
+  missed; `searched_projects` names what the answer read, `per_project`/`cross_project` say where
+  the callers came from, and the walk is incoming-only so `direction` is not a parameter.
+  `complete`/`incomplete_reasons` mark an answer that must not be read as "no callers": an
+  unpinned member, a budget-stopped walk, or an unresolved edge whose `unresolved_target` names the
+  target (reported, never followed, never counted) all make it false with a warning. Default
+  `edge_kinds` is every pinned kind except `CONTAINS`, because a container is not a caller.- **C-020** Implement dependency and neighbour traversal. Add `src/axiom_mcp/query/neighbors.py`
   and `tests/test_query_neighbors.py` over the shared `model.bounded_walk` primitive. `neighbors`
   takes `direction` (`outgoing`/`incoming`/`both`) and an `edge_kinds` allowlist that apply to the
   *edge*, so the two filters compose: `incoming` never returns an edge whose source is the target,

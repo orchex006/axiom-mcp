@@ -603,9 +603,15 @@ def _rank(node: Node, selector: str) -> int:
 
 
 class GraphSet:
-    """Several pinned projects indexed together, so cross-project edges still resolve."""
+    """Several pinned projects indexed together, so cross-project edges still resolve.
 
-    def __init__(self, graphs: Iterable[Graph]) -> None:
+    ``missing_projects`` records members the caller asked about whose generation is *not* pinned
+    here (a collected or unreadable member). Pinned and missing are disjoint: a project cannot be
+    both. Operations that can be read as "there is nothing" - a caller lookup above all - consult
+    this so an absent member is reported as an incomplete search instead of an empty answer.
+    """
+
+    def __init__(self, graphs: Iterable[Graph], *, missing_projects: Iterable[str] = ()) -> None:
         by_project: dict[str, Graph] = {}
         nodes: dict[str, Node] = {}
         outgoing: dict[str, list[Edge]] = {}
@@ -629,7 +635,14 @@ class GraphSet:
                 outgoing.setdefault(edge.source_id, []).append(edge)
                 if edge.target_id is not None:
                     incoming.setdefault(edge.target_id, []).append(edge)
+        absent = tuple(
+            sorted({identifier_text(pid, what="project_id") for pid in missing_projects})
+        )
+        overlap = sorted(set(absent) & set(by_project))
+        if overlap:
+            raise QueryModelError(f"project {overlap[0]!r} is pinned and missing at the same time")
         self._by_project = by_project
+        self._missing_projects = absent
         self._nodes = nodes
         self._outgoing = {key: tuple(value) for key, value in outgoing.items()}
         self._incoming = {key: tuple(value) for key, value in incoming.items()}
@@ -637,6 +650,16 @@ class GraphSet:
     @property
     def project_ids(self) -> tuple[str, ...]:
         return tuple(sorted(self._by_project))
+
+    @property
+    def missing_projects(self) -> tuple[str, ...]:
+        """Members the caller named that this scope does not pin, sorted and deduplicated."""
+        return self._missing_projects
+
+    @property
+    def searched_projects(self) -> tuple[str, ...]:
+        """Every member a traversal over this scope actually reads."""
+        return self.project_ids
 
     @property
     def graphs(self) -> tuple[Graph, ...]:
@@ -720,8 +743,11 @@ def narrow_scope(scope: GraphSet, project_ids: Iterable[str] | None) -> GraphSet
     """Narrow a scope to an explicit project selection, preserving a deterministic order."""
     if project_ids is None:
         return scope
-    chosen = tuple(project_ids)
-    return GraphSet(scope.graph(identifier_text(pid, what="project_id")) for pid in chosen)
+    chosen = tuple(identifier_text(pid, what="project_id") for pid in project_ids)
+    return GraphSet(
+        (scope.graph(pid) for pid in chosen),
+        missing_projects=[pid for pid in scope.missing_projects if pid in chosen],
+    )
 
 
 def _other_end(edge: Edge, node_id: str, direction: str) -> str | None:
