@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+- **C-031** Register the `graph_job` tool in `src/axiom_mcp/tools/job.py`. `graph_job` reads or
+  cancels one daemon job through the `ControlPlane` protocol and enforces three bounds itself.
+  The handler makes exactly one control-plane call - it never loops and never sleeps, so a client
+  cannot make the gateway spin on a queue, and the daemon keeps ownership of waiting - which a
+  test asserts by counting recorded calls. Job ownership is verified on the answer: the job's
+  `solution_id` must be visible to the token and registered locally, otherwise the answer is
+  `NOT_FOUND`, the same answer an unknown job gets, so job ids are not an enumeration oracle.
+  Cancel is capability-checked `before` the daemon - a read-only token gets `FORBIDDEN` and the
+  control plane is never called - while a `status` read has to ask the daemon who owns the job and
+  therefore enforces ownership on the answer; the asymmetry is documented. The request is closed,
+  `job_id` must match `^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}# Changelog — axiom-mcp
+
+ so a path-shaped id never reaches the
+  daemon, `wait_ms` is bounded to `0..30000` and is refused on a cancel. The answer is projected
+  through a closed allowlist: the `job.schema.json` fields plus `retry_after_ms`, a derived
+  `terminal`, and `progress` restricted to the documented units - a percentage field is dropped
+  with a `percentage_not_carried` warning rather than relayed - and a state outside the schema enum
+  is `DAEMON_UNAVAILABLE` instead of being echoed through. Adds 23 regression tests (positive,
+  negative and failure-boundary legs) in `tests/test_tools_job.py`.
+
 - **C-030** Register the `graph_reconcile` tool in `src/axiom_mcp/tools/reconcile.py`. The
   tool authorizes, then delegates through the `ControlPlane` protocol, and never reads a snapshot,
   parses a source file or writes a shard - which is AC1's "Python never parses source or writes

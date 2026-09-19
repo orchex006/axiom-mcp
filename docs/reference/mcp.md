@@ -14,7 +14,8 @@ error model, the native guard engine, the registry, the manifest validator, the 
 query engine and the CLI. `src/axiom_mcp/tools/` now exists: `catalog.py` holds the
 canonical six-tool catalog, `context.py` holds the closed-argument parser and the
 re-authorizing `ToolContext`, `status.py` implements `graph_status`, `query.py` implements the
-`graph_query` dispatcher, and `reconcile.py` implements `graph_reconcile`. The rows below record which tools are real at this revision; every remaining shape is a **contract, not an
+`graph_query` dispatcher, `reconcile.py` implements `graph_reconcile` and `job.py` implements
+`graph_job`. The rows below record which tools are real at this revision; every remaining shape is a **contract, not an
 observation**, until the registering task named in the catalog lands.
 
 ## Transports
@@ -43,8 +44,7 @@ access.
 | `graph_status` | Solution/project freshness, coverage, generations, capabilities | `read` | none | C-028 | Implemented (`tools/status.py`) |
 | `graph_query` | Graph operation: `search`, `context`, `neighbors`, `callers`, `dependencies`, `impact`, `path`, `changes` | `read` | none | C-029 | Implemented (`tools/query.py`) |
 | `graph_reconcile` | Enqueue a graphd reconcile job for a scope | `reconcile` | Enqueue graphd job | C-030 | Implemented (`tools/reconcile.py`) |
-| `graph_job` | Job status or explicit cancel | `reconcile` | Status read; `cancel` is an explicit write | C-031 | Specified, not yet available |
-| `graph_reconcile` detail | see [Reconcile](#graph_reconcile-request-and-answer) | | | | |
+| `graph_job` | Job status or explicit cancel | `reconcile` | Status read; `cancel` is an explicit write | C-031 | Implemented (`tools/job.py`) |
 | `graph_verify` | Bounded verification request against an expected fingerprint or barrier | `checkpoint` | Bounded verification request | C-032 | Specified, not yet available |
 | `graph_version` | Selected components and their compatibility | `read` | none | C-033 | Specified, not yet available |
 
@@ -87,6 +87,147 @@ control plane is `DAEMON_UNAVAILABLE` with `retryable: true`.
   "project_ids": ["auth-api"],
   "job": {"job_id": "job-0007", "state": "PENDING", "target_event_seq": 12, "retry_after_ms": 250},
   "publication": null,
+  "warnings": []
+}
+```
+
+## `graph_job` request and answer
+
+``graph_job`` takes `job_id`, an optional `action` of `status` (default) or `cancel`, and an
+optional `wait_ms` bounded to `0..30000`. The request is closed; `job_id` must match
+`^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}# MCP tools and response reference
+
+Owner: `axiom-mcp`. Normative sources live in `axiom-specs`:
+`repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md` sections 2, 4, 5, 6, 7 and 9 define the
+transport, the tool catalog and the `graph_query` contract;
+`contracts/schemas/query-request.schema.json` and
+`contracts/schemas/query-response.schema.json` define the request and response shapes;
+`contracts/control-api-v1.md` fixes the canonical codes and their HTTP status;
+`contracts/redaction-policy.md` fixes what may cross the response boundary. This page is a
+reference for that contract, not a record of a running gateway.
+
+**Status: the tool layer is landing task by task.** The tree contains the transports, the
+error model, the native guard engine, the registry, the manifest validator, the bounded
+query engine and the CLI. `src/axiom_mcp/tools/` now exists: `catalog.py` holds the
+canonical six-tool catalog, `context.py` holds the closed-argument parser and the
+re-authorizing `ToolContext`, `status.py` implements `graph_status`, `query.py` implements the
+`graph_query` dispatcher, `reconcile.py` implements `graph_reconcile` and `job.py` implements
+`graph_job`. The rows below record which tools are real at this revision; every remaining shape is a **contract, not an
+observation**, until the registering task named in the catalog lands.
+
+## Transports
+
+| Surface | Channel | Contract this revision relies on |
+| --- | --- | --- |
+| Streamable HTTP | `POST /mcp` | The official SDK transport mounted at an exact path with no redirect; a real `initialize` handshake, event stream and session id. See [http-transport.md](../http-transport.md). |
+| stdio | process stdin/stdout | Protocol frames on stdout only; every diagnostic on stderr with no banner. See [stdio-transport.md](../stdio-transport.md). |
+| Health | `GET /healthz` | Minimal process health. It makes **no** readiness claim. |
+| Readiness | `GET /readyz` | Query and control availability, reported separately; `503` with `NOT_READY` while a plane is down. |
+
+A plain REST route that returns a hand-written `initialize`-shaped body is not a transport.
+The two supported surfaces carry the same query core, so an HTTP client and a stdio client
+must receive equivalent results for the same request.
+
+## Tool catalog
+
+Tool names and the capability each requires are fixed by
+`repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md` section 4 and transcribed in
+`src/axiom_mcp/security.py`. An unknown tool name is treated as a read at the transport
+boundary, so the catalog owner answers `NOT_FOUND` rather than the boundary widening
+access.
+
+| Tool | Purpose | Capability | Side effect | Registered by | Status |
+| --- | --- | --- | --- | --- | --- |
+| `graph_status` | Solution/project freshness, coverage, generations, capabilities | `read` | none | C-028 | Implemented (`tools/status.py`) |
+| `graph_query` | Graph operation: `search`, `context`, `neighbors`, `callers`, `dependencies`, `impact`, `path`, `changes` | `read` | none | C-029 | Implemented (`tools/query.py`) |
+| `graph_reconcile` | Enqueue a graphd reconcile job for a scope | `reconcile` | Enqueue graphd job | C-030 | Implemented (`tools/reconcile.py`) |
+| `graph_job` | Job status or explicit cancel | `reconcile` | Status read; `cancel` is an explicit write | C-031 | Implemented (`tools/job.py`) |
+| `graph_verify` | Bounded verification request against an expected fingerprint or barrier | `checkpoint` | Bounded verification request | C-032 | Specified, not yet available |
+| `graph_version` | Selected components and their compatibility | `read` | none | C-033 | Specified, not yet available |
+
+`graph_reconcile`, `graph_job` and `graph_verify` are the mutation paths. They reach beyond
+the read-only plane and the gateway re-authorizes the incoming capability instead of
+inheriting admin authority. Update, bootstrap and install are deliberately **not** MCP
+tools: they travel through the CLI or the skill workflow, so no MCP tool downloads or
+executes an update by default.
+
+## `graph_reconcile` request and answer
+
+``graph_reconcile`` is the first mutation path. The seed's input set is `solution, projects,
+scope, wait_timeout_ms, reason`; this revision accepts `project_id`/`project_ids` for `projects`,
+keeps the request closed (an unexpected key is a `VALIDATION_ERROR`), and is deliberately
+*stricter* than the transport contract in one place: an audit `reason` is required, at most 200
+characters.
+
+| Field | Rule |
+| --- | --- |
+| `solution_id` | Required identifier. The token must carry `reconcile`; an invisible solution is `NOT_FOUND`. |
+| `scope` | `dirty` (default), `project` or `full`. `project` requires an explicit project selector; `full` is explicit owner-authorized work. |
+| `project_id` / `project_ids` | Only with `scope=project`. Validated against the registry and the token's project scope, so an unknown project is `NOT_FOUND`. |
+| `reason` | Required, non-empty, at most 200 characters. It travels to the daemon's journal and is never echoed back. |
+| `wait_timeout_ms` | `0`-30000, default `0`. Long parsing never holds the request open by default. |
+
+The tool does not read a snapshot, parse a source file or write a shard: it authorizes, hands the
+request to the `ControlPlane` protocol, and projects the daemon's answer through a closed
+allowlist. A `202`-style answer is reported as `job` with exactly `{job_id, state,
+target_event_seq, retry_after_ms}`; the `state` must be one of the `job.schema.json` enum values,
+so a non-conformant daemon is `DAEMON_UNAVAILABLE` rather than being echoed through. A
+`200`-style answer (an existing verified publication already satisfies the barrier) is reported
+as `publication` with `{catalog_generation_id, verification, dirty}`. An unreachable or unusable
+control plane is `DAEMON_UNAVAILABLE` with `retryable: true`.
+
+```json
+{
+  "schema_version": 1,
+  "solution_id": "alpha",
+  "scope": "project",
+  "project_ids": ["auth-api"],
+  "job": {"job_id": "job-0007", "state": "PENDING", "target_event_seq": 12, "retry_after_ms": 250},
+  "publication": null,
+  "warnings": []
+}
+```
+
+, so a path-shaped id never reaches the daemon.
+
+Three properties are enforced here rather than delegated:
+
+- **The handler makes exactly one control-plane call.** It never loops and never sleeps, so a
+  client cannot make the gateway spin on a queue; the daemon owns waiting. A test counts the
+  recorded calls.
+- **Job ownership is verified on the answer.** The job's `solution_id` must be visible to the
+  token and registered locally; otherwise the answer is `NOT_FOUND`, the same answer an unknown
+  job gets, so job ids are not an enumeration oracle.
+- **Cancel is capability-checked before the daemon.** A caller without `reconcile` gets
+  `FORBIDDEN` and no control-plane call is made. A `status` read cannot be refused that early -
+  the daemon is the only party that knows who owns the job - so ownership for a read is enforced
+  on the answer instead. `wait_ms` with `action=cancel` is a `VALIDATION_ERROR`: a cancel is
+  idempotent and does not wait.
+
+The answer is `{schema_version, action, solution_id, job, warnings}`. The `job` object carries the
+`job.schema.json` fields plus `retry_after_ms`, a `terminal` boolean derived from the state, and
+`progress` restricted to the documented progress units (`units_done`, `units_total`,
+`projects_done`, `projects_total`, `files_scanned`, `shards_written`). A percentage field is
+dropped and named in `warnings` (`percentage_not_carried:<key>`), because
+`contracts/control-api-v1.md` says not to invent percentages. A state outside the schema enum is
+`DAEMON_UNAVAILABLE` rather than echoed through.
+
+```json
+{
+  "schema_version": 1,
+  "action": "status",
+  "solution_id": "alpha",
+  "job": {
+    "job_id": "job-0001",
+    "kind": "ParseBatch",
+    "state": "RUNNING",
+    "solution_id": "alpha",
+    "attempt": 0,
+    "fence": 3,
+    "target_event_seq": 41,
+    "terminal": false,
+    "progress": {"units_done": 3, "shards_written": 2}
+  },
   "warnings": []
 }
 ```
@@ -400,8 +541,8 @@ the old identity.
   `graph_status` and `graph_query` are implemented, but the handlers are not yet wired into
   the SDK's tool registration, so a client that lists tools still sees an empty catalog.
   Registration is part of the remaining C-030..C-035 work.
-- **`graph_version`, `graph_job`, `graph_verify`.** Each is specified and unobservable at this
-  revision; `graph_status`, `graph_query` and `graph_reconcile` are real.
+- **`graph_version` and `graph_verify`.** Each is specified and unobservable at this revision;
+  `graph_status`, `graph_query`, `graph_reconcile` and `graph_job` are real.
 - **The `changes` diff detail.** `graph_query` carries head-side added and modified facts;
   the removed facts and the engine's per-kind totals are not part of the envelope. The
   bundled `demo-solution` declares no schema major, so `changes` legitimately answers
@@ -411,16 +552,16 @@ the old identity.
   component that computes them (C-027) is not implemented.
 - **Cursors and byte-budget packing.** Specified in C-026 and C-025; not implemented, so
   `next_cursor`, `truncated` and the budget behaviour are contract-only.
-- **The daemon control plane.** `graph_reconcile` delegates through the `ControlPlane`
-  protocol and is covered by tests against that boundary, but the concrete graphd client, its
-  audience handling and its bounded retries (C-034) are not in this repository and are
-  unverified here. `graph_job` and `graph_verify` are not implemented yet.
+- **The daemon control plane.** `graph_reconcile` and `graph_job` delegate
+  through the `ControlPlane` protocol and are covered by tests against that boundary, but the
+  concrete graphd client, its audience handling and its bounded retries (C-034) are not in this
+  repository and are unverified here. `graph_verify` is not implemented yet.
 - **Readiness inputs.** `/readyz` reports the query and control planes; at this revision the
   default reports both unavailable rather than claiming readiness the gateway has not
   earned.
 
 Verified at this revision: the transports, the error model, the capability map and the
-`graph_status`, `graph_query` and `graph_reconcile` handlers are real and covered by tests, exercised against
-the shipped
+`graph_status`, `graph_query`, `graph_reconcile` and `graph_job` handlers are real and covered by
+tests, exercised against the shipped
 `demo-solution` bundle, the real registry and the real native guard. No tool call has been
 observed through a running gateway, because tool registration is not wired yet.
