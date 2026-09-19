@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+- **C-036** Add `release/package.py`, the versioned-environment packager for `axiom-mcp`.
+  It stages a built artifact under an install root, creates one isolated virtual
+  environment per version, installs the artifact with no network and no dependency
+  resolution (`pip install --no-index --no-deps`), and records exactly what the
+  environment contained - artifact name, size and SHA256, interpreter and the
+  `pip freeze --all` set - in a per-version `lockfile.json`. `rollback` is deliberately
+  narrow: it picks an explicit version or the previous install from `history.jsonl`,
+  proves the staged artifact still hashes to the locked digest, recreates the venv or
+  reinstalls the artifact if the frozen set has drifted (recording the repair), refuses
+  with `environment_not_restored` if the frozen set still does not match, and only then
+  moves `current.json`. A moved install root is still recognised as the same environment
+  because frozen direct-URL lines are compared with the absolute directory stripped.
+  Mutations are confined to the install root, and the running interpreter and the
+  package own source tree are refused up front through the same guard the update planner
+  uses. AC1 is proven on this host with the real thing in `tests/test_release_package.py`:
+  two wheels built by the real build backend, installed by the real pip into two isolated
+  venvs, each venv own interpreter observed to import its own build, then a real rollback
+  restoring the earlier version; the drift, tamper, missing-target and failure-boundary
+  legs are driven by a scripted runner and are recorded as scripted, not as real pip
+  runs. Documentation in `docs/release-packaging.md`.
 - **C-035** Implement readiness and guard-releasing shutdown in `src/axiom_mcp/lifecycle.py`,
   and make the HTTP transport reuse those types instead of its own copy. Readiness is not health:
   `Lifecycle.readiness()` refuses to report ready until the SDK is initialized and the query
