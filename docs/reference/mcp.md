@@ -605,9 +605,17 @@ the old identity.
   behaviour are covered by tests over `httpx.MockTransport`, but no real daemon was reached from
   this repository, so its wire shapes are verified against `contracts/control-api-v1.md` rather
   than against a running graphd.
-- **Readiness inputs.** `/readyz` reports the query and control planes; at this revision the
-  default reports both unavailable rather than claiming readiness the gateway has not
-  earned.
+- **Readiness inputs.** `/readyz` reports the query and control planes separately, and the
+  readiness decision now comes from `src/axiom_mcp/lifecycle.py` (C-035): the SDK must be
+  initialized and the query plane usable before a gateway reports ready, an optional query
+  probe may supply or withhold that availability, and a probe that raises is reported as
+  unavailable rather than treated as up. The transport-only default still reports both planes
+  unavailable rather than claiming readiness the gateway has not earned. Shutdown is bounded:
+  in-flight queries are given a deadline, and when it expires the remaining work is counted as
+  cancelled and the guard is released anyway, so a restart cannot inherit a stranded lock.
+  That guard-release leg is covered by a test that drives the real native guard. Control-plane
+  availability is recorded by the caller with `mark_control_available`; it is not yet derived
+  from a running daemon.
 
 Verified at this revision: the transports, the error model, the capability map and the
 `graph_status`, `graph_query`, `graph_reconcile`, `graph_job`, `graph_verify` and

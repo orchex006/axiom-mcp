@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- **C-035** Implement readiness and guard-releasing shutdown in `src/axiom_mcp/lifecycle.py`,
+  and make the HTTP transport reuse those types instead of its own copy. Readiness is not health:
+  `Lifecycle.readiness()` refuses to report ready until the SDK is initialized and the query
+  plane is usable, keeps the query and control planes distinct, and lets an optional query probe
+  decide the query plane - a probe that raises is reported as `query_probe_failed:<Type>` rather
+  than being swallowed as availability. `Lifecycle.query()` is the single admission point: it takes
+  the real native guard through `guard.reader()` and releases it in the same `with` block, so a
+  query that completes, raises, or is cut short leaves no lock behind. `drain()` waits a bounded
+  time for in-flight queries and, when the budget expires, counts the remainder as cancelled and
+  releases the guard anyway; `shutdown()` drains once, releases everything and is idempotent.
+  Out-of-range drain budgets are refused with `LIMIT_EXCEEDED` instead of being silently clamped.
+  AC1's guard leg is proven with the real `SolutionGuard` on this filesystem: a query is admitted in
+  a thread, shutdown runs while it is in flight, and the test asserts the guard ends with
+  `held_names == ()` - no stranded lock.
 - **C-034** Implement the concrete graphd control client in `src/axiom_mcp/control_client.py`.
   It is a bounded synchronous client for `contracts/control-api-v1.md` and the production
   implementation of the `ControlPlane` protocol the delegation tools already use. AC1's audience

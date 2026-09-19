@@ -39,6 +39,12 @@ from fastapi.responses import JSONResponse
 from mcp.server.fastmcp import FastMCP
 
 from axiom_mcp import sdk_compat, version
+from axiom_mcp.lifecycle import (
+    NOT_READY,
+    ComponentReadiness,
+    ReadinessReport,
+    default_readiness,
+)
 
 MCP_ENDPOINT_PATH = "/mcp"
 HEALTH_PATH = "/healthz"
@@ -49,10 +55,6 @@ LOOPBACK_BIND_HOSTS: frozenset[str] = frozenset({"127.0.0.1", "::1", "localhost"
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
-
-# Canonical error code from contracts/error-codes.json: the process is up but a
-# required capability is not available yet.
-NOT_READY = "NOT_READY"
 
 # The SDK requires a client to accept *both* representations; a client that only
 # accepts JSON is refused with HTTP 406 rather than silently downgraded.
@@ -139,54 +141,6 @@ class HttpTransportSettings:
     @property
     def loopback_only(self) -> bool:
         return is_loopback_host(self.host)
-
-
-@dataclass(frozen=True)
-class ComponentReadiness:
-    """One plane's availability, reported separately from the other."""
-
-    name: str
-    available: bool
-    detail: str | None = None
-
-    def as_dict(self) -> dict[str, Any]:
-        payload: dict[str, Any] = {"available": self.available}
-        if self.detail is not None:
-            payload["detail"] = self.detail
-        return payload
-
-
-@dataclass(frozen=True)
-class ReadinessReport:
-    """Query and control readiness, kept distinct on purpose."""
-
-    query: ComponentReadiness
-    control: ComponentReadiness
-
-    @property
-    def ready(self) -> bool:
-        return self.query.available and self.control.available
-
-    def as_dict(self) -> dict[str, Any]:
-        return {
-            "ready": self.ready,
-            "query": self.query.as_dict(),
-            "control": self.control.as_dict(),
-            "error": None if self.ready else NOT_READY,
-        }
-
-
-def default_readiness() -> ReadinessReport:
-    """Transport-only default: the process serves, but no data plane is wired.
-
-    A later task owns the real probes. This default reports unavailable rather
-    than assuming a capability exists, so ``/readyz`` cannot claim readiness the
-    gateway has not earned.
-    """
-    return ReadinessReport(
-        query=ComponentReadiness("query", False, "query data plane not wired"),
-        control=ComponentReadiness("control", False, "graphd control client not wired"),
-    )
 
 
 @dataclass
