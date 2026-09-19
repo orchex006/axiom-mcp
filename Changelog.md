@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- **V2-016** Add `src/axiom_mcp/paths.py`, the boundary where a *wire path* and a *native binding*
+  are normalized by two different rules. A wire path is a repository-relative UTF-8 reference with
+  `/` separators, validated lexically with no filesystem access, so a traversal, drive-qualified,
+  UNC, device, backslash, control-character, alternate-data-stream `:`, trailing dot/space or
+  Windows-reserved component (the CP-03 default portable profile) is refused before any file is
+  opened. A native binding is an absolute path of this host, normalized natively - `..` and
+  symbolic links are resolved, and the portable profile is deliberately *not* applied to it, so a
+  legitimate directory that happens to be named `con` is bound rather than refused. Neither
+  function accepts the other's input, and a wire path is never resolved against the working
+  directory. `resolve_wire_path` joins them in a fixed order and checks containment on the
+  *resolved* paths, never on a string prefix; `registry.SnapshotLocation.resolve` and
+  `registry.CatalogLocation.resolve` - the only places a caller- or manifest-supplied reference
+  becomes a file path - now delegate to it, so a reader refuses an injection before opening a file.
+  `registry.portable_relative` keeps the frozen manifest pattern unchanged, including its
+  acceptance of `a//b` and `a/./b`. Documented in `docs/portable-paths.md`; 52 regression legs in
+  `tests/test_paths.py` (positive, negative and failure-boundary) include a symlink escape that is
+  refused after native resolution and a negative table driven with a nonexistent root, which is what
+  proves the refusal is lexical and precedes any filesystem access. Native reparse-point/ACL
+  behaviour on Windows and macOS remains `not_run` here.
 - **C-036** Add `release/package.py`, the versioned-environment packager for `axiom-mcp`.
   It stages a built artifact under an install root, creates one isolated virtual
   environment per version, installs the artifact with no network and no dependency
