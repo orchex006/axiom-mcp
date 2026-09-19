@@ -2,7 +2,16 @@
 
 ## Unreleased
 
-- **C-021** Implement cross-project caller lookup. Add `src/axiom_mcp/query/callers.py` and
+- **C-022** Implement conservative impact closure. Add `src/axiom_mcp/query/impact.py` and
+  `tests/test_query_impact.py`. `impact` is the bounded reverse closure of a target, split into
+  `proven` (reachable only through exact/annotated edges) and `potential` (everything else, kept
+  but labelled), because section 5 requires conservative static impact rather than an authoritative
+  answer. `exhaustive` is true only when nothing cut the view: a depth bound (probed one hop
+  further, or admitted at the maximum depth), a `max_nodes`/`max_edges` stop, an unpinned member,
+  an unresolved reference naming a closure node, and a searched project whose pinned coverage is
+  not `complete` each force it false with a named reason. The shared `bounded_walk` gained an
+  optional `resolutions` filter, and `model.unresolved_references` now backs both this operation
+  and C-021's caller lookup.- **C-021** Implement cross-project caller lookup. Add `src/axiom_mcp/query/callers.py` and
   `tests/test_query_callers.py`, and record unpinned members on `GraphSet` (`missing_projects`,
   `searched_projects`) in `src/axiom_mcp/query/model.py`. A caller is found by the *global*
   reverse index `GraphSet` builds over every pinned member, so a call from another project is not

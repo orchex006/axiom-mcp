@@ -728,6 +728,33 @@ class GraphSet:
         return tied[0]
 
 
+def unresolved_references(
+    scope: Graph | GraphSet | Iterable[Graph], node: Node
+) -> tuple[Edge, ...]:
+    """Pinned unresolved edges whose ``unresolved_target`` names ``node``.
+
+    An unresolved edge carries no target id, so the reverse index cannot file it under the node it
+    refers to and an incoming walk can never reach it. Reporting these separately is what keeps a
+    "no callers" or "no impact" answer honest: a reference the generation could not resolve *may*
+    be exactly the caller or the impacted node that is missing from the resolved closure.
+
+    The match is the folded name, the folded qualified name, or a dotted suffix of the qualified
+    name, so ``Legacy.Caller`` also names ``Caller``. The comparison is deterministic and case
+    insensitive because a qualified reference is written by a parser, not by a person.
+    """
+    pinned = as_graph_set(scope)
+    folded_name = node.name.casefold()
+    folded_qualified = node.qualified_name.casefold()
+    found: list[Edge] = []
+    for edge in pinned.edges():
+        if edge.resolved:
+            continue
+        named = (edge.unresolved_target or "").casefold()
+        if named in (folded_name, folded_qualified) or named.endswith(f".{folded_name}"):
+            found.append(edge)
+    return tuple(found)
+
+
 def as_graph_set(scope: Graph | GraphSet | Iterable[Graph]) -> GraphSet:
     """Normalise the scope argument every query operation accepts."""
     if isinstance(scope, GraphSet):
@@ -765,11 +792,31 @@ def _other_end(edge: Edge, node_id: str, direction: str) -> str | None:
     return None
 
 
-def _incident(
-    pinned: GraphSet, node_id: str, direction: str, kinds: tuple[str, ...] | None
+def _restrict_resolutions(
+    edges: Iterable[Edge], resolutions: frozenset[str] | None
 ) -> tuple[Edge, ...]:
-    outgoing = pinned.outgoing(node_id, kinds) if direction in ("outgoing", "both") else ()
-    incoming = pinned.incoming(node_id, kinds) if direction in ("incoming", "both") else ()
+    if resolutions is None:
+        return tuple(edges)
+    return tuple(edge for edge in edges if edge.resolution in resolutions)
+
+
+def _incident(
+    pinned: GraphSet,
+    node_id: str,
+    direction: str,
+    kinds: tuple[str, ...] | None,
+    resolutions: frozenset[str] | None = None,
+) -> tuple[Edge, ...]:
+    outgoing = (
+        _restrict_resolutions(pinned.outgoing(node_id, kinds), resolutions)
+        if direction in ("outgoing", "both")
+        else ()
+    )
+    incoming = (
+        _restrict_resolutions(pinned.incoming(node_id, kinds), resolutions)
+        if direction in ("incoming", "both")
+        else ()
+    )
     if direction == "outgoing":
         return tuple(sorted(outgoing, key=lambda edge: (edge.kind, edge.id)))
     if direction == "incoming":
@@ -816,6 +863,7 @@ def bounded_walk(
     depth: int | None = None,
     direction: str | None = None,
     edge_kinds: Sequence[str] | None = None,
+    resolutions: Sequence[str] | None = None,
     max_nodes: int | None = None,
     max_edges: int | None = None,
 ) -> Walk:
@@ -841,6 +889,12 @@ def bounded_walk(
     edge_budget = bounded_int(
         max_edges, "max_edges", low=0, high=MAX_EDGES, default=DEFAULT_MAX_EDGES
     )
+    allowed_resolutions: frozenset[str] | None = None
+    if resolutions is not None:
+        selected_resolutions = choice_list(resolutions, "resolutions", RESOLUTIONS)
+        if not selected_resolutions:
+            raise LimitRejected("resolutions must name at least one resolution")
+        allowed_resolutions = frozenset(selected_resolutions)
 
     ordered_roots: list[str] = []
     for root in roots:
@@ -868,7 +922,7 @@ def bounded_walk(
             break
         discovered: list[str] = []
         for node_id in current:
-            for edge in _incident(pinned, node_id, heading, kinds):
+            for edge in _incident(pinned, node_id, heading, kinds, allowed_resolutions):
                 known = edge.id in walked or edge.id in unresolved
                 if not known and len(walked) + len(unresolved) >= edge_budget:
                     reasons.add("max_edges")

@@ -92,3 +92,19 @@ An empty caller list with `complete` false reads "none found in what was searche
 callers exist". An unresolved edge names the target by text and so cannot be filed in the reverse
 index; it is reported in `unresolved` and never followed or counted. `edge_kinds` defaults to every
 pinned kind except `CONTAINS`, because a container is not a caller.
+## Impact (C-022)
+
+`impact` returns the bounded reverse closure of a target - what has to be re-examined if the target
+changes. It is conservative, and it says so. `nodes` is the closure; `proven` is the subset
+reachable through edges whose resolution is exact or annotated; `potential` is the rest, kept
+because a reader wants the wider net but labelled because it rests on inference. The direction is
+incoming-only: the target's own dependencies are not impact.
+
+Nothing about the answer is allowed to read as exhaustive unless it is. `exhaustive` is true only
+when every one of these held: the depth bound was probed one hop further and found no more (at the
+maximum depth of 8 the bound is admitted as limiting), no node or edge budget stopped expansion, no
+member the caller named is unpinned, no unresolved edge names a node in the closure, and every
+searched project's pinned coverage is `complete`. Otherwise `exhaustive` is false and
+`incomplete_reasons` names what cut the view (`depth_limited`, `truncated`, `missing_members`,
+`unresolved_edges`, `coverage_not_complete`). The result is static potential impact: not proof of
+runtime damage, and not proof that no other node is impacted.

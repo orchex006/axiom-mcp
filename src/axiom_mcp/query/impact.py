@@ -1,27 +1,26 @@
-"""C-021: cross-project caller lookup over every pinned member of the scope.
+"""C-022: a conservative, bounded impact closure that never claims to be exhaustive.
 
-``repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md`` section 5 requires that a caller lookup answer the
-whole pinned scope, and warns that a partial impact view is not proof of the absence of other
-callers. A caller is exactly the case where a *local* lookup looks complete and is wrong: the only
-caller of an endpoint often lives in another project, and a per-project reverse index would return
-an empty list with full confidence.
+``repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md`` section 5 is explicit twice over: a traversal runs
+under a visited set and hard budgets, and "partial impact is static potential impact, not proof of
+runtime damage or of absence of other callers". A closure that returned a tidy node list would
+invite the reader to treat it as the answer, so this operation separates three things:
 
-So this operation is defined against the whole :class:`~axiom_mcp.query.model.GraphSet`:
+* the **closure** - every pinned node that reaches the target through the requested edge kinds
+  within the depth and budgets. It is incoming-only, because impact flows from the changed symbol
+  back to what depends on it;
+* the **proven** subset of that closure, reachable through edges whose ``resolution`` is exact or
+  annotated (:data:`~axiom_mcp.query.model.STATIC_RESOLUTIONS`). Everything else is **potential**:
+  it is included conservatively - a reader wants the wider net - but it is *labelled* as resting on
+  inference, so nobody mistakes it for a proven dependency;
+* the **incompleteness** of the whole answer. ``exhaustive`` is true only when nothing cut the view:
+  no budget truncated the walk, no member the caller named is unpinned, no unresolved reference
+  names a node in the closure, and every searched project's pinned coverage is ``complete``. Any
+  one of those makes ``exhaustive`` false and names the reason, so a bounded traversal can never be
+  read as exhaustive.
 
-* the reverse index it walks is the global one ``GraphSet`` builds over *every* pinned member -
-  each member's incoming edges are indexed under their target id regardless of which project holds
-  the source, so a call from another member is found, not missed;
-* ``searched_projects`` names every member the answer actually read, and ``cross_project`` names
-  the members that contributed a caller from outside the target's own project;
-* ``missing_projects`` carries members the caller named that this scope does not pin. When it is
-  non-empty, ``complete`` is false and a warning says the absence is not proven. An empty caller
-  list with ``complete`` false therefore reads as "none found in what was searched", never as "no
-  callers exist" - which is precisely the misreading the contract forbids.
-
-``direction`` is not a parameter here: a caller is by definition at the *source* of an edge that
-reaches the target, so the walk is incoming-only. ``edge_kinds`` defaults to every pinned kind
-except ``CONTAINS``, because a container is not a caller. A budget that stops the walk, an
-unresolved incoming edge, and an unpinned member all make the answer incomplete rather than empty.
+An unresolved edge that names a closure node is the sharpest case: it has no target id, so the
+incoming walk cannot reach it, yet it may be exactly the impacted node that is missing. It is
+reported in ``unresolved`` and forces ``exhaustive`` false rather than silently disappearing.
 """
 
 from __future__ import annotations
@@ -30,13 +29,13 @@ from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from axiom_mcp.query.callers import CALLER_KINDS
 from axiom_mcp.query.context import (
     DEFAULT_PROJECTION,
     normalise_projection,
     project_node,
 )
 from axiom_mcp.query.model import (
-    CONTAINS,
     DEFAULT_DEPTH,
     DEFAULT_MAX_EDGES,
     DEFAULT_MAX_NODES,
@@ -44,6 +43,7 @@ from axiom_mcp.query.model import (
     MAX_DEPTH,
     MAX_EDGES,
     MAX_NODES,
+    STATIC_RESOLUTIONS,
     Graph,
     GraphSet,
     TargetAmbiguous,
@@ -55,20 +55,19 @@ from axiom_mcp.query.model import (
     unresolved_references,
 )
 
-#: Every pinned edge kind except containment: a container is not a caller.
-CALLER_KINDS = tuple(sorted(EDGE_KINDS - {CONTAINS}))
-
 STATUS_OK = "ok"
 STATUS_AMBIGUOUS_TARGET = "ambiguous_target"
 
-_INCOMPLETE_MISSING = "missing_members"
 _INCOMPLETE_TRUNCATED = "truncated"
+_INCOMPLETE_DEPTH = "depth_limited"
+_INCOMPLETE_MISSING = "missing_members"
 _INCOMPLETE_UNRESOLVED = "unresolved_edges"
+_INCOMPLETE_COVERAGE = "coverage_not_complete"
 
 
 @dataclass(frozen=True)
-class CallersResult:
-    """The bounded reverse-closure answer for one target, with the scope it actually read."""
+class ImpactResult:
+    """The conservative reverse closure, split into proven and potential and labelled bounded."""
 
     target: str | None
     status: str
@@ -77,6 +76,8 @@ class CallersResult:
     edge_kinds: tuple[str, ...]
     depth: int
     nodes: tuple[Mapping[str, Any], ...]
+    proven: tuple[str, ...]
+    potential: tuple[str, ...]
     edges: tuple[Mapping[str, Any], ...]
     unresolved: tuple[Mapping[str, Any], ...]
     candidates: tuple[Mapping[str, Any], ...]
@@ -84,13 +85,13 @@ class CallersResult:
     per_project: Mapping[str, int]
     searched_projects: tuple[str, ...]
     missing_projects: tuple[str, ...]
-    cross_project: tuple[str, ...]
+    coverage: Mapping[str, str]
     visited: int
     depth_reached: int
     truncated: bool
     reasons: tuple[str, ...]
     frontier: tuple[str, ...]
-    complete: bool
+    exhaustive: bool
     incomplete_reasons: tuple[str, ...]
     warnings: tuple[str, ...]
 
@@ -104,6 +105,8 @@ class CallersResult:
             "depth": self.depth,
             "depth_reached": self.depth_reached,
             "nodes": [dict(item) for item in self.nodes],
+            "proven": list(self.proven),
+            "potential": list(self.potential),
             "edges": [dict(item) for item in self.edges],
             "unresolved": [dict(item) for item in self.unresolved],
             "candidates": [dict(item) for item in self.candidates],
@@ -111,12 +114,12 @@ class CallersResult:
             "per_project": dict(self.per_project),
             "searched_projects": list(self.searched_projects),
             "missing_projects": list(self.missing_projects),
-            "cross_project": list(self.cross_project),
+            "coverage": dict(self.coverage),
             "visited": self.visited,
             "truncated": self.truncated,
             "reasons": list(self.reasons),
             "frontier": list(self.frontier),
-            "complete": self.complete,
+            "exhaustive": self.exhaustive,
             "incomplete_reasons": list(self.incomplete_reasons),
             "warnings": list(self.warnings),
         }
@@ -129,7 +132,7 @@ def _per_kind(edges: Iterable[Any]) -> Mapping[str, int]:
     return counts
 
 
-def callers(
+def impact(
     scope: Graph | GraphSet | Iterable[Graph],
     target: str,
     *,
@@ -139,14 +142,8 @@ def callers(
     projection: Sequence[str] | None = DEFAULT_PROJECTION,
     max_nodes: int | None = None,
     max_edges: int | None = None,
-) -> CallersResult:
-    """Return the pinned nodes that reach ``target``, searching every pinned member.
-
-    ``project_ids`` narrows the search only when the caller asks: the default is the whole pinned
-    scope, because narrowing to the target's own project is exactly the mistake this operation
-    exists to prevent. A narrowed search still reports ``searched_projects`` and any member it was
-    told to search but does not pin.
-    """
+) -> ImpactResult:
+    """Return the bounded reverse closure of ``target``, labelled with how complete it is."""
     pinned = narrow_scope(as_graph_set(scope), project_ids)
     sections = normalise_projection(projection)
     hops = bounded_int(depth, "depth", low=0, high=MAX_DEPTH, default=DEFAULT_DEPTH)
@@ -160,18 +157,21 @@ def callers(
 
     searched = pinned.searched_projects
     missing = pinned.missing_projects
+    coverage = {pid: pinned.graph(pid).coverage_status for pid in searched}
 
     try:
         resolved = pinned.resolve(target)
     except TargetAmbiguous as ambiguous:
-        return CallersResult(
+        return ImpactResult(
             target=None,
             status=STATUS_AMBIGUOUS_TARGET,
-            operation="callers",
+            operation="impact",
             direction="incoming",
             edge_kinds=tuple(kinds),
             depth=hops,
             nodes=(),
+            proven=(),
+            potential=(),
             edges=(),
             unresolved=(),
             candidates=tuple(
@@ -182,14 +182,14 @@ def callers(
             per_project={},
             searched_projects=searched,
             missing_projects=missing,
-            cross_project=(),
+            coverage=coverage,
             visited=0,
             depth_reached=0,
             truncated=False,
             reasons=(),
             frontier=(),
-            complete=False,
-            incomplete_reasons=(_INCOMPLETE_MISSING,) if missing else ("ambiguous_target",),
+            exhaustive=False,
+            incomplete_reasons=("ambiguous_target",),
             warnings=(
                 f"ambiguous_target: {len(ambiguous.candidate_ids)} pinned nodes match "
                 f"{target!r}; candidates are returned instead of one pick",
@@ -205,57 +205,110 @@ def callers(
         max_nodes=node_budget,
         max_edges=edge_budget,
     )
-
-    named_unresolved = unresolved_references(pinned, resolved)
-    unresolved_edges = (*walk.unresolved, *named_unresolved)
-
-    caller_nodes = tuple(node for node in walk.nodes if node.id != resolved.id)
-    per_project: dict[str, int] = {}
-    for node in caller_nodes:
-        per_project[node.project_id] = per_project.get(node.project_id, 0) + 1
-    cross_project = tuple(
-        sorted(project for project in per_project if project != resolved.project_id)
+    exact_walk = bounded_walk(
+        pinned,
+        (resolved.id,),
+        depth=hops,
+        direction="incoming",
+        edge_kinds=tuple(kinds),
+        resolutions=tuple(sorted(STATIC_RESOLUTIONS)),
+        max_nodes=node_budget,
+        max_edges=edge_budget,
     )
+
+    # A depth-bounded walk must never read as exhaustive: probe one hop further (or, at the
+    # maximum depth, admit that the bound cannot be shown to be the end) before saying so.
+    if hops >= MAX_DEPTH:
+        depth_limited = True
+    else:
+        deeper = bounded_walk(
+            pinned,
+            (resolved.id,),
+            depth=hops + 1,
+            direction="incoming",
+            edge_kinds=tuple(kinds),
+            max_nodes=node_budget,
+            max_edges=edge_budget,
+        )
+        depth_limited = len(deeper.nodes) > len(walk.nodes)
+
+    closure_nodes = tuple(node for node in walk.nodes if node.id != resolved.id)
+    proven_ids = tuple(sorted(node.id for node in exact_walk.nodes if node.id != resolved.id))
+    proven_set = set(proven_ids)
+    potential_ids = tuple(sorted(node.id for node in closure_nodes if node.id not in proven_set))
+
+    named_unresolved: dict[str, Any] = {}
+    for node in (resolved, *closure_nodes):
+        for edge in unresolved_references(pinned, node):
+            named_unresolved.setdefault(edge.id, edge)
+    unresolved_edges = (
+        *walk.unresolved,
+        *(named_unresolved[key] for key in sorted(named_unresolved)),
+    )
+
+    per_project: dict[str, int] = {}
+    for node in closure_nodes:
+        per_project[node.project_id] = per_project.get(node.project_id, 0) + 1
 
     incomplete: list[str] = []
     warnings: list[str] = []
-    if missing:
-        incomplete.append(_INCOMPLETE_MISSING)
+    if depth_limited:
+        incomplete.append(_INCOMPLETE_DEPTH)
         warnings.append(
-            f"incomplete_search: {len(missing)} requested member(s) are not pinned in this scope "
-            f"({', '.join(missing)}); an empty or short caller list is not proof there are no "
-            "callers"
+            f"depth_limited: the closure stops at depth {hops} and more nodes reach the target "
+            "beyond it; raise depth (maximum 8) to widen the view"
         )
     if walk.truncated:
         incomplete.append(_INCOMPLETE_TRUNCATED)
         warnings.append(
-            f"truncated: expansion stopped at {'/'.join(walk.reasons)}; more callers may exist "
-            "beyond the searched region"
+            f"truncated: expansion stopped at {'/'.join(walk.reasons)}; the closure beyond that "
+            "point was not seen"
+        )
+    if missing:
+        incomplete.append(_INCOMPLETE_MISSING)
+        warnings.append(
+            f"incomplete_scope: {len(missing)} requested member(s) are not pinned in this scope "
+            f"({', '.join(missing)}); a short closure is not proof there is no further impact"
         )
     if unresolved_edges:
         incomplete.append(_INCOMPLETE_UNRESOLVED)
         warnings.append(
-            f"unresolved_edges: {len(unresolved_edges)} pinned edge(s) name {resolved.name!r} "
-            "without a resolved source and were not followed; they may be callers this "
-            "generation cannot place"
+            f"unresolved_edges: {len(unresolved_edges)} pinned edge(s) name a node in this closure "
+            "without a resolved source and were not followed; they may add impact"
         )
-    if cross_project:
+    partial_coverage = tuple(
+        sorted(pid for pid, status in coverage.items() if status != "complete")
+    )
+    if partial_coverage:
+        incomplete.append(_INCOMPLETE_COVERAGE)
         warnings.append(
-            f"cross_project: {len(cross_project)} member(s) outside {resolved.project_id!r} hold "
-            f"callers of this node ({', '.join(cross_project)})"
+            f"coverage: {len(partial_coverage)} searched member(s) do not pin complete coverage "
+            f"({', '.join(partial_coverage)}); the graph itself may be missing nodes or edges"
         )
+    if potential_ids:
+        warnings.append(
+            f"potential: {len(potential_ids)} node(s) rest on non-exact edges and are kept "
+            "included; only `proven` is backed by exact or annotated resolutions"
+        )
+    warnings.append(
+        "not_exhaustive"
+        if incomplete
+        else "static_potential_impact: a bounded static closure, not proof of runtime damage"
+    )
 
-    return CallersResult(
+    return ImpactResult(
         target=resolved.id,
         status=STATUS_OK,
-        operation="callers",
+        operation="impact",
         direction="incoming",
         edge_kinds=tuple(kinds),
         depth=walk.depth,
         nodes=tuple(
             project_node(node, sections, coverage=pinned.graph(node.project_id).coverage_document())
-            for node in caller_nodes
+            for node in closure_nodes
         ),
+        proven=proven_ids,
+        potential=potential_ids,
         edges=tuple(edge.as_document() for edge in walk.edges),
         unresolved=tuple(edge.as_document() for edge in unresolved_edges),
         candidates=(),
@@ -263,22 +316,21 @@ def callers(
         per_project=per_project,
         searched_projects=searched,
         missing_projects=missing,
-        cross_project=cross_project,
+        coverage=coverage,
         visited=walk.visited,
         depth_reached=walk.depth_reached,
         truncated=walk.truncated,
         reasons=walk.reasons,
         frontier=walk.frontier,
-        complete=not incomplete,
+        exhaustive=not incomplete,
         incomplete_reasons=tuple(incomplete),
         warnings=tuple(warnings),
     )
 
 
 __all__ = [
-    "CALLER_KINDS",
     "STATUS_AMBIGUOUS_TARGET",
     "STATUS_OK",
-    "CallersResult",
-    "callers",
+    "ImpactResult",
+    "impact",
 ]
