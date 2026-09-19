@@ -28,6 +28,7 @@ from axiom_mcp.tools.query import graph_query
 from axiom_mcp.tools.reconcile import graph_reconcile
 from axiom_mcp.tools.status import graph_status
 from axiom_mcp.tools.verify import graph_verify
+from axiom_mcp.tools.version import graph_version
 
 __all__ = [
     "TOOL_SPECS",
@@ -42,6 +43,7 @@ __all__ = [
     "graph_reconcile",
     "graph_status",
     "graph_verify",
+    "graph_version",
     "names",
     "spec_for",
 ]

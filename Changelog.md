@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- **C-033** Register the `graph_version` tool in `src/axiom_mcp/tools/version.py`. The tool
+  reports selected components and their compatibility under the `read` capability and is the one
+  surface that can never act. AC1 is enforced by a tripwire rather than promised: a regression test
+  replaces `axiom_mcp.update.apply_plan` (and `delegation_argv`) with a function that fails the
+  test if it is reached, and asserts that a full call leaves it untouched while the handler exposes
+  no `install`/`apply` keyword. Compatibility reuses the same pin checker the CLI and the
+  runtime-pin test use, so `compatible` is true only when the checker returned no reason, and a
+  mismatch raises a `runtime_pin_mismatch` warning; `update` stays `not_checked` until
+  `check_update: true`, and then runs the read-only `update.check_update` and relays its fields
+  verbatim. A component this process cannot observe is reported as unobserved rather than guessed
+  (`axiom-graphd` only when a control client is wired to this process, `axiom-specs`/`axiom-skills`
+  as `not_observable_from_this_component`), an unknown component name is a `VALIDATION_ERROR`
+  naming `allowed`, and every answer carries `installation.implicit_install: false` with
+  `applies_via: cli_or_skill_workflow`. Adds 16 regression tests (positive, negative and
+  failure-boundary legs) in `tests/test_tools_version.py`.
 - **C-032** Register the `graph_verify` tool in `src/axiom_mcp/tools/verify.py`. The tool submits
   a bounded verification request through the `ControlPlane` protocol against an
   `expected_fingerprint` (64 hexadecimal characters) or a `target_event_seq` barrier, and reports
@@ -29,9 +44,8 @@
   Cancel is capability-checked `before` the daemon - a read-only token gets `FORBIDDEN` and the
   control plane is never called - while a `status` read has to ask the daemon who owns the job and
   therefore enforces ownership on the answer; the asymmetry is documented. The request is closed,
-  `job_id` must match `^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}# Changelog — axiom-mcp
-
- so a path-shaped id never reaches the
+  `job_id` must match `^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}`,
+  so a path-shaped id never reaches the
   daemon, `wait_ms` is bounded to `0..30000` and is refused on a cancel. The answer is projected
   through a closed allowlist: the `job.schema.json` fields plus `retry_after_ms`, a derived
   `terminal`, and `progress` restricted to the documented units - a percentage field is dropped
