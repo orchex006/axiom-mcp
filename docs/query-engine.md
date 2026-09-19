@@ -181,3 +181,36 @@ Re-resolving the identical binding is paging, not reuse. Two issues never collid
 includes a sequence, so the same request twice yields two distinct cursors. The query hash is
 key-order independent, `ttl_seconds` ranges 1..3600 (default 300), and an out-of-range ttl or an
 unparseable generation is refused, never clamped.
+
+## Response envelope (C-027)
+
+`build_envelope(...)` assembles the contract's success envelope and nothing else: `schema_version`,
+`solution_id`, `catalog_generation_id`, `project_generations`, `freshness`, `coverage`,
+`verification`, `nodes`, `edges`, `truncated`, `warnings`, plus `next_cursor` when paging. It never
+emits a `result`/`snapshot` wrapper, and a failed query does not come through here at all.
+
+**Exact generations.** `project_generations` lists the pinned members that answered the query, and
+`catalog_generation_id` is a digest over exactly those pairs, so the same set in any order yields
+the same id and a changed member generation yields a different one. A requested project that could
+not be pinned is never folded into the list - it is named in `warnings` and caps coverage at
+`partial`.
+
+**Freshness and coverage are separate.** A generation that is complete for the profile can still be
+stale, and a fresh generation can still be partial, so neither is derived from the other:
+
+| key | values |
+| --- | --- |
+| `freshness` | `fresh`, `stale`, `updating`, `unknown`, `invalid` |
+| `coverage` | `complete_for_profile`, `partial`, `unsupported` (the most limiting pinned member) |
+| `verification.mode` | `inventory_hash` (strongest), `watcher_hint`, `none` |
+
+The envelope only ever moves in the conservative direction:
+
+- a freshness that was not reported, or that is outside the allowlist, is `unknown` - never `fresh`;
+- a `fresh` claim supported only by a `watcher_hint` is reported as `unknown` with a warning, because
+  a hint is not verification; only an `inventory_hash` verification carrying the
+  `source_fingerprint` it recomputed supports `fresh`;
+- a pinned member with no coverage block, or with a status outside the allowlist, raises
+  `EnvelopeInvalid`: `complete_for_profile` cannot be asserted from nothing;
+- a `verification` block that contradicts its own mode (`none` with a fingerprint, `inventory_hash`
+  without one, `watcher_hint` without a time) is refused rather than stored.

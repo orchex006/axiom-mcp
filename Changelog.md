@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- **C-027** Expose freshness coverage and verification. Add `src/axiom_mcp/query/envelope.py` and
+  `tests/test_query_envelope.py`. `build_envelope` writes only the contract's success keys and keeps
+  the two facts apart: `project_generations` lists the exact pinned member generations (and
+  `catalog_generation_id` is a deterministic digest over exactly those), `freshness` and `coverage`
+  are resolved independently, and `verification` records why the freshness claim is believed. The
+  flattering direction is refused: a freshness that was not reported or is outside the allowlist is
+  `unknown` rather than `fresh`; a `fresh` claim backed only by a watcher hint is downgraded to
+  `unknown` with a warning, because only an `inventory_hash` verification carrying the
+  `source_fingerprint` it recomputed supports `fresh`; a member pinning no usable coverage status is
+  refused instead of being called complete; and a requested project that is not pinned caps coverage
+  at `partial` and is named in the warnings. A `verification` block that contradicts its own mode is
+  refused rather than stored.
 - **C-026** Bind cursors to snapshot and query. Add `src/axiom_mcp/query/cursor.py` and
   `tests/test_query_cursor.py`. A cursor is only meaningful inside the request that produced it:
   `CursorStore.issue` binds it to the catalog generation, the operation and its parameters, the
