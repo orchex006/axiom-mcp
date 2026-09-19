@@ -41,6 +41,8 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
+from axiom_mcp import paths
+
 AXIOM_HOME_ENV = "AXIOM_HOME"
 
 REGISTRY_SCHEMA_VERSION = 1
@@ -224,19 +226,17 @@ class SnapshotLocation:
         return self.generations_root / generation_directory_name(generation_id)
 
     def resolve(self, relative: str) -> Path:
-        """Resolve a portable generation-relative reference inside this lane.
+        """Resolve a wire reference inside this lane, through the shared boundary.
 
-        The reference is validated before it is joined, and the joined path is
-        re-checked after symbolic links are resolved, so a symlink planted in
-        the lane cannot be used to read a file outside it.
+        ``axiom_mcp.paths`` owns the two normalizations: the caller's forward-slash reference is
+        validated lexically, and this lane's ``root`` is bound and resolved natively. Containment
+        is then checked on resolved paths, so a symlink planted in the lane cannot be used to read
+        a file outside it, and the reference is refused before any file is opened.
         """
-        portable_relative(relative)
-        root = self.root.resolve()
-        candidate = root.joinpath(*PurePosixPath(relative).parts)
-        resolved = candidate.resolve()
-        if resolved != root and root not in resolved.parents:
-            raise UntrustedPath(f"reference {relative!r} resolves outside the registered lane")
-        return resolved
+        try:
+            return paths.resolve_wire_path(self.root, relative)
+        except paths.PathError as exc:
+            raise UntrustedPath(f"reference {relative!r}: {exc}") from exc
 
 
 @dataclass(frozen=True)
@@ -262,15 +262,11 @@ class CatalogLocation:
         return self.generations_root / generation_directory_name(generation_id)
 
     def resolve(self, relative: str) -> Path:
-        portable_relative(relative)
-        root = self.root.resolve()
-        candidate = root.joinpath(*PurePosixPath(relative).parts)
-        resolved = candidate.resolve()
-        if resolved != root and root not in resolved.parents:
-            raise UntrustedPath(
-                f"reference {relative!r} resolves outside the registered catalog lane"
-            )
-        return resolved
+        """Resolve a wire reference inside this catalog lane, through the shared boundary."""
+        try:
+            return paths.resolve_wire_path(self.root, relative)
+        except paths.PathError as exc:
+            raise UntrustedPath(f"reference {relative!r}: {exc}") from exc
 
 
 @dataclass(frozen=True)

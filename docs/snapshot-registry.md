@@ -101,9 +101,11 @@ paths and nothing else, so a lock backend never invents a namespace.
 <repo-root>/.axiom/graph/<solution-id>/_catalog/{live,checkpoint}/...
 ```
 
-`SnapshotLocation.resolve` joins the reference with POSIX parts, then re-checks
-containment after symbolic links are resolved, so a symlink planted inside a
-lane cannot be used to read a file outside it. `.staging/` is never a read
+`SnapshotLocation.resolve` delegates to `axiom_mcp.paths.resolve_wire_path`: the
+reference is validated lexically, the lane root is bound and resolved natively, and
+containment is re-checked on the resolved paths, so a symlink planted inside a lane
+cannot be used to read a file outside it and the reference is refused before a file
+is opened. See `docs/portable-paths.md` for the wire-path/native-binding split. `.staging/` is never a read
 source: it is named here only so a caller can tell it apart from a generation.
 
 ## Not in this slice
