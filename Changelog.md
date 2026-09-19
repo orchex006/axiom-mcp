@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **C-017** Handle missing, corrupt and archived snapshots. Add `src/axiom_mcp/recovery.py`,
+  `tests/test_recovery.py` and a recovery section in `docs/snapshot-reader-core.md`.
+  `read_with_recovery` runs a whole-catalog loader under a bounded retry, so each attempt is
+  all-or-nothing and a failure carries no partial data. A missing member is `partial` under
+  `allow_partial` and `PROJECT_UNAVAILABLE` with no data under `require_complete`. Missing or
+  corrupt generations retry up to the bound and then report `SNAPSHOT_UNAVAILABLE`/
+  `SNAPSHOT_CORRUPT`; a superseded (collected) generation is `SNAPSHOT_EXPIRED` on the first
+  attempt and is never answered from the current lane data. Snapshot-only and pinned reads
+  report `freshness=unknown` and refuse a caller-supplied live freshness, so freshness is never
+  fabricated.
+
 - **C-016** Cache by immutable generation identity. Add `src/axiom_mcp/cache.py`,
   `tests/test_cache.py` and a cache section in `docs/snapshot-reader-core.md`. `CacheKey` is the
   pointer-free identity `(schema, profile, generation_id, shard_sha256)` plus the manifest

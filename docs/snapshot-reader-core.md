@@ -221,3 +221,39 @@ same bytes under another `generation_id` are a miss), the pointer-change case (a
 generation reloads instead of hitting the old entry), and the negative/boundary ones
 (mis-digest `put` refused, tampered entry dropped on `get`, both LRU limits enforced in LRU
 order, an over-budget payload refused without eviction, and invalid limits/keys refused).
+
+## C-017 ? Missing, corrupt and archived snapshots (`src/axiom_mcp/recovery.py`)
+
+`docs/12-SNAPSHOT-READ-WRITE-PROTOCOL.md` section 5 ends with the rule this module implements:
+if a required generation is missing or corrupt, drop the partial request, retry bounded against
+the whole catalog, and if it still fails return `SNAPSHOT_UNAVAILABLE`/`SNAPSHOT_CORRUPT` and ask
+control to reconcile. Half a new answer and half an old one is not allowed. The owner seed
+`repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md` section 7 adds that a daemon-offline checkpoint may
+be served with `freshness=unknown` in snapshot-only mode, and section 5 that a collected
+generation is `SNAPSHOT_EXPIRED` rather than a read of current data; `docs/14-MULTI-PROJECT-SOLUTIONS.md`
+section 6 makes a missing member `PROJECT_UNAVAILABLE` with partial coverage, never an empty graph.
+
+`read_with_recovery` runs a caller-supplied loader that pins one exact catalog vector. Each
+attempt returns the whole vector or raises, so a failed attempt leaves nothing behind and a
+served answer can never mix two attempts. Attempts are bounded by `RecoveryLimits`; the retry
+applies to the recoverable codes (missing member, unavailable or corrupt generation) and never to
+`SNAPSHOT_EXPIRED`, because reading again cannot bring a collected generation back.
+
+Policy decides a partial vector: under `allow_partial` it is served as `partial` with the members
+that resolved, and under `require_complete` it is refused as `PROJECT_UNAVAILABLE` with no data at
+all. Freshness is never fabricated: snapshot-only mode forces `freshness=unknown` and refuses a
+caller-supplied live reading, and a `pinned`-consistency read is treated the same way because an
+immutable historical generation is not evidence that the source is fresh.
+
+`require_generation`/`classify_absence` make the archived case honest: if the lane still names the
+pinned generation, its absence is `SNAPSHOT_UNAVAILABLE`; if the lane has moved on to a different
+generation, the pinned one was collected and the answer is `SNAPSHOT_EXPIRED`, never the newer
+data.
+
+`tests/test_recovery.py` runs against the copied `demo-solution` bundle and proves the positive
+path (a missing member is partial or refused by policy, and a flaky read recovers on the bounded
+retry), the freshness rule (snapshot-only reports `unknown` and rejects a fabricated live value),
+and the negative/boundary ones (a corrupt or unavailable generation retried then reported with no
+partial data, a superseded generation expired on the first attempt with the newer lane data
+unused, an absent-while-still-pinned generation reported unavailable, and invalid
+configurations/loaders refused).
