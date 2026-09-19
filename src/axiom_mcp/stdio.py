@@ -25,6 +25,7 @@ owns which byte stream carries protocol and which carries diagnostics.
 from __future__ import annotations
 
 import argparse
+import functools
 import io
 import sys
 from collections.abc import Sequence
@@ -273,7 +274,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     import anyio
 
     server = build_stdio_server(args.name)
-    return anyio.run(serve_stdio, server, banner=not args.no_banner)
+    banner = not args.no_banner
+    # ``serve_stdio`` takes ``banner`` as a keyword-only argument, and ``anyio.run``
+    # forwards only positional arguments to the callable it is given.
+    return anyio.run(functools.partial(serve_stdio, server, banner=banner))
 
 
 if __name__ == "__main__":

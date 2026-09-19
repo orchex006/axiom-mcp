@@ -41,6 +41,14 @@ boundary test feeds the spike a legacy-only SDK shape to prove the drift is
 detected instead of trusted. There is no `latest` fallback for the protocol
 revision: `protocol_support_reasons()` fails when the minimum is not advertised.
 
+## Locked entrypoints
+
+A host starts this component without a shell: `src/axiom_mcp/entrypoints.py` resolves the
+active version environment the packager installed, verifies the pinned interpreter and the
+pinned SDK, and renders one absolute interpreter plus an argv list. The launch environment is
+built from scratch and keeps only what the pinned runtime cannot start without. See
+`docs/locked-entrypoints.md` for the document, the refusal codes and the measured findings.
+
 ## Version drift policy
 
 A different SDK patch release, a Python version outside the pinned line, or a
