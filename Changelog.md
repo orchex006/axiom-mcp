@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- **C-018** Implement indexed symbol search. Add `src/axiom_mcp/query/` (the package docstring
+  plus `model.py`) and `src/axiom_mcp/query/search.py`, `tests/test_query_search.py`,
+  `tests/test_query_support.py` and `docs/query-engine.md`. The card names ten modules
+  (`query/search.py` through `query/envelope.py`) but a package cannot be one module: the shared
+  pinned node/edge model and the graph index C-018 needs are `src/axiom_mcp/query/model.py` plus
+  `src/axiom_mcp/query/__init__.py`, both inside the card's `src/axiom_mcp/query/**` deliverable,
+  and the justified path addition is recorded here and in the task evidence. The model has no
+  source-body field at all, so `repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md` section 6's "source
+  positions/symbols instead of full source" default cannot be violated by accident.
+  `search_symbols` answers exact id/qualified-name/name from an index, widens to a
+  `max_nodes`-bounded scan for prefix and substring queries, returns every candidate at the best
+  rank instead of silently choosing one when a name is ambiguous, and reports `truncated` plus a
+  warning when the limit caps the answer. Bounds outside the canonical request ranges raise
+  `LimitRejected` rather than being clamped.
 - **V2-019** Add the cross-language reader guard adapter. Add
   `src/axiom_mcp/guard/adapter.py`, `tests/test_guard_protocol.py`, `tests/test_guard_adapter.py`
   and `tests/test_guard_cross_language.py`, plus a `descriptor()` accessor on both platform
@@ -330,3 +344,4 @@
   `pyproject.toml`, `axiom_mcp.version` and the installed interpreter/SDK, and a boundary
   test proves a legacy-only SDK surface fails the spike.
 - The release gate stays closed. No tag, release branch or publish was created.
+
