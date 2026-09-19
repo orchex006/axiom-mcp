@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+- **V2-027** Add `docs/query-transports.md`, the page that records the JSON-first read model and
+  the two supported transports without restating the snapshot protocol. It states what JSON-first
+  does and does not mean: the processed-JSON snapshot stays directly readable with no MCP process,
+  but a raw multi-file reader holds no guard and stays correct only by pinning one immutable
+  generation - so the page links `docs/guides/snapshots.md` instead of duplicating it. It records
+  the three facts every surface inherits (one pinned generation vector per request in
+  `read_session.py`, a cursor bound to snapshot/query/scope in `query/cursor.py`, and a collected
+  generation answering `SNAPSHOT_EXPIRED` in `recovery.py`), the stdio and Streamable HTTP launch
+  forms, and the locked `plan`/`verify` surfaces that select a mode - the document's fields, the
+  digest inputs, the refusal codes that decide whether a transport starts at all, and the rule that
+  the HTTP allowlist must admit the address about to be bound. The states AC1 requires to stay
+  distinguishable are tabulated with canonical code, retryability, contracted HTTP status and CLI
+  exit code: `DAEMON_UNAVAILABLE` (503/`8`), `SNAPSHOT_UNAVAILABLE` (503/`4`), `SNAPSHOT_CORRUPT`
+  (no contracted status/`8`), `SNAPSHOT_EXPIRED` (410/`4`), `PROJECT_UNAVAILABLE` (503/`3`),
+  incomplete coverage as a truthful `coverage` key rather than an error code, and `NOT_READY`
+  (503/`4`) - so an unreachable daemon is never reported as a missing snapshot. Cross-linked from
+  `docs/stdio-transport.md`, `docs/http-transport.md`, `docs/locked-entrypoints.md` and
+  `docs/reference/mcp.md`. Deviation recorded: the card's own path in specs is named as
+  `tasks/C/V2-027.md`, which does not exist at `origin/main`; the real card is `tasks/V2/V2-027.md`,
+  and the deliverable path it names, `docs/query-transports.md`, did not exist and was created.
+  Documentation only; no product code changed.
+
 - **V2-024** Add `src/axiom_mcp/entrypoints.py`, the locked launch surface a host consumes
   without a shell. A plan is an absolute interpreter plus an argv list, never a command string,
   so a path holding a space, an ampersand, parentheses, an apostrophe and Thai text arrives as

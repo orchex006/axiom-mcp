@@ -31,6 +31,9 @@ observation**, until the registering task named in the catalog lands.
 A plain REST route that returns a hand-written `initialize`-shaped body is not a transport.
 The two supported surfaces carry the same query core, so an HTTP client and a stdio client
 must receive equivalent results for the same request.
+[query-transports.md](../query-transports.md) records the JSON-first read model, the locked
+launch modes that select a transport, and the reader failure states the two surfaces keep
+apart.
 
 ## Tool catalog
 
