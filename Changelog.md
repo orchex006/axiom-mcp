@@ -28,6 +28,54 @@
   unverified here: the foreign-holder leg is skipped with that reason, and the local Windows
   cross-language run was made with a non-Python `LockFileEx` holder (PowerShell/.NET), not with
   the Rust daemon.
+- **C-017** Handle missing, corrupt and archived snapshots. Add `src/axiom_mcp/recovery.py`,
+  `tests/test_recovery.py` and a recovery section in `docs/snapshot-reader-core.md`.
+  `read_with_recovery` runs a whole-catalog loader under a bounded retry, so each attempt is
+  all-or-nothing and a failure carries no partial data. A missing member is `partial` under
+  `allow_partial` and `PROJECT_UNAVAILABLE` with no data under `require_complete`. Missing or
+  corrupt generations retry up to the bound and then report `SNAPSHOT_UNAVAILABLE`/
+  `SNAPSHOT_CORRUPT`; a superseded (collected) generation is `SNAPSHOT_EXPIRED` on the first
+  attempt and is never answered from the current lane data. Snapshot-only and pinned reads
+  report `freshness=unknown` and refuse a caller-supplied live freshness, so freshness is never
+  fabricated.
+
+- **C-016** Cache by immutable generation identity. Add `src/axiom_mcp/cache.py`,
+  `tests/test_cache.py` and a cache section in `docs/snapshot-reader-core.md`. `CacheKey` is the
+  pointer-free identity `(schema, profile, generation_id, shard_sha256)` plus the manifest
+  entry path, so a republished pointer derives a different key and an older entry can never be
+  hit or relabelled. `SnapshotCache.put` refuses bytes that do not hash to the keyed digest and
+  `SnapshotCache.get` re-hashes before returning, so mislabelled data cannot be stored or
+  served. `max_entries` and `max_bytes` bound the cache by LRU eviction; a payload larger than
+  the whole budget is refused without evicting live entries; `evict_generation` invalidates by
+  generation.
+
+- **C-015** Release read locks before response streaming. Add `src/axiom_mcp/read_session.py`,
+  `tests/test_read_session.py` and a read-session section in `docs/snapshot-reader-core.md`.
+  `ReadSession.load` copies the pointer, manifest and required shards through the bounded
+  `copy_shards` path while `SolutionGuard.reader` holds `data.lock`, releases the guard, then
+  verifies the hashes with no lock held and refuses to return if any lock is still held.
+  `render` and `stream` raise `GuardStillHeld` if a lock is held, so the response is always built
+  after the release; the client can stall without keeping a publisher out of the lane. The
+  snapshot records `guard_held_during_copy`/`parsed_after_guard_release` and reports
+  `freshness="unknown"` because no daemon freshness is observable from here.
+
+- **C-014** Load bounded shards and reject traversal. Add `src/axiom_mcp/shards.py`,
+  `tests/test_shards.py` and a bounded-shard section in `docs/snapshot-reader-core.md`. The
+  load runs four checks in a fixed order, all of them before any JSON parser is involved: the
+  entry's role must own the directory its path claims; the declared byte size must fit the
+  caller's `ShardLimits` cap and the plan's declared total must fit the plan budget, both
+  checked before the file is opened; the path must not be a symlink, must be a regular file
+  and must resolve inside its own generation directory; and the read itself is bounded to
+  `cap + 1` bytes, so a shard that grew on disk is refused without ever being materialised.
+  Only then does `Manifest.verify_shard` apply the canonical length/digest/parse/record-count
+  rule to the copied bytes. `ShardLimits` refuses a cap above the canonical 16 MiB instead of
+  silently clamping it, and `copy_shards` is deliberately separate from `verify_copied` so
+  C-015 can copy under the shared guard and parse after releasing it. AC1 is observed by the
+  negative cases: a leaf symlink, a symlinked parent that leaves the lane, a symlinked parent
+  that stays in the lane but outside the generation, an over-declared shard whose file is a
+  directory, an oversized shard whose bytes are not valid JSON, a plan over budget passed a
+  reader that fails if it is ever called, a forged manifest entry, and substituted bytes of
+  the same size.
 - **C-012** Pin one catalog vector per query and never fall back to a project's latest
   generation. Add `src/axiom_mcp/catalog.py`, `tests/test_catalog.py` and vendored pinned
   fixtures under `tests/fixtures/solution/demo-solution/` (byte-for-byte from
