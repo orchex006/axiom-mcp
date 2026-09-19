@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- **C-034** Implement the concrete graphd control client in `src/axiom_mcp/control_client.py`.
+  It is a bounded synchronous client for `contracts/control-api-v1.md` and the production
+  implementation of the `ControlPlane` protocol the delegation tools already use. AC1's audience
+  half is enforced before a socket opens: the client refuses any credential whose audience is not
+  `axiom-graphd-control`, so an MCP token can never be replayed to the daemon and a control
+  credential can never answer an MCP call. Retries are bounded and cannot be widened by
+  configuration - only `429`, `503` and transport failures are retried, `max_attempts` is capped at
+  `MAX_ATTEMPTS_LIMIT` (5), the backoff doubles from `0.25` s to a `2` s cap, and a `Retry-After`
+  header is honoured but clamped - while every other 4xx is raised on the first response so a
+  malformed request is never amplified into a retry storm. A canonical code in the daemon's
+  `{code,message,retryable,details,request_id}` body wins over the status fallback, a bounded
+  identifier pattern keeps a path-shaped id off the wire, and a transport failure becomes a
+  retryable `DAEMON_UNAVAILABLE`. AC1's outage half is proven against the real registry, guard and
+  query engine: with the daemon unreachable `graph_reconcile` reports `DAEMON_UNAVAILABLE` while
+  `graph_query` still answers from the pinned generation with `freshness: unknown` - degraded
+  reader service, not a failed gateway. Adds 26 regression tests (positive, negative and
+  failure-boundary legs) over `httpx.MockTransport` in `tests/test_control_client.py`; no socket is
+  opened and no live daemon is claimed.
 - **C-033** Register the `graph_version` tool in `src/axiom_mcp/tools/version.py`. The tool
   reports selected components and their compatibility under the `read` capability and is the one
   surface that can never act. AC1 is enforced by a tripwire rather than promised: a regression test

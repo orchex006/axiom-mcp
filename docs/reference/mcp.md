@@ -377,6 +377,34 @@ stale-but-valid answer as fresh.
 An immutable historical generation does **not** imply live source freshness. A pinned query
 answers from exactly that generation and reports its freshness honestly.
 
+## Control client
+
+`src/axiom_mcp/control_client.py` implements the `ControlPlane` protocol over the daemon's
+control API. The audience boundary is enforced before a socket is opened: the client accepts only
+a credential minted for `axiom-graphd-control`, so an MCP token can never be replayed to the
+daemon and a control credential can never answer an MCP call.
+
+| Operation | Request | Notes |
+| --- | --- | --- |
+| `status` | `GET /v1/solutions/{id}/status` | versions, freshness, coverage, queue counts |
+| `reconcile` | `POST /v1/solutions/{id}/reconcile` | closed body: `scope`, `project_ids`, `reason`, `wait_timeout_ms` |
+| `job` (`status`) | `GET /v1/jobs/{id}?wait_ms=` | reads one job; `wait_ms` is a bound, not a loop |
+| `job` (`cancel`) | `POST /v1/jobs/{id}/cancel` | idempotent; carries no `wait_ms` |
+| `verify` | `POST /v1/solutions/{id}/verify` | follows the reconcile envelope |
+
+A solution or job id must match a bounded identifier pattern, so a path-shaped id never reaches
+the wire. Retries are bounded and cannot be widened by configuration: only `429`, `503` and
+transport failures are retried, `max_attempts` is capped at `MAX_ATTEMPTS_LIMIT` (5), the backoff
+doubles from `0.25` s to a `2` s cap, and a `Retry-After` header is honoured but clamped to that
+cap. Any other 4xx is raised on the first response, so a malformed request is never amplified into
+a retry storm. A canonical code in the daemon's `{code,message,retryable,details,request_id}` body
+wins; otherwise the HTTP status is mapped to the canonical code.
+
+A transport failure becomes a retryable `DAEMON_UNAVAILABLE`, and that is what makes degraded
+reader service real: `graph_reconcile`, `graph_job` and `graph_verify` report the outage, while a
+`graph_query` under the default `allow_stale` consistency still answers from the pinned generation
+with `freshness: unknown`.
+
 ## Capability and authorization
 
 The gateway authorizes before it resolves a path. Every call carries a bearer token with a
@@ -572,10 +600,11 @@ the old identity.
   component that computes them (C-027) is not implemented.
 - **Cursors and byte-budget packing.** Specified in C-026 and C-025; not implemented, so
   `next_cursor`, `truncated` and the budget behaviour are contract-only.
-- **The daemon control plane.** `graph_reconcile`, `graph_job` and
-  `graph_verify` delegate through the `ControlPlane` protocol and are covered by tests against
-  that boundary, but the concrete graphd client, its audience handling and its bounded retries
-  (C-034) are not in this repository and are unverified here.
+- **A live graphd daemon.** The concrete control client exists (C-034,
+  `src/axiom_mcp/control_client.py`) and its audience handling, bounded retries and outage
+  behaviour are covered by tests over `httpx.MockTransport`, but no real daemon was reached from
+  this repository, so its wire shapes are verified against `contracts/control-api-v1.md` rather
+  than against a running graphd.
 - **Readiness inputs.** `/readyz` reports the query and control planes; at this revision the
   default reports both unavailable rather than claiming readiness the gateway has not
   earned.
