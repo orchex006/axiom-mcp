@@ -2,6 +2,171 @@
 
 ## Unreleased
 
+- **C-036** Add `release/package.py`, the versioned-environment packager for `axiom-mcp`.
+  It stages a built artifact under an install root, creates one isolated virtual
+  environment per version, installs the artifact with no network and no dependency
+  resolution (`pip install --no-index --no-deps`), and records exactly what the
+  environment contained - artifact name, size and SHA256, interpreter and the
+  `pip freeze --all` set - in a per-version `lockfile.json`. `rollback` is deliberately
+  narrow: it picks an explicit version or the previous install from `history.jsonl`,
+  proves the staged artifact still hashes to the locked digest, recreates the venv or
+  reinstalls the artifact if the frozen set has drifted (recording the repair), refuses
+  with `environment_not_restored` if the frozen set still does not match, and only then
+  moves `current.json`. A moved install root is still recognised as the same environment
+  because frozen direct-URL lines are compared with the absolute directory stripped.
+  Mutations are confined to the install root, and the running interpreter and the
+  package own source tree are refused up front through the same guard the update planner
+  uses. AC1 is proven on this host with the real thing in `tests/test_release_package.py`:
+  two wheels built by the real build backend, installed by the real pip into two isolated
+  venvs, each venv own interpreter observed to import its own build, then a real rollback
+  restoring the earlier version; the drift, tamper, missing-target and failure-boundary
+  legs are driven by a scripted runner and are recorded as scripted, not as real pip
+  runs. Documentation in `docs/release-packaging.md`.
+- **C-035** Implement readiness and guard-releasing shutdown in `src/axiom_mcp/lifecycle.py`,
+  and make the HTTP transport reuse those types instead of its own copy. Readiness is not health:
+  `Lifecycle.readiness()` refuses to report ready until the SDK is initialized and the query
+  plane is usable, keeps the query and control planes distinct, and lets an optional query probe
+  decide the query plane - a probe that raises is reported as `query_probe_failed:<Type>` rather
+  than being swallowed as availability. `Lifecycle.query()` is the single admission point: it takes
+  the real native guard through `guard.reader()` and releases it in the same `with` block, so a
+  query that completes, raises, or is cut short leaves no lock behind. `drain()` waits a bounded
+  time for in-flight queries and, when the budget expires, counts the remainder as cancelled and
+  releases the guard anyway; `shutdown()` drains once, releases everything and is idempotent.
+  Out-of-range drain budgets are refused with `LIMIT_EXCEEDED` instead of being silently clamped.
+  AC1's guard leg is proven with the real `SolutionGuard` on this filesystem: a query is admitted in
+  a thread, shutdown runs while it is in flight, and the test asserts the guard ends with
+  `held_names == ()` - no stranded lock.
+- **C-034** Implement the concrete graphd control client in `src/axiom_mcp/control_client.py`.
+  It is a bounded synchronous client for `contracts/control-api-v1.md` and the production
+  implementation of the `ControlPlane` protocol the delegation tools already use. AC1's audience
+  half is enforced before a socket opens: the client refuses any credential whose audience is not
+  `axiom-graphd-control`, so an MCP token can never be replayed to the daemon and a control
+  credential can never answer an MCP call. Retries are bounded and cannot be widened by
+  configuration - only `429`, `503` and transport failures are retried, `max_attempts` is capped at
+  `MAX_ATTEMPTS_LIMIT` (5), the backoff doubles from `0.25` s to a `2` s cap, and a `Retry-After`
+  header is honoured but clamped - while every other 4xx is raised on the first response so a
+  malformed request is never amplified into a retry storm. A canonical code in the daemon's
+  `{code,message,retryable,details,request_id}` body wins over the status fallback, a bounded
+  identifier pattern keeps a path-shaped id off the wire, and a transport failure becomes a
+  retryable `DAEMON_UNAVAILABLE`. AC1's outage half is proven against the real registry, guard and
+  query engine: with the daemon unreachable `graph_reconcile` reports `DAEMON_UNAVAILABLE` while
+  `graph_query` still answers from the pinned generation with `freshness: unknown` - degraded
+  reader service, not a failed gateway. Adds 26 regression tests (positive, negative and
+  failure-boundary legs) over `httpx.MockTransport` in `tests/test_control_client.py`; no socket is
+  opened and no live daemon is claimed.
+- **C-033** Register the `graph_version` tool in `src/axiom_mcp/tools/version.py`. The tool
+  reports selected components and their compatibility under the `read` capability and is the one
+  surface that can never act. AC1 is enforced by a tripwire rather than promised: a regression test
+  replaces `axiom_mcp.update.apply_plan` (and `delegation_argv`) with a function that fails the
+  test if it is reached, and asserts that a full call leaves it untouched while the handler exposes
+  no `install`/`apply` keyword. Compatibility reuses the same pin checker the CLI and the
+  runtime-pin test use, so `compatible` is true only when the checker returned no reason, and a
+  mismatch raises a `runtime_pin_mismatch` warning; `update` stays `not_checked` until
+  `check_update: true`, and then runs the read-only `update.check_update` and relays its fields
+  verbatim. A component this process cannot observe is reported as unobserved rather than guessed
+  (`axiom-graphd` only when a control client is wired to this process, `axiom-specs`/`axiom-skills`
+  as `not_observable_from_this_component`), an unknown component name is a `VALIDATION_ERROR`
+  naming `allowed`, and every answer carries `installation.implicit_install: false` with
+  `applies_via: cli_or_skill_workflow`. Adds 16 regression tests (positive, negative and
+  failure-boundary legs) in `tests/test_tools_version.py`.
+- **C-032** Register the `graph_verify` tool in `src/axiom_mcp/tools/verify.py`. The tool submits
+  a bounded verification request through the `ControlPlane` protocol against an
+  `expected_fingerprint` (64 hexadecimal characters) or a `target_event_seq` barrier, and reports
+  the four verification modes `hash`, `schema`, `catalog` and `source` **separately** instead of
+  collapsing them into one "verified" boolean. AC1's second half is enforced, not documented: every
+  answer names its `basis` (`archive` or `working_tree`), and an `archive` basis whose `source`
+  dimension claims `current` is refused as `DAEMON_UNAVAILABLE` with
+  `{dimension: "source", basis: "archive"}`, because an archived checkpoint cannot speak for the
+  live filesystem. Absence and novelty never become a pass either: a dimension the daemon did not
+  report is `not_run` with a `dimension_not_reported:<name>` warning and an unrecognised mode
+  becomes `unknown` with an `unrecognised_mode:<name>` warning. The tool reads no snapshot (a
+  source spy that raises on any read is asserted untouched), the `checkpoint` capability is
+  required before the daemon is consulted, an invisible solution is `NOT_FOUND`, and an
+  asynchronous answer returns the job handle with `verification: null` plus a
+  `verification_incomplete` warning. Adds 23 regression tests (positive, negative and
+  failure-boundary legs) in `tests/test_tools_verify.py`.
+
+- **C-031** Register the `graph_job` tool in `src/axiom_mcp/tools/job.py`. `graph_job` reads or
+  cancels one daemon job through the `ControlPlane` protocol and enforces three bounds itself.
+  The handler makes exactly one control-plane call - it never loops and never sleeps, so a client
+  cannot make the gateway spin on a queue, and the daemon keeps ownership of waiting - which a
+  test asserts by counting recorded calls. Job ownership is verified on the answer: the job's
+  `solution_id` must be visible to the token and registered locally, otherwise the answer is
+  `NOT_FOUND`, the same answer an unknown job gets, so job ids are not an enumeration oracle.
+  Cancel is capability-checked `before` the daemon - a read-only token gets `FORBIDDEN` and the
+  control plane is never called - while a `status` read has to ask the daemon who owns the job and
+  therefore enforces ownership on the answer; the asymmetry is documented. The request is closed,
+  `job_id` must match `^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}`,
+  so a path-shaped id never reaches the
+  daemon, `wait_ms` is bounded to `0..30000` and is refused on a cancel. The answer is projected
+  through a closed allowlist: the `job.schema.json` fields plus `retry_after_ms`, a derived
+  `terminal`, and `progress` restricted to the documented units - a percentage field is dropped
+  with a `percentage_not_carried` warning rather than relayed - and a state outside the schema enum
+  is `DAEMON_UNAVAILABLE` instead of being echoed through. Adds 23 regression tests (positive,
+  negative and failure-boundary legs) in `tests/test_tools_job.py`.
+
+- **C-030** Register the `graph_reconcile` tool in `src/axiom_mcp/tools/reconcile.py`. The
+  tool authorizes, then delegates through the `ControlPlane` protocol, and never reads a snapshot,
+  parses a source file or writes a shard - which is AC1's "Python never parses source or writes
+  graph shards" in executable form: `tests/test_tools_reconcile.py` swaps in a source spy that
+  raises on any read and asserts it is never touched, and asserts the daemon was asked for exactly
+  one reconcile. The request is closed and stricter than the transport contract in one place: the
+  seed lists `solution,projects,scope,wait_timeout_ms,reason`, and this revision requires a
+  bounded audit `reason` (<=200 characters) because the string travels to the daemon's journal.
+  `scope` is `dirty` (default), `project` or `full`; `project` requires an explicit project
+  selector and `scope != project` refuses one, so an ambiguous request is a `VALIDATION_ERROR`
+  rather than a guess. `wait_timeout_ms` is bounded to `0..30000` so an MCP call cannot park a
+  request on a queue. A read-only token is `FORBIDDEN` before the control plane is consulted; an
+  invisible solution is `NOT_FOUND`; an unknown project is `NOT_FOUND`. The daemon's answer is
+  never passed through verbatim: a job answer is projected to `{job_id, state, target_event_seq,
+  retry_after_ms}` and a `state` outside `contracts/schemas/job.schema.json` is
+  `DAEMON_UNAVAILABLE`, while an existing-publication answer is projected to
+  `{catalog_generation_id, verification, dirty}`. An unreachable or unusable control plane is
+  `DAEMON_UNAVAILABLE` with `retryable: true`. Adds 21 regression tests (positive, negative and
+  failure-boundary legs) in `tests/test_tools_reconcile.py`.
+
+- **C-029** Register the `graph_query` tool in `src/axiom_mcp/tools/query.py`. One bounded
+  dispatcher turns a closed request into exactly one engine call over the pinned generations read
+  through the trusted registry, and answers with the contract envelope built by
+  `query/envelope.build_envelope` and packed by `query/budget.pack_response`, so the byte cap is
+  measured over the whole document and a trimmed answer says `truncated`. The request is closed
+  *per operation*, which is what makes "no arbitrary SQL, Cypher, shell or code evaluation" a
+  property of the parser rather than a promise: `sql`, `cypher`, `command` and `script` are not
+  fields, an unknown key is a `VALIDATION_ERROR` naming only the key, an operation outside the
+  documented eight is `UNSUPPORTED_OPERATION`, and a selector that cannot apply to the requested
+  operation (`target` on `search`, `direction` on `changes`) is refused instead of ignored.
+  `pinned` requires the `catalog_generation_id` it pins and answers `SNAPSHOT_EXPIRED` when the
+  lane no longer publishes that vector; `require_fresh` needs the `reconcile` capability - a
+  read-only token is `FORBIDDEN` before the control plane is consulted - and with it enqueues a
+  bounded reconcile and answers `NOT_READY` carrying the job id rather than serving a snapshot as
+  fresh. Every answer is `freshness=unknown` with `verification.mode=none`: a pinned generation
+  proves which bytes answered, not that the source was re-read. A cursor is re-checked against
+  generation, query, scope and capability on every use, each drift with its own named refusal,
+  and an unreadable cursor id is `NOT_FOUND` rather than a leaked engine error. `changes` carries
+  head-side added and modified facts; because the baseline vector cannot be pinned through the
+  read session at this revision, a named non-current baseline answers `missing_baseline` with a
+  `baseline_not_pinnable` warning instead of a diff against whatever is current. Adds 28
+  regression tests (positive, negative and failure-boundary legs) in `tests/test_tools_query.py`.
+  Documentation corrected: the budget rules claimed an over-budget value is a
+  `VALIDATION_ERROR`; the code refuses it with `LIMIT_EXCEEDED`.
+
+- **C-028** Register the `graph_status` tool. Add the `src/axiom_mcp/tools/` package: `catalog.py`
+  (the six-tool catalog with its capability, read-only/destructive/open-world annotation and the
+  registering task), `context.py` (the closed-argument parser and the `ToolContext` every handler
+  runs inside) and `status.py` (`graph_status`). The answer is a closed object - an unexpected field
+  is a `VALIDATION_ERROR` whose message names the key and never its value - and it reports the
+  snapshot and the optional daemon half as two separate facts: the generations, records,
+  fingerprints and coverage come from the pinned generations read through the trusted registry with
+  the same bounded read session a query uses, and the daemon is consulted only when `include_daemon`
+  asks for it. Freshness is never overstated: a read session's `manifest_hash` proves the bytes are
+  the published ones and *not* that the snapshot is newer than the source tree, so a daemon that
+  merely reports `fresh` without an `inventory_hash` verification carrying the fingerprint it
+  recomputed is downgraded to `unknown` with the reason in `warnings`, and an unreachable daemon is
+  an unavailable plane with the failure named rather than a failed status answer. An unauthorized
+  solution and an unregistered one both answer `NOT_FOUND`, so the tool is not a solution
+  enumeration oracle, and a project outside the token's scope is equally invisible. A pinned
+  generation whose coverage block is unusable is `SNAPSHOT_CORRUPT`, not a complete answer.
+
 - **docs** Correct the guard limits in `docs/guides/snapshots.md`. The guide claimed the
   Windows `LockFileEx` backend was not present and that `src/axiom_mcp/guard/` ships
   `locks_posix.py` only, which was stale after C-011 and V2-019: `locks_windows.py` ships and

@@ -9,13 +9,14 @@ transport, the tool catalog and the `graph_query` contract;
 `contracts/redaction-policy.md` fixes what may cross the response boundary. This page is a
 reference for that contract, not a record of a running gateway.
 
-**Status: the tool layer is not implemented at this revision.** The tree contains the
-transports, the error model, the native guard engine, the registry, the manifest validator
-and the CLI. It contains no tool registration: there is no `src/axiom_mcp/tools/` package
-and nothing calls the SDK's tool registration. The six tools below are the canonical
-catalog the specification fixes, and `src/axiom_mcp/security.py` already enforces their
-capability map at the transport boundary before the tool layer exists - but a client that
-lists tools today sees an empty catalog. Every shape here is a **contract, not an
+**Status: the tool layer is landing task by task.** The tree contains the transports, the
+error model, the native guard engine, the registry, the manifest validator, the bounded
+query engine and the CLI. `src/axiom_mcp/tools/` now exists: `catalog.py` holds the
+canonical six-tool catalog, `context.py` holds the closed-argument parser and the
+re-authorizing `ToolContext`, `status.py` implements `graph_status`, `query.py` implements the
+`graph_query` dispatcher, `reconcile.py` implements `graph_reconcile`, `job.py` implements
+`graph_job`, `verify.py` implements `graph_verify` and `version.py` implements
+`graph_version`. The rows below record which tools are real at this revision; every remaining shape is a **contract, not an
 observation**, until the registering task named in the catalog lands.
 
 ## Transports
@@ -41,18 +42,217 @@ access.
 
 | Tool | Purpose | Capability | Side effect | Registered by | Status |
 | --- | --- | --- | --- | --- | --- |
-| `graph_status` | Solution/project freshness, coverage, generations, capabilities | `read` | none | C-028 | Specified, not yet available |
-| `graph_query` | Graph operation: `search`, `context`, `neighbors`, `callers`, `dependencies`, `impact`, `path`, `changes` | `read` | none | C-029 | Specified, not yet available |
-| `graph_reconcile` | Enqueue a graphd reconcile job for a scope | `reconcile` | Enqueue graphd job | C-030 | Specified, not yet available |
-| `graph_job` | Job status or explicit cancel | `reconcile` | Status read; `cancel` is an explicit write | C-031 | Specified, not yet available |
-| `graph_verify` | Bounded verification request against an expected fingerprint or barrier | `checkpoint` | Bounded verification request | C-032 | Specified, not yet available |
-| `graph_version` | Selected components and their compatibility | `read` | none | C-033 | Specified, not yet available |
+| `graph_status` | Solution/project freshness, coverage, generations, capabilities | `read` | none | C-028 | Implemented (`tools/status.py`) |
+| `graph_query` | Graph operation: `search`, `context`, `neighbors`, `callers`, `dependencies`, `impact`, `path`, `changes` | `read` | none | C-029 | Implemented (`tools/query.py`) |
+| `graph_reconcile` | Enqueue a graphd reconcile job for a scope | `reconcile` | Enqueue graphd job | C-030 | Implemented (`tools/reconcile.py`) |
+| `graph_job` | Job status or explicit cancel | `reconcile` | Status read; `cancel` is an explicit write | C-031 | Implemented (`tools/job.py`) |
+| `graph_verify` | Bounded verification request against an expected fingerprint or barrier | `checkpoint` | Bounded verification request | C-032 | Implemented (`tools/verify.py`) |
+| `graph_version` | Selected components and their compatibility | `read` | none | C-033 | Implemented (`tools/version.py`) |
 
 `graph_reconcile`, `graph_job` and `graph_verify` are the mutation paths. They reach beyond
 the read-only plane and the gateway re-authorizes the incoming capability instead of
 inheriting admin authority. Update, bootstrap and install are deliberately **not** MCP
 tools: they travel through the CLI or the skill workflow, so no MCP tool downloads or
 executes an update by default.
+
+## `graph_reconcile` request and answer
+
+``graph_reconcile`` is the first mutation path. The seed's input set is `solution, projects,
+scope, wait_timeout_ms, reason`; this revision accepts `project_id`/`project_ids` for `projects`,
+keeps the request closed (an unexpected key is a `VALIDATION_ERROR`), and is deliberately
+*stricter* than the transport contract in one place: an audit `reason` is required, at most 200
+characters.
+
+| Field | Rule |
+| --- | --- |
+| `solution_id` | Required identifier. The token must carry `reconcile`; an invisible solution is `NOT_FOUND`. |
+| `scope` | `dirty` (default), `project` or `full`. `project` requires an explicit project selector; `full` is explicit owner-authorized work. |
+| `project_id` / `project_ids` | Only with `scope=project`. Validated against the registry and the token's project scope, so an unknown project is `NOT_FOUND`. |
+| `reason` | Required, non-empty, at most 200 characters. It travels to the daemon's journal and is never echoed back. |
+| `wait_timeout_ms` | `0`-30000, default `0`. Long parsing never holds the request open by default. |
+
+The tool does not read a snapshot, parse a source file or write a shard: it authorizes, hands the
+request to the `ControlPlane` protocol, and projects the daemon's answer through a closed
+allowlist. A `202`-style answer is reported as `job` with exactly `{job_id, state,
+target_event_seq, retry_after_ms}`; the `state` must be one of the `job.schema.json` enum values,
+so a non-conformant daemon is `DAEMON_UNAVAILABLE` rather than being echoed through. A
+`200`-style answer (an existing verified publication already satisfies the barrier) is reported
+as `publication` with `{catalog_generation_id, verification, dirty}`. An unreachable or unusable
+control plane is `DAEMON_UNAVAILABLE` with `retryable: true`.
+
+```json
+{
+  "schema_version": 1,
+  "solution_id": "alpha",
+  "scope": "project",
+  "project_ids": ["auth-api"],
+  "job": {"job_id": "job-0007", "state": "PENDING", "target_event_seq": 12, "retry_after_ms": 250},
+  "publication": null,
+  "warnings": []
+}
+```
+
+## `graph_job` request and answer
+
+``graph_job`` takes `job_id`, an optional `action` of `status` (default) or `cancel`, and an
+optional `wait_ms` bounded to `0..30000`. The request is closed; `job_id` must match
+`^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}`, so a path-shaped id never reaches the daemon.
+
+Three properties are enforced here rather than delegated:
+
+- **The handler makes exactly one control-plane call.** It never loops and never sleeps, so a
+  client cannot make the gateway spin on a queue; the daemon owns waiting. A test counts the
+  recorded calls.
+- **Job ownership is verified on the answer.** The job's `solution_id` must be visible to the
+  token and registered locally; otherwise the answer is `NOT_FOUND`, the same answer an unknown
+  job gets, so job ids are not an enumeration oracle.
+- **Cancel is capability-checked before the daemon.** A caller without `reconcile` gets
+  `FORBIDDEN` and no control-plane call is made. A `status` read cannot be refused that early -
+  the daemon is the only party that knows who owns the job - so ownership for a read is enforced
+  on the answer instead. `wait_ms` with `action=cancel` is a `VALIDATION_ERROR`: a cancel is
+  idempotent and does not wait.
+
+The answer is `{schema_version, action, solution_id, job, warnings}`. The `job` object carries the
+`job.schema.json` fields plus `retry_after_ms`, a `terminal` boolean derived from the state, and
+`progress` restricted to the documented progress units (`units_done`, `units_total`,
+`projects_done`, `projects_total`, `files_scanned`, `shards_written`). A percentage field is
+dropped and named in `warnings` (`percentage_not_carried:<key>`), because
+`contracts/control-api-v1.md` says not to invent percentages. A state outside the schema enum is
+`DAEMON_UNAVAILABLE` rather than echoed through.
+
+```json
+{
+  "schema_version": 1,
+  "action": "status",
+  "solution_id": "alpha",
+  "job": {
+    "job_id": "job-0001",
+    "kind": "ParseBatch",
+    "state": "RUNNING",
+    "solution_id": "alpha",
+    "attempt": 0,
+    "fence": 3,
+    "target_event_seq": 41,
+    "terminal": false,
+    "progress": {"units_done": 3, "shards_written": 2}
+  },
+  "warnings": []
+}
+```
+
+## `graph_verify` request and answer
+
+``graph_verify`` takes `solution_id`, an optional project scope, and at least one of
+`expected_fingerprint` (64 hexadecimal characters) or `target_event_seq` (a non-negative,
+bounded barrier). A request with neither is a `VALIDATION_ERROR`. The token must carry
+`checkpoint`; an invisible solution is `NOT_FOUND` and the control plane is consulted only after
+that check.
+
+**The four verification modes are reported separately, and an archive cannot claim current
+filesystem state.** The answer always carries its `basis` - `archive` or `working_tree` - and a
+`verification` object with one entry per dimension (`hash`, `schema`, `catalog`, `source`). A
+dimension the daemon did not report is `{"mode": "not_run"}` with a
+`dimension_not_reported:<name>` warning, and an unrecognised mode becomes
+`{"mode": "unknown"}` with an `unrecognised_mode:<name>` warning: absence and novelty are never
+promoted to a pass. A basis of `archive` whose `source` dimension claims `current` is refused
+outright as `DAEMON_UNAVAILABLE` with `{dimension: "source", basis: "archive"}`, because an
+archived checkpoint cannot speak for the live working tree.
+
+An asynchronous answer (`job_id` present) returns the job handle and `verification: null`, with a
+`verification_incomplete` warning if the daemon also volunteered unmapped verification fields.
+
+```json
+{
+  "schema_version": 1,
+  "solution_id": "alpha",
+  "project_ids": ["auth-api"],
+  "basis": "archive",
+  "verification": {
+    "hash": {"mode": "recomputed", "matched": true, "observed": "3f0a...6e7f"},
+    "schema": {"mode": "declared"},
+    "catalog": {"mode": "matched"},
+    "source": {"mode": "archive_contents"}
+  },
+  "job": null,
+  "warnings": []
+}
+```
+
+## `graph_version` request and answer
+
+``graph_version`` reports the selected components, their compatibility and update availability,
+and it is deliberately the one tool that can never act. The request is closed and carries only
+`components` (a subset of `axiom-mcp`, `axiom-graphd`, `axiom-specs` and `axiom-skills`, defaulting
+to the whole set) and `check_update` (a boolean, default `false`). An unregistered component name
+is a `VALIDATION_ERROR` naming the `allowed` set, and the token must carry `read`.
+
+A component this process cannot observe is reported as unobserved rather than guessed. Only
+`axiom-mcp` is observable from inside itself, so it carries the pinned `version`, `spec_version`,
+`spec_revision`, a `compatible` flag and the pin checker's `reasons` verbatim. `axiom-graphd` is
+`observed` only when a control client is wired into this process, and `axiom-specs` and
+`axiom-skills` report `not_observable_from_this_component`. `compatibility` restates the runtime
+and SDK pins (`python`, `supported`, `pinned_python`, `pinned_sdk`, `installed`,
+`protocol_versions`, `protocol_minimum`) plus the `reasons` that make `compatible` false; an
+incompatible runtime also raises a `runtime_pin_mismatch` warning.
+
+`update` is `not_checked` until the caller asks for it, and `check_update: true` runs the
+**read-only** `axiom_mcp.update.check_update`, whose `status`, `available`, `compatible`,
+`channel`, `source_origin`, `needs_restart` and `reasons` are relayed verbatim. Nothing on this
+surface installs; the answer always states the boundary explicitly:
+
+```json
+"installation": {
+  "implicit_install": false,
+  "reason": "no_install_path_on_the_mcp_surface",
+  "applies_via": "cli_or_skill_workflow"
+}
+```
+
+Update, bootstrap and install stay on the CLI/skill workflow. A regression test replaces the
+update applier with a tripwire that fails if this tool reaches it, so AC1 is enforced rather
+than promised.
+
+```json
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "component": "axiom-mcp",
+      "observed": true,
+      "version": "0.0.0.dev0",
+      "spec_version": "2.0.0-draft.1",
+      "spec_revision": "80f44e8",
+      "compatible": true,
+      "reasons": []
+    }
+  ],
+  "dimensions": {
+    "component": "axiom-mcp",
+    "version": "0.0.0.dev0",
+    "spec_version": "2.0.0-draft.1",
+    "graph_schema": 1,
+    "control_api": 1,
+    "queue_schema": 1,
+    "build_revision": "80f44e8",
+    "update_status": "not_checked"
+  },
+  "compatibility": {"compatible": true, "runtime": {}, "sdk": {}, "reasons": []},
+  "update": {
+    "status": "not_checked",
+    "installed": "0.0.0.dev0",
+    "available": null,
+    "compatible": null,
+    "needs_restart": false,
+    "reasons": ["update_check_not_requested"]
+  },
+  "installation": {
+    "implicit_install": false,
+    "reason": "no_install_path_on_the_mcp_surface",
+    "applies_via": "cli_or_skill_workflow"
+  },
+  "warnings": []
+}
+```
 
 ## `graph_query` request
 
@@ -89,12 +289,16 @@ The complete `edge_kinds` allowlist, in schema order: `CONTAINS`, `IMPORTS`,
 gateway truncates to fit and sets `truncated`; it does not exceed the cap to answer in
 full. Traversal uses a visited set and hard expansion and wall-time budgets. There is no
 arbitrary SQL, Cypher, code evaluation or unbounded regular expression anywhere in the
-query path.
+query path. That is enforced by the request parser (`tools/context.closed_arguments`)
+rather than promised: `sql`, `cypher`, `command` and `script` are not fields of the request,
+a request carrying one is a `VALIDATION_ERROR` that names only the key, and a selector that
+cannot apply to the requested operation (`target` on `search`, `direction` on `changes`) is
+refused rather than silently ignored.
 
 ### Budgets are ceilings, not hints
 
 `depth`, `max_nodes`, `max_edges` and `max_bytes` are validated against the schema before
-the query runs. A value above its maximum is a `VALIDATION_ERROR`; the gateway does not
+the query runs. A value above its maximum is refused with `LIMIT_EXCEEDED`; the gateway does not
 clamp an over-budget request to the maximum and continue, because that would answer a
 different question than the one asked. A budget that a caller leaves unset takes the
 documented default.
@@ -137,6 +341,26 @@ Provenance is carried in each node's `source` location and each edge's `evidence
 `analyzer_id`. The schema deliberately has no competing `result` or `snapshot` envelope: a
 consumer that finds one is reading a non-conformant server, not an alternate shape.
 
+### Consistency at this revision
+
+`allow_stale` (the default) answers from the pinned generation. A named
+`catalog_generation_id` is always honoured as a pin: when the lane no longer publishes that
+vector the answer is `SNAPSHOT_EXPIRED` rather than a read of whatever is current, and a
+`pinned` request without the field is a `VALIDATION_ERROR`. `require_fresh` needs the
+`reconcile` capability - a read-only token gets `FORBIDDEN` before the control plane is
+consulted at all - and with the capability the request enqueues a bounded reconcile and
+answers `NOT_READY` with the job id, because the request itself cannot prove the reconcile
+finished. Every `graph_query` answer is `freshness=unknown` with `verification.mode=none`: a
+pinned generation proves which bytes answered, not that the source tree was re-read.
+
+`changes` compares the head against a baseline generation. The baseline vector cannot be
+pinned through the read session at this revision, so a named baseline that is *not* the
+current one answers `missing_baseline` with a `baseline_not_pinnable` warning instead of a
+diff against whatever is current, while a baseline equal to the head is a comparable (empty)
+diff. Facts are head-side only: an `added` fact is a head document and a `modified` fact is
+rebuilt as one from the head side of the before/after pair, so every node still carries its
+own `source`; `removed` facts belong to the baseline generation and are not carried.
+
 ### Freshness, coverage and verification are three different claims
 
 They are separate fields on purpose, because collapsing them is how a caller treats a
@@ -152,6 +376,34 @@ stale-but-valid answer as fresh.
 
 An immutable historical generation does **not** imply live source freshness. A pinned query
 answers from exactly that generation and reports its freshness honestly.
+
+## Control client
+
+`src/axiom_mcp/control_client.py` implements the `ControlPlane` protocol over the daemon's
+control API. The audience boundary is enforced before a socket is opened: the client accepts only
+a credential minted for `axiom-graphd-control`, so an MCP token can never be replayed to the
+daemon and a control credential can never answer an MCP call.
+
+| Operation | Request | Notes |
+| --- | --- | --- |
+| `status` | `GET /v1/solutions/{id}/status` | versions, freshness, coverage, queue counts |
+| `reconcile` | `POST /v1/solutions/{id}/reconcile` | closed body: `scope`, `project_ids`, `reason`, `wait_timeout_ms` |
+| `job` (`status`) | `GET /v1/jobs/{id}?wait_ms=` | reads one job; `wait_ms` is a bound, not a loop |
+| `job` (`cancel`) | `POST /v1/jobs/{id}/cancel` | idempotent; carries no `wait_ms` |
+| `verify` | `POST /v1/solutions/{id}/verify` | follows the reconcile envelope |
+
+A solution or job id must match a bounded identifier pattern, so a path-shaped id never reaches
+the wire. Retries are bounded and cannot be widened by configuration: only `429`, `503` and
+transport failures are retried, `max_attempts` is capped at `MAX_ATTEMPTS_LIMIT` (5), the backoff
+doubles from `0.25` s to a `2` s cap, and a `Retry-After` header is honoured but clamped to that
+cap. Any other 4xx is raised on the first response, so a malformed request is never amplified into
+a retry storm. A canonical code in the daemon's `{code,message,retryable,details,request_id}` body
+wins; otherwise the HTTP status is mapped to the canonical code.
+
+A transport failure becomes a retryable `DAEMON_UNAVAILABLE`, and that is what makes degraded
+reader service real: `graph_reconcile`, `graph_job` and `graph_verify` report the outage, while a
+`graph_query` under the default `allow_stale` consistency still answers from the pinned generation
+with `freshness: unknown`.
 
 ## Capability and authorization
 
@@ -335,20 +587,39 @@ the old identity.
 
 ## Unverified / not yet available
 
-- **The whole tool layer.** No tool is registered; `src/axiom_mcp/tools/` does not exist.
-  All six tools and every shape on this page are contract-only until C-028..C-033 land.
-- **`graph_status`, `graph_query`, `graph_version`, `graph_reconcile`, `graph_job`,
-  `graph_verify`.** Each is specified and unobservable at this revision.
+- **Tool registration and the SDK mount.** `src/axiom_mcp/tools/` exists and
+  `graph_status` and `graph_query` are implemented, but the handlers are not yet wired into
+  the SDK's tool registration, so a client that lists tools still sees an empty catalog.
+  Registration is part of the remaining C-030..C-035 work.
+- **The `changes` diff detail.** `graph_query` carries head-side added and modified facts;
+  the removed facts and the engine's per-kind totals are not part of the envelope. The
+  bundled `demo-solution` declares no schema major, so `changes` legitimately answers
+  `unknown_schema` there and a comparable diff is only reachable for a generation that
+  declares one.
 - **Freshness, coverage and verification computation.** The fields are specified; the
   component that computes them (C-027) is not implemented.
 - **Cursors and byte-budget packing.** Specified in C-026 and C-025; not implemented, so
   `next_cursor`, `truncated` and the budget behaviour are contract-only.
-- **The daemon control plane.** `graph_reconcile`, `graph_job` and `graph_verify` delegate
-  to a graphd control API that is not present in this repository; their delegation and
-  timeout behaviour (C-034) is unverified.
-- **Readiness inputs.** `/readyz` reports the query and control planes; at this revision the
-  default reports both unavailable rather than claiming readiness the gateway has not
-  earned.
+- **A live graphd daemon.** The concrete control client exists (C-034,
+  `src/axiom_mcp/control_client.py`) and its audience handling, bounded retries and outage
+  behaviour are covered by tests over `httpx.MockTransport`, but no real daemon was reached from
+  this repository, so its wire shapes are verified against `contracts/control-api-v1.md` rather
+  than against a running graphd.
+- **Readiness inputs.** `/readyz` reports the query and control planes separately, and the
+  readiness decision now comes from `src/axiom_mcp/lifecycle.py` (C-035): the SDK must be
+  initialized and the query plane usable before a gateway reports ready, an optional query
+  probe may supply or withhold that availability, and a probe that raises is reported as
+  unavailable rather than treated as up. The transport-only default still reports both planes
+  unavailable rather than claiming readiness the gateway has not earned. Shutdown is bounded:
+  in-flight queries are given a deadline, and when it expires the remaining work is counted as
+  cancelled and the guard is released anyway, so a restart cannot inherit a stranded lock.
+  That guard-release leg is covered by a test that drives the real native guard. Control-plane
+  availability is recorded by the caller with `mark_control_available`; it is not yet derived
+  from a running daemon.
 
-Verified at this revision: the transports, the error model and the capability map are real
-and covered by tests. Nothing on this page was observed from a running tool call.
+Verified at this revision: the transports, the error model, the capability map and the
+`graph_status`, `graph_query`, `graph_reconcile`, `graph_job`, `graph_verify` and
+`graph_version` handlers are real
+and covered by tests, exercised against the shipped
+`demo-solution` bundle, the real registry and the real native guard. No tool call has been
+observed through a running gateway, because tool registration is not wired yet.
