@@ -11,6 +11,105 @@
   skips unless `AXIOM_GUARD_HOLDER_ARGV` names an ABI-conformant holder - and the POSIX `flock`
   primitive stays recorded as absent from this host's run. Documentation only; no product code
   changed.
+- **C-027** Expose freshness coverage and verification. Add `src/axiom_mcp/query/envelope.py` and
+  `tests/test_query_envelope.py`. `build_envelope` writes only the contract's success keys and keeps
+  the two facts apart: `project_generations` lists the exact pinned member generations (and
+  `catalog_generation_id` is a deterministic digest over exactly those), `freshness` and `coverage`
+  are resolved independently, and `verification` records why the freshness claim is believed. The
+  flattering direction is refused: a freshness that was not reported or is outside the allowlist is
+  `unknown` rather than `fresh`; a `fresh` claim backed only by a watcher hint is downgraded to
+  `unknown` with a warning, because only an `inventory_hash` verification carrying the
+  `source_fingerprint` it recomputed supports `fresh`; a member pinning no usable coverage status is
+  refused instead of being called complete; and a requested project that is not pinned caps coverage
+  at `partial` and is named in the warnings. A `verification` block that contradicts its own mode is
+  refused rather than stored.
+- **C-026** Bind cursors to snapshot and query. Add `src/axiom_mcp/query/cursor.py` and
+  `tests/test_query_cursor.py`. A cursor is only meaningful inside the request that produced it:
+  `CursorStore.issue` binds it to the catalog generation, the operation and its parameters, the
+  scope, the capability and an expiry, and `CursorStore.resolve` returns the record only for that
+  exact binding. Every mismatch is refused with a named reason - `unknown`, `expired`, `generation`,
+  `scope`, `query`, `capability` - so a cursor can never be replayed against another project,
+  another generation or another query and be misread as paging. Re-resolving the identical binding
+  is paging, not reuse; two issues never collide because the token includes a sequence; the query
+  hash is key-order independent; and an out-of-range ttl plus an unparseable generation are refused
+  rather than clamped.
+- **C-025** Implement response byte-budget packer. Add `src/axiom_mcp/query/budget.py` and
+  `tests/test_query_budget.py`. `pack_response` measures the encoded compact JSON, UTF-8, of the
+  whole document including every metadata key, so the cap cannot be spent separately from the
+  facts. When it does not fit, whole items are trimmed from the end of `nodes`, `edges`,
+  `unresolved`, `candidates` and finally `warnings`, and `dropped` reports exactly what went; a
+  single item too large to fit is recorded as `oversized_item` rather than partially serialised,
+  and metadata that cannot fit at all raises `BudgetExceeded` instead of returning an over-cap
+  document. An unmeasurable document and an out-of-range `max_bytes` are refused explicitly.
+
+- **C-024** Implement generation change comparison. Add `src/axiom_mcp/query/changes.py` and
+  `tests/test_query_changes.py`, plus an optional `schema_major` on `Graph` and
+  `graph_from_documents` in `src/axiom_mcp/query/model.py`. `changes(head, baseline)` reports
+  `added`/`removed`/`modified` node and edge facts per project, matching by pinned id so a rename
+  is an add plus a remove rather than a silent edit, and every answer names the exact head and
+  baseline generations it compared. When the comparison is not valid it is refused with its own
+  status instead of guessed: `missing_baseline`, `incompatible_scope` (different member sets),
+  `unknown_schema` (an undeclared schema major on either side) and `incompatible_schema` (two
+  different majors), each with a warning and no diff to misread.- **C-023** Implement shortest bounded path query. Add `src/axiom_mcp/query/path.py` and
+  `tests/test_query_path.py`, plus public `incident_edges`/`other_end` helpers in
+  `src/axiom_mcp/query/model.py` for operations that need their own walk. `path` returns the
+  shortest bounded path from `target` to `target_to` (`direction` defaults to `both`), and every
+  edge on it is a real pinned edge resolved to the next node. The negative answer is split so a
+  budget stop can never be read as "no path": `budget_exhausted` (a `max_nodes`/`max_edges` stop)
+  is distinct from `proven_absent`, which requires the frontier to empty without being cut, no
+  unpinned requested member, no depth bound reached with a live frontier, and no unresolved
+  reference naming a visited node. `incomplete_reasons` names whatever made the absence
+  provisional.- **C-022** Implement conservative impact closure. Add `src/axiom_mcp/query/impact.py` and
+  `tests/test_query_impact.py`. `impact` is the bounded reverse closure of a target, split into
+  `proven` (reachable only through exact/annotated edges) and `potential` (everything else, kept
+  but labelled), because section 5 requires conservative static impact rather than an authoritative
+  answer. `exhaustive` is true only when nothing cut the view: a depth bound (probed one hop
+  further, or admitted at the maximum depth), a `max_nodes`/`max_edges` stop, an unpinned member,
+  an unresolved reference naming a closure node, and a searched project whose pinned coverage is
+  not `complete` each force it false with a named reason. The shared `bounded_walk` gained an
+  optional `resolutions` filter, and `model.unresolved_references` now backs both this operation
+  and C-021's caller lookup.- **C-021** Implement cross-project caller lookup. Add `src/axiom_mcp/query/callers.py` and
+  `tests/test_query_callers.py`, and record unpinned members on `GraphSet` (`missing_projects`,
+  `searched_projects`) in `src/axiom_mcp/query/model.py`. A caller is found by the *global*
+  reverse index `GraphSet` builds over every pinned member, so a call from another project is not
+  missed; `searched_projects` names what the answer read, `per_project`/`cross_project` say where
+  the callers came from, and the walk is incoming-only so `direction` is not a parameter.
+  `complete`/`incomplete_reasons` mark an answer that must not be read as "no callers": an
+  unpinned member, a budget-stopped walk, or an unresolved edge whose `unresolved_target` names the
+  target (reported, never followed, never counted) all make it false with a warning. Default
+  `edge_kinds` is every pinned kind except `CONTAINS`, because a container is not a caller.- **C-020** Implement dependency and neighbour traversal. Add `src/axiom_mcp/query/neighbors.py`
+  and `tests/test_query_neighbors.py` over the shared `model.bounded_walk` primitive. `neighbors`
+  takes `direction` (`outgoing`/`incoming`/`both`) and an `edge_kinds` allowlist that apply to the
+  *edge*, so the two filters compose: `incoming` never returns an edge whose source is the target,
+  and a filtered-out kind never contributes a hop. `dependencies` is not a second implementation -
+  it is `neighbors(direction="outgoing")` with the dependency kinds as its default - so "what this
+  depends on" and "what points at this" cannot disagree about the graph. A cycle terminates on the
+  visited set, budgets stop expansion with `truncated` and the budget name in `reasons`, and an
+  unresolved edge is reported in `unresolved` rather than followed or silently dropped.- **C-019** Implement context projection. Add `src/axiom_mcp/query/context.py` and
+  `tests/test_query_context.py`, plus `Walk`/`bounded_walk` and an optional pinned `coverage`
+  block on `Graph` in `src/axiom_mcp/query/model.py`. `context` honours `depth` literally,
+  projects exactly the requested `identity`/`source_locations`/`relations`/`coverage` sections,
+  and records `truncated` with the budget name and the nodes where expansion stopped when
+  `max_nodes`/`max_edges` cut the neighbourhood short, so a partial answer cannot be read as a
+  complete one. The breadth-first walk is shared (`bounded_walk`) and terminates on a cycle by
+  visited set; unresolved edges are collected and reported rather than followed silently. An
+  ambiguous target returns candidates with `status="ambiguous_target"` and no invented
+  neighbourhood, a target that matches nothing is `TargetNotFound`, and an out-of-range depth is
+  rejected instead of clamped.
+- **C-018** Implement indexed symbol search. Add `src/axiom_mcp/query/` (the package docstring
+  plus `model.py`) and `src/axiom_mcp/query/search.py`, `tests/test_query_search.py`,
+  `tests/test_query_support.py` and `docs/query-engine.md`. The card names ten modules
+  (`query/search.py` through `query/envelope.py`) but a package cannot be one module: the shared
+  pinned node/edge model and the graph index C-018 needs are `src/axiom_mcp/query/model.py` plus
+  `src/axiom_mcp/query/__init__.py`, both inside the card's `src/axiom_mcp/query/**` deliverable,
+  and the justified path addition is recorded here and in the task evidence. The model has no
+  source-body field at all, so `repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md` section 6's "source
+  positions/symbols instead of full source" default cannot be violated by accident.
+  `search_symbols` answers exact id/qualified-name/name from an index, widens to a
+  `max_nodes`-bounded scan for prefix and substring queries, returns every candidate at the best
+  rank instead of silently choosing one when a name is ambiguous, and reports `truncated` plus a
+  warning when the limit caps the answer. Bounds outside the canonical request ranges raise
+  `LimitRejected` rather than being clamped.
 - **V2-019** Add the cross-language reader guard adapter. Add
   `src/axiom_mcp/guard/adapter.py`, `tests/test_guard_protocol.py`, `tests/test_guard_adapter.py`
   and `tests/test_guard_cross_language.py`, plus a `descriptor()` accessor on both platform
@@ -339,3 +438,4 @@
   `pyproject.toml`, `axiom_mcp.version` and the installed interpreter/SDK, and a boundary
   test proves a legacy-only SDK surface fails the spike.
 - The release gate stays closed. No tag, release branch or publish was created.
+
