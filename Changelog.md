@@ -2,7 +2,16 @@
 
 ## Unreleased
 
-- **C-022** Implement conservative impact closure. Add `src/axiom_mcp/query/impact.py` and
+- **C-023** Implement shortest bounded path query. Add `src/axiom_mcp/query/path.py` and
+  `tests/test_query_path.py`, plus public `incident_edges`/`other_end` helpers in
+  `src/axiom_mcp/query/model.py` for operations that need their own walk. `path` returns the
+  shortest bounded path from `target` to `target_to` (`direction` defaults to `both`), and every
+  edge on it is a real pinned edge resolved to the next node. The negative answer is split so a
+  budget stop can never be read as "no path": `budget_exhausted` (a `max_nodes`/`max_edges` stop)
+  is distinct from `proven_absent`, which requires the frontier to empty without being cut, no
+  unpinned requested member, no depth bound reached with a live frontier, and no unresolved
+  reference naming a visited node. `incomplete_reasons` names whatever made the absence
+  provisional.- **C-022** Implement conservative impact closure. Add `src/axiom_mcp/query/impact.py` and
   `tests/test_query_impact.py`. `impact` is the bounded reverse closure of a target, split into
   `proven` (reachable only through exact/annotated edges) and `potential` (everything else, kept
   but labelled), because section 5 requires conservative static impact rather than an authoritative

@@ -800,6 +800,29 @@ def _restrict_resolutions(
     return tuple(edge for edge in edges if edge.resolution in resolutions)
 
 
+def incident_edges(
+    scope: Graph | GraphSet | Iterable[Graph],
+    node_id: str,
+    direction: str,
+    edge_kinds: Sequence[str] | None = None,
+) -> tuple[Edge, ...]:
+    """Public, validated form of :func:`_incident` for operations that need their own walk."""
+    pinned = as_graph_set(scope)
+    heading = choice(direction, "direction", DIRECTIONS, default="both")
+    kinds = (
+        None
+        if edge_kinds is None
+        else choice_list(edge_kinds, "edge_kinds", tuple(sorted(EDGE_KINDS)))
+    )
+    return _incident(pinned, node_id, heading, kinds)
+
+
+def other_end(edge: Edge, node_id: str, direction: str) -> str | None:
+    """Public form of :func:`_other_end`: the node one hop away, or ``None`` if unresolved."""
+    heading = choice(direction, "direction", DIRECTIONS, default="both")
+    return _other_end(edge, node_id, heading)
+
+
 def _incident(
     pinned: GraphSet,
     node_id: str,

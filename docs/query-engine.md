@@ -108,3 +108,17 @@ searched project's pinned coverage is `complete`. Otherwise `exhaustive` is fals
 `incomplete_reasons` names what cut the view (`depth_limited`, `truncated`, `missing_members`,
 `unresolved_edges`, `coverage_not_complete`). The result is static potential impact: not proof of
 runtime damage, and not proof that no other node is impacted.
+## Path (C-023)
+
+`path` returns the shortest bounded path from `target` to `target_to` (required). `direction`
+defaults to `both`, so a path may follow an edge in either orientation; pass `outgoing` for a
+dependency-only path. A found path is returned in order with `length`, and every edge on it is a
+real pinned edge of the scope resolved to the next node.
+
+The point of the operation is the negative answer. `budget_exhausted` and `proven_absent` are
+different fields because they mean different things: a `max_nodes` or `max_edges` stop leaves the
+question open, and reading it as "there is no path" would be wrong. `proven_absent` is true only
+when the search finished without being cut - the frontier emptied, the depth bound was not hit
+with a live frontier, no requested member is unpinned, and no unresolved reference names a node the
+search visited. Otherwise `incomplete_reasons` names why (`budget_exhausted`, `depth_limited`,
+`missing_members`, `unresolved_edges`) and the answer is "not found, and not disproved".
