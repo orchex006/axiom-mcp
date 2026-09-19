@@ -51,6 +51,44 @@
   one process, an upgrade attempt and a recursive acquisition being refused with deterministic
   reasons, an identity read after close failing as `identity_unreadable`, and a reader denied on
   `data.lock` releasing the admission it already held.
+- **D-011** Document the snapshot race and read-only semantics. Add `docs/guides/snapshots.md`,
+  the reader-facing guide to the publication protocol in
+  `axiom-specs/docs/12-SNAPSHOT-READ-WRITE-PROTOCOL.md` and the lock ABI in
+  `axiom-specs/contracts/native-reader-writer-guards.md`. The guide states the eight
+  invariants (SNP-01..SNP-08) and then the one rule the rest exists to protect: a reader holds
+  the shared guard, reads the pointer once and pins exactly one generation vector for the whole
+  request, so an answer can never be half old and half new. It walks the three nested integrity
+  claims (pointer names the generation and carries the manifest digest; the manifest lists every
+  shard with path, role, SHA-256, byte size and record count; each shard is pinned by that
+  entry), the exact guard shape (`SolutionGuard.reader()` acquires `admission.lock` then
+  `data.lock` shared, releases admission early, copies the bounded bytes, releases data, and only
+  then parses), the bounded-wait constants (default 5000 ms, maximum single wait 60000 ms, retry
+  25 ms doubling to a 250 ms cap, no upgrade and no recursive acquire), the recovery table for
+  missing, corrupt and collected generations (`SNAPSHOT_UNAVAILABLE` retryable,
+  `SNAPSHOT_CORRUPT` and `SNAPSHOT_EXPIRED` not), retention and disk-full behaviour that never
+  deletes the current generation, and the crash-recovery matrix. It states plainly that raw
+  multi-file reads are not safe - they hold no reader registration and no lock, so nothing
+  coordinates them with GC or a Git checkout - and that a direct reader keeps consistency only
+  by pinning one generation and validating every hash. The unimplemented surfaces are named
+  rather than implied: the Windows guard backend is absent at this revision, cross-process Rust
+  and Python interop is unverified, and no GC, daemon or reader-session runtime exists here.
+- **D-007** Write the MCP tools and response reference. Add `docs/reference/mcp.md`, the
+  reference for the tool and response contract the specification fixes. It opens with an
+  explicit status note that the tool layer is **not implemented at this revision** - there is no
+  `src/axiom_mcp/tools/` package and nothing registers a tool, so a client that lists tools sees
+  an empty catalog - and every shape is labelled a contract rather than an observation. The page
+  records the two protocol transports (`/mcp` Streamable HTTP and stdio) with `/healthz` and
+  `/readyz` kept apart, the six-tool catalog with purpose, required capability, side effect and
+  the registering task (C-028..C-033), the complete `graph_query` request with its closed schema,
+  scope rule (`project_id` XOR `project_ids`) and per-operation requirements, the budgets with
+  their defaults and maxima (`depth` 0..8 default 2, `max_nodes` 1..500 default 50, `max_edges`
+  0..1000 default 100, `max_bytes` 512..32768 default 8192), the fifteen edge kinds, the
+  `consistency`, `direction` and `projection` allowlists, the response keys with the freshness,
+  coverage and verification enums, the capability map and audience separation, both error
+  surfaces with the canonical envelope and code table plus the JSON-RPC and HTTP mappings, and
+  the redaction and detail bounds. Two self-contained sample queries are contract examples and
+  are noted as such; neither names a file, and the page states that `graph_query` has no `path`,
+  `file` or `root` input, so a client cannot read an arbitrary file by naming one.
 - **C-013** Validate manifest digests and canonical JSON. Add
   `src/axiom_mcp/manifest.py`, `tests/test_manifest.py`, `docs/manifest-validation.md` and
   vendored pinned test fixtures under `tests/fixtures/`. A published generation is three
