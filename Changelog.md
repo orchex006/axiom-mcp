@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+- **C-030** Register the `graph_reconcile` tool in `src/axiom_mcp/tools/reconcile.py`. The
+  tool authorizes, then delegates through the `ControlPlane` protocol, and never reads a snapshot,
+  parses a source file or writes a shard - which is AC1's "Python never parses source or writes
+  graph shards" in executable form: `tests/test_tools_reconcile.py` swaps in a source spy that
+  raises on any read and asserts it is never touched, and asserts the daemon was asked for exactly
+  one reconcile. The request is closed and stricter than the transport contract in one place: the
+  seed lists `solution,projects,scope,wait_timeout_ms,reason`, and this revision requires a
+  bounded audit `reason` (<=200 characters) because the string travels to the daemon's journal.
+  `scope` is `dirty` (default), `project` or `full`; `project` requires an explicit project
+  selector and `scope != project` refuses one, so an ambiguous request is a `VALIDATION_ERROR`
+  rather than a guess. `wait_timeout_ms` is bounded to `0..30000` so an MCP call cannot park a
+  request on a queue. A read-only token is `FORBIDDEN` before the control plane is consulted; an
+  invisible solution is `NOT_FOUND`; an unknown project is `NOT_FOUND`. The daemon's answer is
+  never passed through verbatim: a job answer is projected to `{job_id, state, target_event_seq,
+  retry_after_ms}` and a `state` outside `contracts/schemas/job.schema.json` is
+  `DAEMON_UNAVAILABLE`, while an existing-publication answer is projected to
+  `{catalog_generation_id, verification, dirty}`. An unreachable or unusable control plane is
+  `DAEMON_UNAVAILABLE` with `retryable: true`. Adds 21 regression tests (positive, negative and
+  failure-boundary legs) in `tests/test_tools_reconcile.py`.
+
 - **C-029** Register the `graph_query` tool in `src/axiom_mcp/tools/query.py`. One bounded
   dispatcher turns a closed request into exactly one engine call over the pinned generations read
   through the trusted registry, and answers with the contract envelope built by

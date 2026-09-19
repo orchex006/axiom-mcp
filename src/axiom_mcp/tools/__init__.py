@@ -24,6 +24,7 @@ from axiom_mcp.tools.context import (
     ToolPrincipal,
 )
 from axiom_mcp.tools.query import graph_query
+from axiom_mcp.tools.reconcile import graph_reconcile
 from axiom_mcp.tools.status import graph_status
 
 __all__ = [
@@ -35,6 +36,7 @@ __all__ = [
     "ToolSpec",
     "UnknownTool",
     "graph_query",
+    "graph_reconcile",
     "graph_status",
     "names",
     "spec_for",
