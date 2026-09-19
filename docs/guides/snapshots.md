@@ -262,10 +262,16 @@ consistency.
 - **No GC, daemon or publication runtime exists in this repository.** Retention, disk-full
   behaviour and outbox recovery are specified in the protocol; nothing here implements or
   has observed them.
-- **No reader-session or cache runtime exists.** The pin-once reader algorithm, the shared
-  guard copy and the closure check are specified; the manifest validator
-  (`src/axiom_mcp/manifest.py`) and the registry (`src/axiom_mcp/registry.py`) are
-  implemented and tested on their own.
+- **The reader session and the cache ship as code, with their limits stated rather than
+  implied.** `src/axiom_mcp/read_session.py` copies the pointer, the manifest and the required
+  shards under the shared guard and releases the guard before any response work;
+  `guard_held_during_copy` and `parsed_after_guard_release` are recorded on the snapshot, so
+  the phase split is observable instead of assumed. `src/axiom_mcp/cache.py` keys its bounded
+  LRU by immutable generation identity and never by a pointer, so a moved pointer cannot hit
+  the previous generation's entry. The manifest validator (`src/axiom_mcp/manifest.py`) and
+  the registry (`src/axiom_mcp/registry.py`) remain implemented and tested on their own. What
+  no module here implements is the writer's half: the daemon, the publication outbox and GC
+  are `axiom-graphd` work, as the item above records.
 - **Platform coverage.** Verified on Windows with this repository's interpreter only; no
   Linux, macOS, CI, installed-wheel or native certification was performed, and the release
   gate stays closed.

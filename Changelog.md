@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- **docs** (W9-4) Enforce the snapshot guide's limits and correct the remaining stale one. The
+  guard-limits correction recorded by lane L5 had already landed as `48b9e36`, so the "Windows
+  backend is absent" sentence is not in `docs/guides/snapshots.md` at this revision; the recorded
+  follow-up was therefore delivered as the checkable statement plus enforcement it asked for. That
+  same "Unverified / limits" list still claimed **no reader-session or cache runtime exists**,
+  which is stale for the same reason: `src/axiom_mcp/read_session.py` (copies under the shared
+  guard, releases before any response work, records `guard_held_during_copy` and
+  `parsed_after_guard_release`) and `src/axiom_mcp/cache.py` (bounded LRU keyed by immutable
+  generation identity) ship and are tested. The paragraph now names both modules and what they
+  guarantee, and keeps the part that is genuinely not implemented - the writer's half - as
+  `axiom-graphd` work. New `tests/test_snapshot_guide_truth.py` reads the guide and compares it
+  with the backends' own `primitive`/`scope` declarations and `guard.protocol.WINDOWS_BYTE_RANGE`
+  (normalized, so "byte range" and "byte-range" compare equal), asserts the nine modules the guide
+  points at are named and present, and fails if a stale claim reappears; the negative leg rewrites
+  the guide back to the old wording and shows the checker rejects it. The backends are read as
+  source declarations rather than imported, because `locks_posix` needs `fcntl` and `locks_windows`
+  needs `msvcrt`, so the check runs on every platform instead of skipping on the one whose
+  paragraph it protects. Documentation and test only; no product code changed.
+
 - **V2-027** Add `docs/query-transports.md`, the page that records the JSON-first read model and
   the two supported transports without restating the snapshot protocol. It states what JSON-first
   does and does not mean: the processed-JSON snapshot stays directly readable with no MCP process,
