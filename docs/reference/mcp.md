@@ -9,13 +9,12 @@ transport, the tool catalog and the `graph_query` contract;
 `contracts/redaction-policy.md` fixes what may cross the response boundary. This page is a
 reference for that contract, not a record of a running gateway.
 
-**Status: the tool layer is not implemented at this revision.** The tree contains the
-transports, the error model, the native guard engine, the registry, the manifest validator
-and the CLI. It contains no tool registration: there is no `src/axiom_mcp/tools/` package
-and nothing calls the SDK's tool registration. The six tools below are the canonical
-catalog the specification fixes, and `src/axiom_mcp/security.py` already enforces their
-capability map at the transport boundary before the tool layer exists - but a client that
-lists tools today sees an empty catalog. Every shape here is a **contract, not an
+**Status: the tool layer is landing task by task.** The tree contains the transports, the
+error model, the native guard engine, the registry, the manifest validator, the bounded
+query engine and the CLI. `src/axiom_mcp/tools/` now exists: `catalog.py` holds the
+canonical six-tool catalog, `context.py` holds the closed-argument parser and the
+re-authorizing `ToolContext`, and `status.py` implements `graph_status`. The rows below
+record which tools are real at this revision; every remaining shape is a **contract, not an
 observation**, until the registering task named in the catalog lands.
 
 ## Transports
@@ -41,7 +40,7 @@ access.
 
 | Tool | Purpose | Capability | Side effect | Registered by | Status |
 | --- | --- | --- | --- | --- | --- |
-| `graph_status` | Solution/project freshness, coverage, generations, capabilities | `read` | none | C-028 | Specified, not yet available |
+| `graph_status` | Solution/project freshness, coverage, generations, capabilities | `read` | none | C-028 | Implemented (`tools/status.py`) |
 | `graph_query` | Graph operation: `search`, `context`, `neighbors`, `callers`, `dependencies`, `impact`, `path`, `changes` | `read` | none | C-029 | Specified, not yet available |
 | `graph_reconcile` | Enqueue a graphd reconcile job for a scope | `reconcile` | Enqueue graphd job | C-030 | Specified, not yet available |
 | `graph_job` | Job status or explicit cancel | `reconcile` | Status read; `cancel` is an explicit write | C-031 | Specified, not yet available |
@@ -335,8 +334,12 @@ the old identity.
 
 ## Unverified / not yet available
 
-- **The whole tool layer.** No tool is registered; `src/axiom_mcp/tools/` does not exist.
-  All six tools and every shape on this page are contract-only until C-028..C-033 land.
+- **Tool registration and the SDK mount.** `src/axiom_mcp/tools/` exists and
+  `graph_status` is implemented, but the handlers are not yet wired into the SDK's tool
+  registration, so a client that lists tools still sees an empty catalog. Registration is
+  part of the remaining C-029..C-033 work.
+- **`graph_query`, `graph_version`, `graph_reconcile`, `graph_job`, `graph_verify`.**
+  Each is specified and unobservable at this revision; only `graph_status` is real.
 - **`graph_status`, `graph_query`, `graph_version`, `graph_reconcile`, `graph_job`,
   `graph_verify`.** Each is specified and unobservable at this revision.
 - **Freshness, coverage and verification computation.** The fields are specified; the
@@ -350,5 +353,7 @@ the old identity.
   default reports both unavailable rather than claiming readiness the gateway has not
   earned.
 
-Verified at this revision: the transports, the error model and the capability map are real
-and covered by tests. Nothing on this page was observed from a running tool call.
+Verified at this revision: the transports, the error model, the capability map and the
+`graph_status` handler are real and covered by tests, exercised against the shipped
+`demo-solution` bundle, the real registry and the real native guard. No tool call has been
+observed through a running gateway, because tool registration is not wired yet.

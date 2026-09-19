@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- **C-028** Register the `graph_status` tool. Add the `src/axiom_mcp/tools/` package: `catalog.py`
+  (the six-tool catalog with its capability, read-only/destructive/open-world annotation and the
+  registering task), `context.py` (the closed-argument parser and the `ToolContext` every handler
+  runs inside) and `status.py` (`graph_status`). The answer is a closed object - an unexpected field
+  is a `VALIDATION_ERROR` whose message names the key and never its value - and it reports the
+  snapshot and the optional daemon half as two separate facts: the generations, records,
+  fingerprints and coverage come from the pinned generations read through the trusted registry with
+  the same bounded read session a query uses, and the daemon is consulted only when `include_daemon`
+  asks for it. Freshness is never overstated: a read session's `manifest_hash` proves the bytes are
+  the published ones and *not* that the snapshot is newer than the source tree, so a daemon that
+  merely reports `fresh` without an `inventory_hash` verification carrying the fingerprint it
+  recomputed is downgraded to `unknown` with the reason in `warnings`, and an unreachable daemon is
+  an unavailable plane with the failure named rather than a failed status answer. An unauthorized
+  solution and an unregistered one both answer `NOT_FOUND`, so the tool is not a solution
+  enumeration oracle, and a project outside the token's scope is equally invisible. A pinned
+  generation whose coverage block is unusable is `SNAPSHOT_CORRUPT`, not a complete answer.
+
 - **docs** Correct the guard limits in `docs/guides/snapshots.md`. The guide claimed the
   Windows `LockFileEx` backend was not present and that `src/axiom_mcp/guard/` ships
   `locks_posix.py` only, which was stale after C-011 and V2-019: `locks_windows.py` ships and
