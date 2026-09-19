@@ -79,5 +79,8 @@ This module owns **which stream carries protocol and which carries diagnostics**
 
 ## Verification
 
+`python -m axiom_mcp.stdio --name <name>` is also the argv a locked launch plan names
+(`docs/locked-entrypoints.md`), so `main` is covered end to end by that plan's launch leg as well.
+
 `tests/test_stdio_transport.py` is the targeted regression test. `python -m pytest tests -q` is the required repository
 check; `python -m ruff check .` and `python -m ruff format --check .` cover lint and formatting.

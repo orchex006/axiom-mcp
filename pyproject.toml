@@ -26,6 +26,9 @@ dev = [
 
 [project.scripts]
 axiom-mcp = "axiom_mcp.cli:main"
+# The locked launch surface, so a version environment can be asked for its own plan
+# by name as well as through `python -m axiom_mcp.entrypoints`.
+axiom-mcp-entrypoints = "axiom_mcp.entrypoints:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

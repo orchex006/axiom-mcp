@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+- **V2-024** Add `src/axiom_mcp/entrypoints.py`, the locked launch surface a host consumes
+  without a shell. A plan is an absolute interpreter plus an argv list, never a command string,
+  so a path holding a space, an ampersand, parentheses, an apostrophe and Thai text arrives as
+  one argument; `--activation-script` and `--resolve-from-path` are refused rather than honoured.
+  The surface reads the packager layout it does not own (`current.json` -> `versions/<v>/` ->
+  `lockfile.json`) and mirrors that layout's names, because `release/` is not installed; a test
+  reads both definitions so a mirror that drifts fails instead of becoming a silent second
+  definition. Resolution verifies rather than believes: the recorded interpreter must resolve
+  inside that version's own `venv`, and it is then asked what it is - prefix, base prefix,
+  supported Python line and SDK version - with a bare interpreter, an interpreter outside the
+  environment, a non-isolated prefix, an unsupported Python line and an SDK that is not
+  `mcp==1.28.1` all refused with stable codes. The launch environment is built from scratch
+  (no `PYTHONPATH`, `PYTHONHOME` or login `PATH`), so a plan digest is reproducible;
+  `PYTHONNOUSERSITE` is set only for an environment that does not declare sharing, and the host
+  facts an interpreter cannot start without - the user-site anchors and, on Windows,
+  `SystemRoot` plus the loader directory - survive a caller that supplies a partial environment.
+  Three behaviours were measured here instead of assumed: without `SystemRoot` importing the SDK
+  dies in `asyncio/windows_events.py` with `OSError: [WinError 10106]`; a sharing environment's
+  user site is located through `APPDATA`, so dropping it makes a complete environment look
+  `sdk_not_installed`; and `pyvenv.cfg` created at a non-ASCII path can hold cp874 or cp1252
+  bytes, so the one-boolean metadata read is deliberately lossy. HTTP stays opt-in and is refused
+  unless its allowlist admits the address about to be bound. AC1 and AC2 are proven in
+  `tests/test_entrypoints.py` (55 legs) with real `venv` environments at that awkward path and a
+  real JSON-RPC `initialize` over the launched plan pipes. That launch exposed a live defect in
+  the entrypoint it distributes: `axiom_mcp.stdio.main` passed `banner=` to `anyio.run`, which
+  forwards only positional arguments, so `python -m axiom_mcp.stdio` - the documented way to run
+  the transport on its own, and the exact argv this plan names - died with `TypeError: run() got
+  an unexpected keyword argument 'banner'` before serving anything. `serve_stdio` was correct and
+  directly tested, which is why it stayed latent; `main` now binds the keyword with
+  `functools.partial`. Its `main` is declared in `pyproject.toml` as the
+  `axiom-mcp-entrypoints` console script, and the emitted document keeps `ensure_ascii`
+  on: reading a plan back as a process showed the Thai part of the interpreter path
+  arriving as mojibake, because `ensure_ascii=False` hands raw characters to a stdout
+  whose pipe encoding is the host code page. Documented in `docs/locked-entrypoints.md`. Native Windows reparse-point
+  and ACL behaviour, macOS, and a real non-loopback bind remain `not_run` here.
 - **V2-016** Add `src/axiom_mcp/paths.py`, the boundary where a *wire path* and a *native binding*
   are normalized by two different rules. A wire path is a repository-relative UTF-8 reference with
   `/` separators, validated lexically with no filesystem access, so a traversal, drive-qualified,
