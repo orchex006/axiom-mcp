@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- **C-014** Load bounded shards and reject traversal. Add `src/axiom_mcp/shards.py`,
+  `tests/test_shards.py` and a bounded-shard section in `docs/snapshot-reader-core.md`. The
+  load runs four checks in a fixed order, all of them before any JSON parser is involved: the
+  entry's role must own the directory its path claims; the declared byte size must fit the
+  caller's `ShardLimits` cap and the plan's declared total must fit the plan budget, both
+  checked before the file is opened; the path must not be a symlink, must be a regular file
+  and must resolve inside its own generation directory; and the read itself is bounded to
+  `cap + 1` bytes, so a shard that grew on disk is refused without ever being materialised.
+  Only then does `Manifest.verify_shard` apply the canonical length/digest/parse/record-count
+  rule to the copied bytes. `ShardLimits` refuses a cap above the canonical 16 MiB instead of
+  silently clamping it, and `copy_shards` is deliberately separate from `verify_copied` so
+  C-015 can copy under the shared guard and parse after releasing it. AC1 is observed by the
+  negative cases: a leaf symlink, a symlinked parent that leaves the lane, a symlinked parent
+  that stays in the lane but outside the generation, an over-declared shard whose file is a
+  directory, an oversized shard whose bytes are not valid JSON, a plan over budget passed a
+  reader that fails if it is ever called, a forged manifest entry, and substituted bytes of
+  the same size.
 - **C-012** Pin one catalog vector per query and never fall back to a project's latest
   generation. Add `src/axiom_mcp/catalog.py`, `tests/test_catalog.py` and vendored pinned
   fixtures under `tests/fixtures/solution/demo-solution/` (byte-for-byte from

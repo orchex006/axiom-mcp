@@ -108,3 +108,46 @@ renamed generation directory and an absent catalog pointer.
 `tests/fixtures/solution/demo-solution/` is vendored byte-for-byte from
 `axiom-specs/examples/snapshots/.axiom/graph/demo-solution`; the test asserts each vendored
 manifest still hashes to the generation directory that holds it.
+
+## C-014 — Bounded shard load (`src/axiom_mcp/shards.py`)
+
+`docs/12-SNAPSHOT-READ-WRITE-PROTOCOL.md` section 5 step 5 fixes the traversal rule - traverse
+from the manifest indexes only, never glob JSON, keep every file under the bound graph root
+after canonicalization, and refuse a symlink escape - and `docs/11-GRAPH-DATA-CONTRACT.md`
+section 6 fixes each role's shard location and the 16 MiB hard cap. This module is where those
+two rules are enforced *before* a JSON parser is involved, which is the difference between a
+cap and a post-hoc check.
+
+Four checks, in this order, and the order is the point:
+
+| Step | Check | Refuses |
+| --- | --- | --- |
+| 1 | the entry's role owns the directory its path claims | a `nodes` entry pointing at `edges/000000.json`, an unknown role, a nested path |
+| 2 | declared `bytes` fit the caller's cap, and the plan's declared total fits the plan budget | a shard or plan over budget, before the file is opened |
+| 3 | the path is not a symlink, is a regular file, and resolves inside its generation directory | a leaf symlink, a symlinked parent, a directory where a shard should be |
+| 4 | the read is bounded to `cap + 1` bytes | a shard that grew on disk, without ever materialising it |
+
+Only then does `Manifest.verify_shard` run - length, digest, parse, record count - so the bytes
+that are parsed are the bytes that were hashed, and the hash is the one the manifest declares.
+`ShardLimits` may lower the cap for one query but refuses a value above the canonical 16 MiB,
+because widening the contract cap locally is exactly the silent weakening the contract forbids;
+a plan is refused for its declared size before the first read, so an oversized manifest cannot
+turn into disk traffic first.
+
+Consequences worth knowing when reading the code:
+
+* **`copy_shards` is separate from `verify_copied` on purpose.** C-015 needs the copy to happen
+  under the shared guard and the parse to happen after the guard is released, so the copy and
+  the verification are two functions rather than one call.
+* **`read_bounded` is the only read path.** It returns at most `limit + 1` bytes, so a caller
+  that sees more than `limit` knows the file is over the cap without ever holding it.
+* **A manifest is not trusted just because it was validated.** `shard_path` re-checks the role
+  and the path, and a forged `ManifestEntry` that is not a permitted role/path pair is refused
+  even though it never came from `load_manifest_bytes`.
+
+`tests/test_shards.py` proves the positive path (only the required roles are read, exactly one
+bounded read each) and the negative ones: a leaf symlink, a symlinked parent that leaves the
+lane, a symlinked parent that stays in the lane but outside the generation, an over-declared
+shard whose file is a directory, an oversized shard whose bytes are not valid JSON, a plan that
+is over budget passing a reader that fails if it is ever called, a forged manifest entry, and
+substituted bytes of the same size.
