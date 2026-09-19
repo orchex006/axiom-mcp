@@ -451,6 +451,7 @@ class Graph:
     generation_id: str
     nodes: tuple[Node, ...]
     edges: tuple[Edge, ...]
+    coverage: Mapping[str, Any] | None = None
     _by_id: Mapping[str, Node] = field(init=False, repr=False, compare=False)
     _outgoing: Mapping[str, tuple[Edge, ...]] = field(init=False, repr=False, compare=False)
     _incoming: Mapping[str, tuple[Edge, ...]] = field(init=False, repr=False, compare=False)
@@ -512,6 +513,29 @@ class Graph:
     def incoming(self, node_id: str, kinds: tuple[str, ...] | None = None) -> tuple[Edge, ...]:
         return _direct(self._incoming, node_id, kinds)
 
+    @property
+    def coverage_status(self) -> str:
+        """The pinned coverage status, or ``unknown`` when this view has no coverage block."""
+        if not self.coverage:
+            return "unknown"
+        return str(self.coverage.get("status", "unknown"))
+
+    def coverage_document(self) -> Mapping[str, Any]:
+        """The contract fields of the pinned coverage block, and nothing else."""
+        if not self.coverage:
+            return {}
+        return {
+            key: self.coverage[key]
+            for key in (
+                "status",
+                "input_files",
+                "processed_files",
+                "unresolved_references",
+                "unsupported_patterns",
+            )
+            if key in self.coverage
+        }
+
     def as_set(self) -> GraphSet:
         return GraphSet((self,))
 
@@ -522,6 +546,7 @@ def graph_from_documents(
     *,
     nodes: Iterable[Mapping[str, Any]],
     edges: Iterable[Mapping[str, Any]],
+    coverage: Mapping[str, Any] | None = None,
 ) -> Graph:
     """Build one pinned generation from already-parsed shard documents."""
     return Graph(
@@ -529,6 +554,7 @@ def graph_from_documents(
         generation_id=generation_id,
         nodes=tuple(node_from_document(item) for item in nodes),
         edges=tuple(edge_from_document(item) for item in edges),
+        coverage=coverage,
     )
 
 
@@ -540,16 +566,20 @@ def graph_from_snapshot(snapshot: LoadedSnapshot) -> Graph:
     """
     nodes: list[Mapping[str, Any]] = []
     edges: list[Mapping[str, Any]] = []
+    coverage: Mapping[str, Any] | None = None
     for shard in snapshot.shards:
         if shard.role == "nodes":
             nodes.extend(shard.document)
         elif shard.role == "edges":
             edges.extend(shard.document)
+        elif shard.role == "coverage":
+            coverage = dict(shard.document)
     return graph_from_documents(
         snapshot.project_id,
         snapshot.generation_id,
         nodes=nodes,
         edges=edges,
+        coverage=coverage,
     )
 
 
@@ -694,6 +724,161 @@ def narrow_scope(scope: GraphSet, project_ids: Iterable[str] | None) -> GraphSet
     return GraphSet(scope.graph(identifier_text(pid, what="project_id")) for pid in chosen)
 
 
+def _other_end(edge: Edge, node_id: str, direction: str) -> str | None:
+    """The node one hop away from ``node_id`` along ``edge``, or ``None`` for an unresolved edge."""
+    if edge.target_id is None:
+        return None
+    if direction == "outgoing":
+        return edge.target_id if edge.source_id == node_id else None
+    if direction == "incoming":
+        return edge.source_id if edge.target_id == node_id else None
+    if edge.source_id == node_id:
+        return edge.target_id
+    if edge.target_id == node_id:
+        return edge.source_id
+    return None
+
+
+def _incident(
+    pinned: GraphSet, node_id: str, direction: str, kinds: tuple[str, ...] | None
+) -> tuple[Edge, ...]:
+    outgoing = pinned.outgoing(node_id, kinds) if direction in ("outgoing", "both") else ()
+    incoming = pinned.incoming(node_id, kinds) if direction in ("incoming", "both") else ()
+    if direction == "outgoing":
+        return tuple(sorted(outgoing, key=lambda edge: (edge.kind, edge.id)))
+    if direction == "incoming":
+        return tuple(sorted(incoming, key=lambda edge: (edge.kind, edge.id)))
+    merged: dict[str, Edge] = {}
+    for edge in (*outgoing, *incoming):
+        merged.setdefault(edge.id, edge)
+    return tuple(merged[key] for key in sorted(merged, key=lambda key: (merged[key].kind, key)))
+
+
+@dataclass(frozen=True)
+class Walk:
+    """The bounded result of a breadth-first walk over pinned edges.
+
+    ``truncated`` is true when a budget stopped the walk, and ``reasons`` names which one. A walk
+    that ends because the frontier emptied is *not* truncated: that is the difference between "the
+    answer was cut short" and "there was nothing further to walk", and the operations built on
+    this primitive report it instead of collapsing the two into one flag.
+    """
+
+    roots: tuple[str, ...]
+    nodes: tuple[Node, ...]
+    edges: tuple[Edge, ...]
+    unresolved: tuple[Edge, ...]
+    depth: int
+    depth_reached: int
+    truncated: bool
+    reasons: tuple[str, ...]
+    frontier: tuple[str, ...]
+
+    @property
+    def node_ids(self) -> tuple[str, ...]:
+        return tuple(node.id for node in self.nodes)
+
+    @property
+    def visited(self) -> int:
+        return len(self.nodes)
+
+
+def bounded_walk(
+    scope: Graph | GraphSet | Iterable[Graph],
+    roots: Iterable[str],
+    *,
+    depth: int | None = None,
+    direction: str | None = None,
+    edge_kinds: Sequence[str] | None = None,
+    max_nodes: int | None = None,
+    max_edges: int | None = None,
+) -> Walk:
+    """Breadth-first walk bounded by depth, node count and edge count.
+
+    ``depth`` counts hops: 0 returns the roots alone. A visited set makes a cycle terminate by
+    construction - a node is expanded once, so ``a -> b -> a`` cannot loop - and the node/edge
+    budgets stop expansion even when the graph is larger than the requested answer. Unresolved
+    edges (``resolution="unresolved"``, no ``target_id``) are collected rather than followed: they
+    are exactly the "there may be more, and this generation cannot say where" case.
+    """
+    pinned = as_graph_set(scope)
+    hops = bounded_int(depth, "depth", low=0, high=MAX_DEPTH, default=DEFAULT_DEPTH)
+    heading = choice(direction, "direction", DIRECTIONS, default="both")
+    kinds = (
+        None
+        if edge_kinds is None
+        else choice_list(edge_kinds, "edge_kinds", tuple(sorted(EDGE_KINDS)))
+    )
+    node_budget = bounded_int(
+        max_nodes, "max_nodes", low=1, high=MAX_NODES, default=DEFAULT_MAX_NODES
+    )
+    edge_budget = bounded_int(
+        max_edges, "max_edges", low=0, high=MAX_EDGES, default=DEFAULT_MAX_EDGES
+    )
+
+    ordered_roots: list[str] = []
+    for root in roots:
+        node_id = sha256_text(root, what="walk root")
+        if node_id not in ordered_roots:
+            ordered_roots.append(node_id)
+    ordered_roots.sort()
+
+    visited: dict[str, Node] = {}
+    walked: dict[str, Edge] = {}
+    unresolved: dict[str, Edge] = {}
+    reasons: set[str] = set()
+    blocked_at: set[str] = set()
+    for node_id in ordered_roots:
+        if len(visited) >= node_budget:
+            reasons.add("max_nodes")
+            blocked_at.add(node_id)
+            break
+        visited[node_id] = pinned.node(node_id)
+
+    current = [node_id for node_id in ordered_roots if node_id in visited]
+    depth_reached = 0
+    for level in range(1, hops + 1):
+        if not current:
+            break
+        discovered: list[str] = []
+        for node_id in current:
+            for edge in _incident(pinned, node_id, heading, kinds):
+                known = edge.id in walked or edge.id in unresolved
+                if not known and len(walked) + len(unresolved) >= edge_budget:
+                    reasons.add("max_edges")
+                    blocked_at.add(node_id)
+                    continue
+                if edge.resolved:
+                    walked.setdefault(edge.id, edge)
+                else:
+                    unresolved.setdefault(edge.id, edge)
+                other = _other_end(edge, node_id, heading)
+                if other is None or other in visited or other in discovered:
+                    continue
+                if len(visited) + len(discovered) >= node_budget:
+                    reasons.add("max_nodes")
+                    blocked_at.add(node_id)
+                    continue
+                discovered.append(other)
+        for node_id in discovered:
+            visited[node_id] = pinned.node(node_id)
+        if discovered:
+            depth_reached = level
+        current = discovered
+
+    return Walk(
+        roots=tuple(ordered_roots),
+        nodes=tuple(visited[key] for key in sorted(visited)),
+        edges=tuple(walked[key] for key in sorted(walked)),
+        unresolved=tuple(unresolved[key] for key in sorted(unresolved)),
+        depth=hops,
+        depth_reached=depth_reached,
+        truncated=bool(reasons),
+        reasons=tuple(sorted(reasons)),
+        frontier=tuple(sorted(blocked_at)),
+    )
+
+
 __all__ = [
     "CALL_KINDS",
     "CONTAINS",
@@ -729,7 +914,9 @@ __all__ = [
     "TargetAmbiguous",
     "TargetNotFound",
     "UNRESOLVED",
+    "Walk",
     "as_graph_set",
+    "bounded_walk",
     "bounded_int",
     "choice",
     "choice_list",

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **C-019** Implement context projection. Add `src/axiom_mcp/query/context.py` and
+  `tests/test_query_context.py`, plus `Walk`/`bounded_walk` and an optional pinned `coverage`
+  block on `Graph` in `src/axiom_mcp/query/model.py`. `context` honours `depth` literally,
+  projects exactly the requested `identity`/`source_locations`/`relations`/`coverage` sections,
+  and records `truncated` with the budget name and the nodes where expansion stopped when
+  `max_nodes`/`max_edges` cut the neighbourhood short, so a partial answer cannot be read as a
+  complete one. The breadth-first walk is shared (`bounded_walk`) and terminates on a cycle by
+  visited set; unresolved edges are collected and reported rather than followed silently. An
+  ambiguous target returns candidates with `status="ambiguous_target"` and no invented
+  neighbourhood, a target that matches nothing is `TargetNotFound`, and an out-of-range depth is
+  rejected instead of clamped.
 - **C-018** Implement indexed symbol search. Add `src/axiom_mcp/query/` (the package docstring
   plus `model.py`) and `src/axiom_mcp/query/search.py`, `tests/test_query_search.py`,
   `tests/test_query_support.py` and `docs/query-engine.md`. The card names ten modules

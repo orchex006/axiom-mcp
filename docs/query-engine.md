@@ -43,3 +43,17 @@ field that could hold one, so a body cannot be returned by accident.
 An ambiguous *name* is not resolved by the server: every candidate at the best rank is returned,
 `ambiguous` is true and a warning says so. `limit` caps the answer and sets `truncated` with a
 warning when it does.
+
+## Context (C-019)
+
+`context` projects the neighbourhood of one target. `depth` is the hop count and is honoured
+literally: 0 is the target alone, and `n` never walks further. `projection` is the contract's
+allowlist - `identity` (always present), `source_locations`, `relations` (the incident edge ids of
+the returned neighbourhood) and `coverage` (the pinned coverage block of the node's generation).
+A section that was not requested does not appear.
+
+Expansion runs on `model.bounded_walk`: a visited set makes a cycle terminate, and the node/edge
+budgets stop expansion. When a budget stops it, `truncated` is true, `reasons` names the budget and
+`frontier` names the nodes at which expansion stopped, so a partial neighbourhood cannot be read as
+a complete one. An ambiguous target returns its candidates with `status="ambiguous_target"` and no
+invented neighbourhood.
