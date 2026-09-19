@@ -142,3 +142,20 @@ generations looks like a fact and is not one:
 | `incompatible_schema` | the two sides declare different schema majors |
 
 Every refusal sets `comparable` false, returns no diff, and carries a warning naming the reason.
+## Byte budget (C-025)
+
+`pack_response(document, max_bytes=...)` packs a response inside a hard byte cap. The measurement is
+the encoded compact JSON in UTF-8 of the *whole* document, metadata included: the cap cannot be
+spent separately from the facts, and a Thai string is charged its real bytes, not its characters.
+The range is 512..32768 bytes, default 8192; a bound outside it is refused, not clamped.
+
+When the document does not fit, whole items are trimmed from the tail of `nodes`, `edges`,
+`unresolved`, `candidates`, then `warnings`, and the result reports `dropped` per collection plus
+`truncated`. Two cases are explicit:
+
+- a single item that cannot fit (even alone with the metadata) is dropped and reported as
+  `oversized_item`, so a trimmed list is never confused with one that could not hold the item;
+- metadata that exceeds the cap on its own raises `BudgetExceeded` - packing cannot fix that by
+  dropping facts, and an over-cap document would break the contract.
+
+An unmeasurable (non JSON-serialisable) document raises `BudgetInvalid`.
