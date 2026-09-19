@@ -14,8 +14,8 @@ error model, the native guard engine, the registry, the manifest validator, the 
 query engine and the CLI. `src/axiom_mcp/tools/` now exists: `catalog.py` holds the
 canonical six-tool catalog, `context.py` holds the closed-argument parser and the
 re-authorizing `ToolContext`, `status.py` implements `graph_status`, `query.py` implements the
-`graph_query` dispatcher, `reconcile.py` implements `graph_reconcile` and `job.py` implements
-`graph_job`. The rows below record which tools are real at this revision; every remaining shape is a **contract, not an
+`graph_query` dispatcher, `reconcile.py` implements `graph_reconcile`, `job.py` implements
+`graph_job` and `verify.py` implements `graph_verify`. The rows below record which tools are real at this revision; every remaining shape is a **contract, not an
 observation**, until the registering task named in the catalog lands.
 
 ## Transports
@@ -45,7 +45,7 @@ access.
 | `graph_query` | Graph operation: `search`, `context`, `neighbors`, `callers`, `dependencies`, `impact`, `path`, `changes` | `read` | none | C-029 | Implemented (`tools/query.py`) |
 | `graph_reconcile` | Enqueue a graphd reconcile job for a scope | `reconcile` | Enqueue graphd job | C-030 | Implemented (`tools/reconcile.py`) |
 | `graph_job` | Job status or explicit cancel | `reconcile` | Status read; `cancel` is an explicit write | C-031 | Implemented (`tools/job.py`) |
-| `graph_verify` | Bounded verification request against an expected fingerprint or barrier | `checkpoint` | Bounded verification request | C-032 | Specified, not yet available |
+| `graph_verify` | Bounded verification request against an expected fingerprint or barrier | `checkpoint` | Bounded verification request | C-032 | Implemented (`tools/verify.py`) |
 | `graph_version` | Selected components and their compatibility | `read` | none | C-033 | Specified, not yet available |
 
 `graph_reconcile`, `graph_job` and `graph_verify` are the mutation paths. They reach beyond
@@ -228,6 +228,44 @@ dropped and named in `warnings` (`percentage_not_carried:<key>`), because
     "terminal": false,
     "progress": {"units_done": 3, "shards_written": 2}
   },
+  "warnings": []
+}
+```
+
+## `graph_verify` request and answer
+
+``graph_verify`` takes `solution_id`, an optional project scope, and at least one of
+`expected_fingerprint` (64 hexadecimal characters) or `target_event_seq` (a non-negative,
+bounded barrier). A request with neither is a `VALIDATION_ERROR`. The token must carry
+`checkpoint`; an invisible solution is `NOT_FOUND` and the control plane is consulted only after
+that check.
+
+**The four verification modes are reported separately, and an archive cannot claim current
+filesystem state.** The answer always carries its `basis` - `archive` or `working_tree` - and a
+`verification` object with one entry per dimension (`hash`, `schema`, `catalog`, `source`). A
+dimension the daemon did not report is `{"mode": "not_run"}` with a
+`dimension_not_reported:<name>` warning, and an unrecognised mode becomes
+`{"mode": "unknown"}` with an `unrecognised_mode:<name>` warning: absence and novelty are never
+promoted to a pass. A basis of `archive` whose `source` dimension claims `current` is refused
+outright as `DAEMON_UNAVAILABLE` with `{dimension: "source", basis: "archive"}`, because an
+archived checkpoint cannot speak for the live working tree.
+
+An asynchronous answer (`job_id` present) returns the job handle and `verification: null`, with a
+`verification_incomplete` warning if the daemon also volunteered unmapped verification fields.
+
+```json
+{
+  "schema_version": 1,
+  "solution_id": "alpha",
+  "project_ids": ["auth-api"],
+  "basis": "archive",
+  "verification": {
+    "hash": {"mode": "recomputed", "matched": true, "observed": "3f0a...6e7f"},
+    "schema": {"mode": "declared"},
+    "catalog": {"mode": "matched"},
+    "source": {"mode": "archive_contents"}
+  },
+  "job": null,
   "warnings": []
 }
 ```
@@ -541,8 +579,8 @@ the old identity.
   `graph_status` and `graph_query` are implemented, but the handlers are not yet wired into
   the SDK's tool registration, so a client that lists tools still sees an empty catalog.
   Registration is part of the remaining C-030..C-035 work.
-- **`graph_version` and `graph_verify`.** Each is specified and unobservable at this revision;
-  `graph_status`, `graph_query`, `graph_reconcile` and `graph_job` are real.
+- **`graph_version`.** Specified and unobservable at this revision; every other tool in the
+  catalog is real.
 - **The `changes` diff detail.** `graph_query` carries head-side added and modified facts;
   the removed facts and the engine's per-kind totals are not part of the envelope. The
   bundled `demo-solution` declares no schema major, so `changes` legitimately answers
@@ -552,16 +590,16 @@ the old identity.
   component that computes them (C-027) is not implemented.
 - **Cursors and byte-budget packing.** Specified in C-026 and C-025; not implemented, so
   `next_cursor`, `truncated` and the budget behaviour are contract-only.
-- **The daemon control plane.** `graph_reconcile` and `graph_job` delegate
-  through the `ControlPlane` protocol and are covered by tests against that boundary, but the
-  concrete graphd client, its audience handling and its bounded retries (C-034) are not in this
-  repository and are unverified here. `graph_verify` is not implemented yet.
+- **The daemon control plane.** `graph_reconcile`, `graph_job` and
+  `graph_verify` delegate through the `ControlPlane` protocol and are covered by tests against
+  that boundary, but the concrete graphd client, its audience handling and its bounded retries
+  (C-034) are not in this repository and are unverified here.
 - **Readiness inputs.** `/readyz` reports the query and control planes; at this revision the
   default reports both unavailable rather than claiming readiness the gateway has not
   earned.
 
 Verified at this revision: the transports, the error model, the capability map and the
-`graph_status`, `graph_query`, `graph_reconcile` and `graph_job` handlers are real and covered by
-tests, exercised against the shipped
+`graph_status`, `graph_query`, `graph_reconcile`, `graph_job` and `graph_verify` handlers are real
+and covered by tests, exercised against the shipped
 `demo-solution` bundle, the real registry and the real native guard. No tool call has been
 observed through a running gateway, because tool registration is not wired yet.

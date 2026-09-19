@@ -27,6 +27,7 @@ from axiom_mcp.tools.job import graph_job
 from axiom_mcp.tools.query import graph_query
 from axiom_mcp.tools.reconcile import graph_reconcile
 from axiom_mcp.tools.status import graph_status
+from axiom_mcp.tools.verify import graph_verify
 
 __all__ = [
     "TOOL_SPECS",
@@ -40,6 +41,7 @@ __all__ = [
     "graph_query",
     "graph_reconcile",
     "graph_status",
+    "graph_verify",
     "names",
     "spec_for",
 ]

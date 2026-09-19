@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- **C-032** Register the `graph_verify` tool in `src/axiom_mcp/tools/verify.py`. The tool submits
+  a bounded verification request through the `ControlPlane` protocol against an
+  `expected_fingerprint` (64 hexadecimal characters) or a `target_event_seq` barrier, and reports
+  the four verification modes `hash`, `schema`, `catalog` and `source` **separately** instead of
+  collapsing them into one "verified" boolean. AC1's second half is enforced, not documented: every
+  answer names its `basis` (`archive` or `working_tree`), and an `archive` basis whose `source`
+  dimension claims `current` is refused as `DAEMON_UNAVAILABLE` with
+  `{dimension: "source", basis: "archive"}`, because an archived checkpoint cannot speak for the
+  live filesystem. Absence and novelty never become a pass either: a dimension the daemon did not
+  report is `not_run` with a `dimension_not_reported:<name>` warning and an unrecognised mode
+  becomes `unknown` with an `unrecognised_mode:<name>` warning. The tool reads no snapshot (a
+  source spy that raises on any read is asserted untouched), the `checkpoint` capability is
+  required before the daemon is consulted, an invisible solution is `NOT_FOUND`, and an
+  asynchronous answer returns the job handle with `verification: null` plus a
+  `verification_incomplete` warning. Adds 23 regression tests (positive, negative and
+  failure-boundary legs) in `tests/test_tools_verify.py`.
+
 - **C-031** Register the `graph_job` tool in `src/axiom_mcp/tools/job.py`. `graph_job` reads or
   cancels one daemon job through the `ControlPlane` protocol and enforces three bounds itself.
   The handler makes exactly one control-plane call - it never loops and never sleeps, so a client
