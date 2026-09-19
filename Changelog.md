@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- **docs** Correct the guard limits in `docs/guides/snapshots.md`. The guide claimed the
+  Windows `LockFileEx` backend was not present and that `src/axiom_mcp/guard/` ships
+  `locks_posix.py` only, which was stale after C-011 and V2-019: `locks_windows.py` ships and
+  `tests/test_guard_windows.py` exercises it against the real primitive on this host, including
+  exclusion between two independent processes. The unverified item is narrowed to what is
+  actually unrun - the Rust holder versus Python holder exclusion, whose foreign-holder leg
+  skips unless `AXIOM_GUARD_HOLDER_ARGV` names an ABI-conformant holder - and the POSIX `flock`
+  primitive stays recorded as absent from this host's run. Documentation only; no product code
+  changed.
 - **V2-019** Add the cross-language reader guard adapter. Add
   `src/axiom_mcp/guard/adapter.py`, `tests/test_guard_protocol.py`, `tests/test_guard_adapter.py`
   and `tests/test_guard_cross_language.py`, plus a `descriptor()` accessor on both platform

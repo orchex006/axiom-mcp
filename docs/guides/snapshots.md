@@ -240,14 +240,25 @@ consistency.
 
 ## Unverified / limits
 
-- **The native guard engine is the only part of this guide that exists as code**, and its
-  Windows backend is **not present at this revision**: `src/axiom_mcp/guard/` ships
-  `locks_posix.py` only. Windows reader/writer safety is specified in
-  `contracts/native-reader-writer-guards.md` but is not available or verified here.
-- **Cross-process interoperability is unverified here.** The required Rust holder versus
-  Python holder exclusion in two real processes, on Windows and POSIX, has not been run.
-- **The POSIX guard tests skip where `fcntl` is unavailable**, so this revision's Windows
-  test run does not exercise the POSIX primitive.
+- **The native guard engine ships as code on both platforms.** It is not the only implemented
+  part of this guide - the registry and the manifest validator are implemented and tested on
+  their own, as noted below - and `src/axiom_mcp/guard/` contains both backends:
+  `locks_posix.py` (`flock`, whole-file) and `locks_windows.py` (`LockFileEx`, byte range
+  offset 0 length 1), behind the shared `engine.py`, `protocol.py` and `adapter.py`. The
+  Windows backend is present at this revision and is exercised against the real primitive by
+  `tests/test_guard_windows.py` on this host, including exclusion observed between two
+  independent processes.
+- **Cross-language interoperability with the Rust holder is unverified here.** Python reader
+  and writer exclusion is observed between two real processes on Windows, but the required
+  Rust holder versus Python holder exclusion has not been run: the foreign-holder leg of
+  `tests/test_guard_cross_language.py` skips unless `AXIOM_GUARD_HOLDER_ARGV` names an
+  ABI-conformant holder, and the local Windows cross-language run used a non-Python
+  (`LockFileEx`) holder rather than the `axiom-graphd` daemon. The POSIX holder target is
+  likewise unverified on this host.
+- **The POSIX guard tests skip where `fcntl` is unavailable**, so this revision's Windows test
+  run does not exercise the POSIX `flock` primitive. The POSIX backend exists as code
+  (`locks_posix.py`) but is not executed on this host; only the Windows backend is certified
+  by this revision's run.
 - **No GC, daemon or publication runtime exists in this repository.** Retention, disk-full
   behaviour and outbox recovery are specified in the protocol; nothing here implements or
   has observed them.
