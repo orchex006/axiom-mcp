@@ -452,6 +452,7 @@ class Graph:
     nodes: tuple[Node, ...]
     edges: tuple[Edge, ...]
     coverage: Mapping[str, Any] | None = None
+    schema_major: int | None = None
     _by_id: Mapping[str, Node] = field(init=False, repr=False, compare=False)
     _outgoing: Mapping[str, tuple[Edge, ...]] = field(init=False, repr=False, compare=False)
     _incoming: Mapping[str, tuple[Edge, ...]] = field(init=False, repr=False, compare=False)
@@ -459,6 +460,10 @@ class Graph:
     def __post_init__(self) -> None:
         identifier_text(self.project_id, what="graph project_id")
         sha256_text(self.generation_id, what="graph generation_id")
+        if self.schema_major is not None and not isinstance(self.schema_major, int):
+            raise QueryModelError(
+                f"schema_major must be an integer or None, got {self.schema_major!r}"
+            )
         nodes = tuple(self.nodes)
         edges = tuple(self.edges)
         by_id: dict[str, Node] = {}
@@ -547,6 +552,7 @@ def graph_from_documents(
     nodes: Iterable[Mapping[str, Any]],
     edges: Iterable[Mapping[str, Any]],
     coverage: Mapping[str, Any] | None = None,
+    schema_major: int | None = None,
 ) -> Graph:
     """Build one pinned generation from already-parsed shard documents."""
     return Graph(
@@ -555,6 +561,7 @@ def graph_from_documents(
         nodes=tuple(node_from_document(item) for item in nodes),
         edges=tuple(edge_from_document(item) for item in edges),
         coverage=coverage,
+        schema_major=schema_major,
     )
 
 

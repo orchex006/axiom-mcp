@@ -2,7 +2,15 @@
 
 ## Unreleased
 
-- **C-023** Implement shortest bounded path query. Add `src/axiom_mcp/query/path.py` and
+- **C-024** Implement generation change comparison. Add `src/axiom_mcp/query/changes.py` and
+  `tests/test_query_changes.py`, plus an optional `schema_major` on `Graph` and
+  `graph_from_documents` in `src/axiom_mcp/query/model.py`. `changes(head, baseline)` reports
+  `added`/`removed`/`modified` node and edge facts per project, matching by pinned id so a rename
+  is an add plus a remove rather than a silent edit, and every answer names the exact head and
+  baseline generations it compared. When the comparison is not valid it is refused with its own
+  status instead of guessed: `missing_baseline`, `incompatible_scope` (different member sets),
+  `unknown_schema` (an undeclared schema major on either side) and `incompatible_schema` (two
+  different majors), each with a warning and no diff to misread.- **C-023** Implement shortest bounded path query. Add `src/axiom_mcp/query/path.py` and
   `tests/test_query_path.py`, plus public `incident_edges`/`other_end` helpers in
   `src/axiom_mcp/query/model.py` for operations that need their own walk. `path` returns the
   shortest bounded path from `target` to `target_to` (`direction` defaults to `both`), and every

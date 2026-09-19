@@ -122,3 +122,23 @@ when the search finished without being cut - the frontier emptied, the depth bou
 with a live frontier, no requested member is unpinned, and no unresolved reference names a node the
 search visited. Otherwise `incomplete_reasons` names why (`budget_exhausted`, `depth_limited`,
 `missing_members`, `unresolved_edges`) and the answer is "not found, and not disproved".
+## Changes (C-024)
+
+`changes(head, baseline)` compares two pinned generations fact by fact. Each project reports
+`added`, `removed` and `modified` nodes and edges; nodes and edges are matched by pinned id, so a
+rename is an add plus a remove rather than a silent modification, and a `modified` entry carries
+both the previous and the current fact. The answer always names the exact `head_generations` and
+`baseline_generations` it compared.
+
+A comparison that is not valid is refused rather than guessed, because a diff across unlike
+generations looks like a fact and is not one:
+
+| status | meaning |
+| --- | --- |
+| `ok` | same projects, same known schema major; the diff is comparable |
+| `missing_baseline` | no baseline was given; there is nothing to compare against |
+| `incompatible_scope` | the two sides do not pin the same projects |
+| `unknown_schema` | at least one side declares no schema major, so fact shapes cannot be compared |
+| `incompatible_schema` | the two sides declare different schema majors |
+
+Every refusal sets `comparable` false, returns no diff, and carries a warning naming the reason.
