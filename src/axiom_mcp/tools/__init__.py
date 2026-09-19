@@ -23,6 +23,7 @@ from axiom_mcp.tools.context import (
     ToolContext,
     ToolPrincipal,
 )
+from axiom_mcp.tools.query import graph_query
 from axiom_mcp.tools.status import graph_status
 
 __all__ = [
@@ -33,6 +34,7 @@ __all__ = [
     "ToolPrincipal",
     "ToolSpec",
     "UnknownTool",
+    "graph_query",
     "graph_status",
     "names",
     "spec_for",

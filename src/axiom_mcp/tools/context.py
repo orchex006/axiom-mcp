@@ -32,6 +32,7 @@ from typing import Any, Protocol
 from axiom_mcp import security
 from axiom_mcp.errors import AxiomError
 from axiom_mcp.guard.engine import SolutionGuard
+from axiom_mcp.query.cursor import CursorStore
 from axiom_mcp.query.model import identifier_text
 from axiom_mcp.read_session import LoadedSnapshot, ReadLimits, ReadSession
 from axiom_mcp.registry import RegistryError, SnapshotLocation, SnapshotRegistry
@@ -301,6 +302,7 @@ class ToolContext:
     source: SnapshotSource
     control: ControlPlane | None = None
     clock: Callable[[], float] = field(default=time.monotonic)
+    cursors: CursorStore = field(default_factory=CursorStore)
 
     def solution_projects(self, solution_id: str) -> tuple[str, ...]:
         """Every project of a visible solution, in registry order."""

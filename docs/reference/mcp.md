@@ -13,8 +13,8 @@ reference for that contract, not a record of a running gateway.
 error model, the native guard engine, the registry, the manifest validator, the bounded
 query engine and the CLI. `src/axiom_mcp/tools/` now exists: `catalog.py` holds the
 canonical six-tool catalog, `context.py` holds the closed-argument parser and the
-re-authorizing `ToolContext`, and `status.py` implements `graph_status`. The rows below
-record which tools are real at this revision; every remaining shape is a **contract, not an
+re-authorizing `ToolContext`, and `status.py` implements `graph_status` and `query.py` implements the
+`graph_query` dispatcher. The rows below record which tools are real at this revision; every remaining shape is a **contract, not an
 observation**, until the registering task named in the catalog lands.
 
 ## Transports
@@ -41,7 +41,7 @@ access.
 | Tool | Purpose | Capability | Side effect | Registered by | Status |
 | --- | --- | --- | --- | --- | --- |
 | `graph_status` | Solution/project freshness, coverage, generations, capabilities | `read` | none | C-028 | Implemented (`tools/status.py`) |
-| `graph_query` | Graph operation: `search`, `context`, `neighbors`, `callers`, `dependencies`, `impact`, `path`, `changes` | `read` | none | C-029 | Specified, not yet available |
+| `graph_query` | Graph operation: `search`, `context`, `neighbors`, `callers`, `dependencies`, `impact`, `path`, `changes` | `read` | none | C-029 | Implemented (`tools/query.py`) |
 | `graph_reconcile` | Enqueue a graphd reconcile job for a scope | `reconcile` | Enqueue graphd job | C-030 | Specified, not yet available |
 | `graph_job` | Job status or explicit cancel | `reconcile` | Status read; `cancel` is an explicit write | C-031 | Specified, not yet available |
 | `graph_verify` | Bounded verification request against an expected fingerprint or barrier | `checkpoint` | Bounded verification request | C-032 | Specified, not yet available |
@@ -88,12 +88,16 @@ The complete `edge_kinds` allowlist, in schema order: `CONTAINS`, `IMPORTS`,
 gateway truncates to fit and sets `truncated`; it does not exceed the cap to answer in
 full. Traversal uses a visited set and hard expansion and wall-time budgets. There is no
 arbitrary SQL, Cypher, code evaluation or unbounded regular expression anywhere in the
-query path.
+query path. That is enforced by the request parser (`tools/context.closed_arguments`)
+rather than promised: `sql`, `cypher`, `command` and `script` are not fields of the request,
+a request carrying one is a `VALIDATION_ERROR` that names only the key, and a selector that
+cannot apply to the requested operation (`target` on `search`, `direction` on `changes`) is
+refused rather than silently ignored.
 
 ### Budgets are ceilings, not hints
 
 `depth`, `max_nodes`, `max_edges` and `max_bytes` are validated against the schema before
-the query runs. A value above its maximum is a `VALIDATION_ERROR`; the gateway does not
+the query runs. A value above its maximum is refused with `LIMIT_EXCEEDED`; the gateway does not
 clamp an over-budget request to the maximum and continue, because that would answer a
 different question than the one asked. A budget that a caller leaves unset takes the
 documented default.
@@ -135,6 +139,26 @@ result or the `error` variant:
 Provenance is carried in each node's `source` location and each edge's `evidence` and
 `analyzer_id`. The schema deliberately has no competing `result` or `snapshot` envelope: a
 consumer that finds one is reading a non-conformant server, not an alternate shape.
+
+### Consistency at this revision
+
+`allow_stale` (the default) answers from the pinned generation. A named
+`catalog_generation_id` is always honoured as a pin: when the lane no longer publishes that
+vector the answer is `SNAPSHOT_EXPIRED` rather than a read of whatever is current, and a
+`pinned` request without the field is a `VALIDATION_ERROR`. `require_fresh` needs the
+`reconcile` capability - a read-only token gets `FORBIDDEN` before the control plane is
+consulted at all - and with the capability the request enqueues a bounded reconcile and
+answers `NOT_READY` with the job id, because the request itself cannot prove the reconcile
+finished. Every `graph_query` answer is `freshness=unknown` with `verification.mode=none`: a
+pinned generation proves which bytes answered, not that the source tree was re-read.
+
+`changes` compares the head against a baseline generation. The baseline vector cannot be
+pinned through the read session at this revision, so a named baseline that is *not* the
+current one answers `missing_baseline` with a `baseline_not_pinnable` warning instead of a
+diff against whatever is current, while a baseline equal to the head is a comparable (empty)
+diff. Facts are head-side only: an `added` fact is a head document and a `modified` fact is
+rebuilt as one from the head side of the before/after pair, so every node still carries its
+own `source`; `removed` facts belong to the baseline generation and are not carried.
 
 ### Freshness, coverage and verification are three different claims
 
@@ -335,13 +359,16 @@ the old identity.
 ## Unverified / not yet available
 
 - **Tool registration and the SDK mount.** `src/axiom_mcp/tools/` exists and
-  `graph_status` is implemented, but the handlers are not yet wired into the SDK's tool
-  registration, so a client that lists tools still sees an empty catalog. Registration is
-  part of the remaining C-029..C-033 work.
-- **`graph_query`, `graph_version`, `graph_reconcile`, `graph_job`, `graph_verify`.**
-  Each is specified and unobservable at this revision; only `graph_status` is real.
-- **`graph_status`, `graph_query`, `graph_version`, `graph_reconcile`, `graph_job`,
-  `graph_verify`.** Each is specified and unobservable at this revision.
+  `graph_status` and `graph_query` are implemented, but the handlers are not yet wired into
+  the SDK's tool registration, so a client that lists tools still sees an empty catalog.
+  Registration is part of the remaining C-030..C-035 work.
+- **`graph_version`, `graph_reconcile`, `graph_job`, `graph_verify`.** Each is specified and
+  unobservable at this revision; only `graph_status` and `graph_query` are real.
+- **The `changes` diff detail.** `graph_query` carries head-side added and modified facts;
+  the removed facts and the engine's per-kind totals are not part of the envelope. The
+  bundled `demo-solution` declares no schema major, so `changes` legitimately answers
+  `unknown_schema` there and a comparable diff is only reachable for a generation that
+  declares one.
 - **Freshness, coverage and verification computation.** The fields are specified; the
   component that computes them (C-027) is not implemented.
 - **Cursors and byte-budget packing.** Specified in C-026 and C-025; not implemented, so
@@ -354,6 +381,7 @@ the old identity.
   earned.
 
 Verified at this revision: the transports, the error model, the capability map and the
-`graph_status` handler are real and covered by tests, exercised against the shipped
+`graph_status` and `graph_query` handlers are real and covered by tests, exercised against
+the shipped
 `demo-solution` bundle, the real registry and the real native guard. No tool call has been
 observed through a running gateway, because tool registration is not wired yet.

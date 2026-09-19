@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+- **C-029** Register the `graph_query` tool in `src/axiom_mcp/tools/query.py`. One bounded
+  dispatcher turns a closed request into exactly one engine call over the pinned generations read
+  through the trusted registry, and answers with the contract envelope built by
+  `query/envelope.build_envelope` and packed by `query/budget.pack_response`, so the byte cap is
+  measured over the whole document and a trimmed answer says `truncated`. The request is closed
+  *per operation*, which is what makes "no arbitrary SQL, Cypher, shell or code evaluation" a
+  property of the parser rather than a promise: `sql`, `cypher`, `command` and `script` are not
+  fields, an unknown key is a `VALIDATION_ERROR` naming only the key, an operation outside the
+  documented eight is `UNSUPPORTED_OPERATION`, and a selector that cannot apply to the requested
+  operation (`target` on `search`, `direction` on `changes`) is refused instead of ignored.
+  `pinned` requires the `catalog_generation_id` it pins and answers `SNAPSHOT_EXPIRED` when the
+  lane no longer publishes that vector; `require_fresh` needs the `reconcile` capability - a
+  read-only token is `FORBIDDEN` before the control plane is consulted - and with it enqueues a
+  bounded reconcile and answers `NOT_READY` carrying the job id rather than serving a snapshot as
+  fresh. Every answer is `freshness=unknown` with `verification.mode=none`: a pinned generation
+  proves which bytes answered, not that the source was re-read. A cursor is re-checked against
+  generation, query, scope and capability on every use, each drift with its own named refusal,
+  and an unreadable cursor id is `NOT_FOUND` rather than a leaked engine error. `changes` carries
+  head-side added and modified facts; because the baseline vector cannot be pinned through the
+  read session at this revision, a named non-current baseline answers `missing_baseline` with a
+  `baseline_not_pinnable` warning instead of a diff against whatever is current. Adds 28
+  regression tests (positive, negative and failure-boundary legs) in `tests/test_tools_query.py`.
+  Documentation corrected: the budget rules claimed an over-budget value is a
+  `VALIDATION_ERROR`; the code refuses it with `LIMIT_EXCEEDED`.
+
 - **C-028** Register the `graph_status` tool. Add the `src/axiom_mcp/tools/` package: `catalog.py`
   (the six-tool catalog with its capability, read-only/destructive/open-world annotation and the
   registering task), `context.py` (the closed-argument parser and the `ToolContext` every handler
