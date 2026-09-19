@@ -2,7 +2,15 @@
 
 ## Unreleased
 
-- **C-019** Implement context projection. Add `src/axiom_mcp/query/context.py` and
+- **C-020** Implement dependency and neighbour traversal. Add `src/axiom_mcp/query/neighbors.py`
+  and `tests/test_query_neighbors.py` over the shared `model.bounded_walk` primitive. `neighbors`
+  takes `direction` (`outgoing`/`incoming`/`both`) and an `edge_kinds` allowlist that apply to the
+  *edge*, so the two filters compose: `incoming` never returns an edge whose source is the target,
+  and a filtered-out kind never contributes a hop. `dependencies` is not a second implementation -
+  it is `neighbors(direction="outgoing")` with the dependency kinds as its default - so "what this
+  depends on" and "what points at this" cannot disagree about the graph. A cycle terminates on the
+  visited set, budgets stop expansion with `truncated` and the budget name in `reasons`, and an
+  unresolved edge is reported in `unresolved` rather than followed or silently dropped.- **C-019** Implement context projection. Add `src/axiom_mcp/query/context.py` and
   `tests/test_query_context.py`, plus `Walk`/`bounded_walk` and an optional pinned `coverage`
   block on `Graph` in `src/axiom_mcp/query/model.py`. `context` honours `depth` literally,
   projects exactly the requested `identity`/`source_locations`/`relations`/`coverage` sections,

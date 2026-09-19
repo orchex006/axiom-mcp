@@ -57,3 +57,21 @@ budgets stop expansion. When a budget stops it, `truncated` is true, `reasons` n
 `frontier` names the nodes at which expansion stopped, so a partial neighbourhood cannot be read as
 a complete one. An ambiguous target returns its candidates with `status="ambiguous_target"` and no
 invented neighbourhood.
+## Neighbours and dependencies (C-020)
+
+`neighbors` walks a target's incident edges; `dependencies` is the outgoing dependency-kind case of
+the same traversal, not a second implementation. `direction` is `outgoing` (edges whose source is
+the target), `incoming` (edges whose target is it) or `both` (the union). `edge_kinds` is an
+allowlist over the pinned edge kinds. Both filters apply to the *edge*, so they compose: a caller
+asking for `incoming` + `CALLS` never receives an outgoing `REFERENCES` edge, and a kind that is
+filtered out never contributes a hop, so a filtered-out path cannot secretly extend the walk.
+
+The walk is breadth-first over `model.bounded_walk`, so a cycle terminates by construction: each
+node is expanded once and each edge reported once, regardless of `depth`. When a budget stops the
+walk, `truncated` is true and `reasons` names `max_nodes` or `max_edges`; when the frontier simply
+empties, `truncated` stays false - "cut short" and "nothing further" are not the same answer.
+
+An edge with `resolution="unresolved"` (no resolved target in this generation) is returned in
+`unresolved` and is never followed: a list that silently omitted it would look complete when the
+generation cannot claim it is. `per_kind` counts the returned edges by kind, and an ambiguous
+target returns its candidates with `status="ambiguous_target"` and no invented neighbourhood.
