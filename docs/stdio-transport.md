@@ -2,6 +2,8 @@
 
 Owner: `axiom-mcp`. Contract: `repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md` sections 1, 2 and 10, at the pinned
 `axiom-specs` revision. This document records implementation, not policy.
+Companion document: `docs/query-transports.md` compares stdio with the Streamable HTTP
+transport and the JSON-first read model both transports carry.
 
 ## Why this module exists
 

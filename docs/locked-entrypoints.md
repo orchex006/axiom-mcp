@@ -6,7 +6,8 @@ source a script and does not quote a command line: it launches one absolute
 interpreter with an argument vector. This document records that implementation; the
 distribution, update and compatibility contracts stay in `axiom-specs`.
 Companion documents: `docs/release-packaging.md` (the packager that owns the
-install-root layout) and `docs/runtime-compatibility.md` (the Python and SDK pin).
+install-root layout), `docs/runtime-compatibility.md` (the Python and SDK pin) and
+`docs/query-transports.md` (how a plan mode maps to a transport and its argv).
 
 ## What the surface reads
 

@@ -2,6 +2,8 @@
 
 Owner: `axiom-mcp`. Contract: `repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md` sections 2, 6 and 9, at the pinned
 `axiom-specs` revision. This document records implementation, not policy.
+Companion document: `docs/query-transports.md` compares HTTP with the stdio transport and
+records how the three reader failure states stay distinguishable across surfaces.
 
 ## Surfaces
 
