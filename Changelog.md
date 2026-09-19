@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **C-015** Release read locks before response streaming. Add `src/axiom_mcp/read_session.py`,
+  `tests/test_read_session.py` and a read-session section in `docs/snapshot-reader-core.md`.
+  `ReadSession.load` copies the pointer, manifest and required shards through the bounded
+  `copy_shards` path while `SolutionGuard.reader` holds `data.lock`, releases the guard, then
+  verifies the hashes with no lock held and refuses to return if any lock is still held.
+  `render` and `stream` raise `GuardStillHeld` if a lock is held, so the response is always built
+  after the release; the client can stall without keeping a publisher out of the lane. The
+  snapshot records `guard_held_during_copy`/`parsed_after_guard_release` and reports
+  `freshness="unknown"` because no daemon freshness is observable from here.
+
 - **C-014** Load bounded shards and reject traversal. Add `src/axiom_mcp/shards.py`,
   `tests/test_shards.py` and a bounded-shard section in `docs/snapshot-reader-core.md`. The
   load runs four checks in a fixed order, all of them before any JSON parser is involved: the

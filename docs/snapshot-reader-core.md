@@ -151,3 +151,38 @@ lane, a symlinked parent that stays in the lane but outside the generation, an o
 shard whose file is a directory, an oversized shard whose bytes are not valid JSON, a plan that
 is over budget passing a reader that fails if it is ever called, a forged manifest entry, and
 substituted bytes of the same size.
+
+## C-015 ? Read session: copy under guard, respond after release (`src/axiom_mcp/read_session.py`)
+
+`docs/12-SNAPSHOT-READ-WRITE-PROTOCOL.md` section 3.1 fixes the shape of a read: take the shared
+guard, copy the pointer, the manifest and only the shards the query needs into memory, then
+release before building the response. A consumer that stops reading must not keep a publisher
+out of the lane, so the release cannot depend on the client finishing.
+
+`ReadSession` splits one read into two phases that cannot be confused:
+
+* `ReadSession.load` enters `SolutionGuard.reader(...)`, checks that `data.lock` is held, copies
+  the bounded bytes with `shards.copy_shards` (so the copy window is bounded by `ReadLimits` and
+  `ShardLimits`, not by a client), leaves the reader context, then verifies the hashes
+  (`verify_copied`) with no lock held. Before returning it asserts no lock is still held, so a
+  session that would silently block a publisher raises instead.
+* `ReadSession.render` and `ReadSession.stream` build and emit the response. Both call
+  `_require_released()` first and raise `GuardStillHeld` if any lock is held, so "the response is
+  computed outside the guard" is enforced rather than documented. `stream` pads the payload to
+  a JSON body and yields it in `chunk_bytes`-sized pieces; a stalled consumer only stalls this
+  generator.
+
+The returned `LoadedSnapshot` records which phase did the work - `guard_held_during_copy` and
+`parsed_after_guard_release` - so a caller, a test or an evidence file can see it instead of
+assuming it. Freshness is not invented: this module never talks to the daemon, so the snapshot
+carries `freshness="unknown"` and `verification="manifest_hash"`. A hash-verified pinned
+generation proves the bytes are the published ones; it is not evidence that they are newer than
+the source tree.
+
+`tests/test_read_session.py` proves both halves of AC1: an injected byte source observes every
+copy read happening while `data.lock` is held and none after, and a second *process*
+(`python -m axiom_mcp.guard.interop`) times out while the copy is in flight but acquires the
+lane while the response is still only half streamed. The negative and boundary cases refuse a
+response attempted while a lock is held, refuse oversized pointer/manifest/plan copies before
+anything is read, and surface a shard removed mid-copy as an error with the guard released
+rather than as a partial answer.
