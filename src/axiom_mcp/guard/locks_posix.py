@@ -87,6 +87,10 @@ class PosixLockHandle(LockHandle):
     def close(self) -> None:
         os.close(self._fd)
 
+    def descriptor(self) -> int:
+        """The descriptor this handle opened, opened ``O_CLOEXEC``."""
+        return self._fd
+
     def identity(self) -> str:
         return protocol.identity_of_stat(os.fstat(self._fd))
 

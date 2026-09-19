@@ -197,6 +197,14 @@ class WindowsLockHandle(LockHandle):
             os.close(self._fd)
             self._fd = -1
 
+    def descriptor(self) -> int:
+        """The descriptor adopted from the Win32 handle, or -1 after close.
+
+        The Win32 handle was opened with no security attributes, so it is not inheritable; the
+        CRT descriptor adopted from it is checked by the tests with ``os.get_inheritable``.
+        """
+        return self._fd
+
     def identity(self) -> str:
         try:
             return protocol.identity_of_stat(os.fstat(self._fd))

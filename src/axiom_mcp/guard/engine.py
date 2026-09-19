@@ -90,6 +90,13 @@ class LockHandle(Protocol):
     def close(self) -> None:
         """Close the handle. A handle never leaks into a child process."""
 
+    def descriptor(self) -> int:
+        """The open descriptor or handle of the guard file, while it is open.
+
+        Section 7 of the contract requires a guard handle to be non-inheritable, so the value a
+        caller can inspect is the descriptor this handle actually opened - not a wrapper.
+        """
+
     def identity(self) -> str:
         """Stable identity of the file this handle refers to."""
 

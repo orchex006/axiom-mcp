@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+- **V2-019** Add the cross-language reader guard adapter. Add
+  `src/axiom_mcp/guard/adapter.py`, `tests/test_guard_protocol.py`, `tests/test_guard_adapter.py`
+  and `tests/test_guard_cross_language.py`, plus a `descriptor()` accessor on both platform
+  handles and the package export of the adapter. The card proposes `src/axiom_mcp/guard.py`, but
+  C-010 landed the guard as the package `src/axiom_mcp/guard/`, so the adapter is a module inside
+  that package rather than a second top-level module; the justified path change is recorded in
+  the task evidence, as C-011 recorded its own. `abi_descriptor()` publishes the frozen surface
+  a second language needs - the two lock files with their roles, both platform rows, the
+  acquisition and release order, the bounded wait, crash release and the interoperability
+  requirement - in the contract's own field names, with `abi_json()`/`abi_sha256()` to pin this
+  build, and `python -m axiom_mcp.guard.adapter abi` to print it from an independent process.
+  The holder *process contract* (argv, one-JSON-line events, exit codes) is documented in the
+  same place, and `AXIOM_GUARD_HOLDER_ARGV` points the tests at any ABI-conformant holder - the
+  Rust daemon included - instead of the in-repo probe; a holder that cannot be started is
+  reported as `holder_unavailable` rather than silently replaced. `ReaderGuardAdapter` is the
+  reader shape of section 5: admission shared, data shared while admission is still held,
+  admission released early, the bounded bytes copied by `read_pinned` under `data.lock`, data
+  released, and parsing only after the guard is gone; `verify_surface()` refuses a guard
+  directory or lock file that is a link, because two languages following one name to different
+  targets are not one guard. Tests use real second processes for the exclusive holder, the
+  bounded timeout, a killed holder, and normal release with closed handles; the contract-fidelity
+  test recomputes the frozen-field digest and rejects a document mutated in memory. The Rust
+  holder, the POSIX `flock` primitive and the Rust↔Python proof on a POSIX host remain
+  unverified here: the foreign-holder leg is skipped with that reason, and the local Windows
+  cross-language run was made with a non-Python `LockFileEx` holder (PowerShell/.NET), not with
+  the Rust daemon.
 - **C-012** Pin one catalog vector per query and never fall back to a project's latest
   generation. Add `src/axiom_mcp/catalog.py`, `tests/test_catalog.py` and vendored pinned
   fixtures under `tests/fixtures/solution/demo-solution/` (byte-for-byte from
