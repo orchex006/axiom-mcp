@@ -65,7 +65,7 @@
   `sdk_not_installed`; and `pyvenv.cfg` created at a non-ASCII path can hold cp874 or cp1252
   bytes, so the one-boolean metadata read is deliberately lossy. HTTP stays opt-in and is refused
   unless its allowlist admits the address about to be bound. AC1 and AC2 are proven in
-  `tests/test_entrypoints.py` (55 legs) with real `venv` environments at that awkward path and a
+  `tests/test_entrypoints.py` (57 legs) with real `venv` environments at that awkward path and a
   real JSON-RPC `initialize` over the launched plan pipes. That launch exposed a live defect in
   the entrypoint it distributes: `axiom_mcp.stdio.main` passed `banner=` to `anyio.run`, which
   forwards only positional arguments, so `python -m axiom_mcp.stdio` - the documented way to run
