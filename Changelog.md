@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- **C-016** Cache by immutable generation identity. Add `src/axiom_mcp/cache.py`,
+  `tests/test_cache.py` and a cache section in `docs/snapshot-reader-core.md`. `CacheKey` is the
+  pointer-free identity `(schema, profile, generation_id, shard_sha256)` plus the manifest
+  entry path, so a republished pointer derives a different key and an older entry can never be
+  hit or relabelled. `SnapshotCache.put` refuses bytes that do not hash to the keyed digest and
+  `SnapshotCache.get` re-hashes before returning, so mislabelled data cannot be stored or
+  served. `max_entries` and `max_bytes` bound the cache by LRU eviction; a payload larger than
+  the whole budget is refused without evicting live entries; `evict_generation` invalidates by
+  generation.
+
 - **C-015** Release read locks before response streaming. Add `src/axiom_mcp/read_session.py`,
   `tests/test_read_session.py` and a read-session section in `docs/snapshot-reader-core.md`.
   `ReadSession.load` copies the pointer, manifest and required shards through the bounded

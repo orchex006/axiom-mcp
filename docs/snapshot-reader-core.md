@@ -186,3 +186,38 @@ lane while the response is still only half streamed. The negative and boundary c
 response attempted while a lock is held, refuse oversized pointer/manifest/plan copies before
 anything is read, and surface a shard removed mid-copy as an error with the guard released
 rather than as a partial answer.
+
+## C-016 ? Cache keyed by immutable generation identity (`src/axiom_mcp/cache.py`)
+
+A cache in front of a pinned read must not undo the pin. SNP-03 says one query reads one exact
+generation and never follows `current.json` again; a cache keyed by lane, project name or
+pointer would answer a later query with an earlier generation's bytes and label them as the
+new one. So the key is the immutable identity itself.
+
+`CacheKey` is `(schema, profile, generation_id, shard_sha256)` plus the manifest entry `path`.
+`generation_id` is the sha256 that names the generation directory and `shard_sha256` is the
+manifest-declared digest of the bytes, so two reads derive the same key only when they would
+read the very same bytes of the very same generation. When a publisher republishes and the
+pointer moves, the caller pins the new generation before it derives any key, so the new key
+differs and the old entry cannot be hit. `cache_key_for(shard, ...)` builds the key from the
+copied shard's own declared digest, never from anything mutable.
+
+Two invariants make "cached data under the wrong generation label" impossible rather than
+merely unlikely:
+
+* `SnapshotCache.put` refuses bytes whose sha256 is not the key's `shard_sha256`
+  (`CacheMismatch`), so nothing can be stored under a label its bytes do not hash to.
+* `SnapshotCache.get` re-hashes the stored bytes against the key before returning them; an entry
+  that no longer matches is dropped and reported as a miss, never handed back.
+
+Memory is bounded twice: `max_entries` bounds the live entry count and `max_bytes` bounds their
+total payload size, both enforced by evicting least-recently-used entries. A payload that is
+itself larger than `max_bytes` is refused without evicting anything, because it could never fit
+and clearing live entries for it would only lose data. `evict_generation` invalidates by
+immutable generation, which is the only safe invalidation unit here.
+
+`tests/test_cache.py` proves the positive path (a hit returns exactly the pinned bytes and the
+same bytes under another `generation_id` are a miss), the pointer-change case (a changed
+generation reloads instead of hitting the old entry), and the negative/boundary ones
+(mis-digest `put` refused, tampered entry dropped on `get`, both LRU limits enforced in LRU
+order, an over-budget payload refused without eviction, and invalid limits/keys refused).
