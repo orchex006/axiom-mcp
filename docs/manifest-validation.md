@@ -89,7 +89,7 @@ each fixture's SHA-256 so a silent fixture edit fails the suite:
 
 * `tests/fixtures/canonical/` vendors the four `metadata`-form canonical vectors from
   `axiom-specs` `conformance/fixtures/canonical/` (pinned specification revision
-  `1bf754298ba1bb266a77f13cded4bfe69484906f`). Their `input.json` is deliberately
+  `80f44e836ced442e8f3ea33d167bd369ed6796bc`). Their `input.json` is deliberately
   non-canonical and their `expected.canonical.json` is the pinned expected byte sequence.
   The two `identity-tuple` vectors of that corpus are a different form that this reader
   does not implement and are not vendored.
