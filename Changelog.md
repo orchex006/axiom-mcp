@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+- **docs** (W10-B) Write the repository README and the documentation index, and correct a stale
+  status line in the development contract. `README.md` was a **0-byte file** at this revision even
+  though `pyproject.toml` declares `readme = "README.md"`, so the distribution would have shipped an
+  empty long description; it now states the owner scope (the MCP server surface, and explicitly not
+  the graph runtime, ecosystem contracts or skills), the repository layout across the 49 modules in
+  `src/axiom_mcp/` and the 44 modules in `tests/`, the three required checks established by `C-001`,
+  the pinned dependency set, the six-tool catalog and the four transport surfaces, the unapproved
+  draft nature of `spec.lock.json` with the offline and `--release` verification commands, and the
+  platform status - `compatibility/platform-matrix.json` is `required_not_certified` with **0 of 4**
+  mandatory targets certified, and the legs this Windows host cannot execute (POSIX guard backend,
+  cross-language Rust-holder exclusion, real host-process launches) are named as recorded `not_run`
+  rather than as passing. `docs/README.md` did not exist at all; it now indexes the 18 implementation
+  guides by area (transports and protocol, query and read path, errors/contracts/compatibility,
+  operations) and states that canonical contracts stay in `axiom-specs` and are resolved through the
+  pinned revision. `Development.md` said "repository นี้ยังไม่มี implementation" and that the first
+  task must create the required checks; both were stale for the 49-module tree and `C-001`, so the
+  paragraph now records the real state and keeps the obligation to record unrun checks as unverified.
+  Verification on the delivered revision: `python -m pytest tests -q` exit 0 with
+  `750 passed, 2 skipped, 230 subtests passed`, `python -m ruff check .` exit 0 with
+  `All checks passed!`, and `python -m ruff format --check .` exit 0 with `102 files already
+  formatted`; every relative link in the two new files resolves inside this repository. Recorded and
+  not changed: no `VERSION` file is added, because no contract requires one and this component
+  already declares its version in `pyproject.toml`; no Docker, no native host launch and no
+  certification is claimed.
 - **docs** (W9-4) Enforce the snapshot guide's limits and correct the remaining stale one. The
   guard-limits correction recorded by lane L5 had already landed as `48b9e36`, so the "Windows
   backend is absent" sentence is not in `docs/guides/snapshots.md` at this revision; the recorded
