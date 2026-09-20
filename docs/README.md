@@ -32,6 +32,7 @@ canonical contracts live there and must not be forked as an editable copy here.
 
 ## Operations
 
+- [Installation and upgrade](install-and-upgrade.md)
 - [CLI: version and doctor](cli-version-and-doctor.md)
 - [Locked native entrypoints](locked-entrypoints.md)
 - [Update check and approved-plan delegation](update-plan-delegation.md)
