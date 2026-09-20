@@ -1,0 +1,107 @@
+/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+  warnings.warn(
+axiom-mcp: stdio_start banner=True component=axiom-mcp sdk=1.28.1
+axiom-mcp: axiom-mcp stdio transport
+axiom-mcp: component=axiom-mcp version=0.0.0.dev0
+axiom-mcp: spec_version=2.0.0-draft.1 spec_revision=80f44e836ced442e8f3ea33d167bd369ed6796bc
+axiom-mcp: sdk=mcp==1.28.1 protocol_min=2025-11-25
+axiom-mcp: protocol=2025-11-25
+axiom-mcp: stdout=protocol-only stderr=diagnostics
+/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+  warnings.warn(
+axiom-mcp: stdio_start banner=True component=axiom-mcp sdk=1.28.1
+axiom-mcp: axiom-mcp stdio transport
+axiom-mcp: component=axiom-mcp version=0.0.0.dev0
+axiom-mcp: spec_version=2.0.0-draft.1 spec_revision=80f44e836ced442e8f3ea33d167bd369ed6796bc
+axiom-mcp: sdk=mcp==1.28.1 protocol_min=2025-11-25
+axiom-mcp: protocol=2025-11-25
+axiom-mcp: stdout=protocol-only stderr=diagnostics
+axiom-mcp: stdio_stop protocol_bytes=339 protocol_writes=2 violations=0
+Traceback (most recent call last):
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/streams/memory.py", line 118, in receive
+    return self.receive_nowait()
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/streams/memory.py", line 113, in receive_nowait
+    raise WouldBlock
+anyio.WouldBlock
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/thanatmet-t/.axiom-runtime/py313/lib/python3.13/asyncio/runners.py", line 119, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/thanatmet-t/.axiom-runtime/py313/lib/python3.13/asyncio/base_events.py", line 726, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py", line 2464, in wrapper
+    return await func(*args)
+           ^^^^^^^^^^^^^^^^^
+  File "/mnt/d/SP-Billy/axiom-worktrees/axiom-mcp-w10-v2031/src/axiom_mcp/stdio.py", line 254, in serve_stdio
+    await server.run_stdio_async()
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/mcp/server/fastmcp/server.py", line 756, in run_stdio_async
+    await self._mcp_server.run(
+    ...<3 lines>...
+    )
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/mcp/server/lowlevel/server.py", line 662, in run
+    async with AsyncExitStack() as stack:
+               ~~~~~~~~~~~~~~^^
+  File "/home/thanatmet-t/.axiom-runtime/py313/lib/python3.13/contextlib.py", line 768, in __aexit__
+    raise exc
+  File "/home/thanatmet-t/.axiom-runtime/py313/lib/python3.13/contextlib.py", line 751, in __aexit__
+    cb_suppress = await cb(*exc_details)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/mcp/shared/session.py", line 238, in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py", line 819, in __aexit__
+    raise exc_val
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/mcp/server/lowlevel/server.py", line 679, in run
+    async with anyio.create_task_group() as tg:
+               ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py", line 819, in __aexit__
+    raise exc_val
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/mcp/server/lowlevel/server.py", line 681, in run
+    async for message in session.incoming_messages:
+    ...<8 lines>...
+        )
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/abc/_streams.py", line 35, in __anext__
+    return await self.receive()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/streams/memory.py", line 126, in receive
+    await receive_event.wait()
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py", line 1866, in wait
+    await self._event.wait()
+  File "/home/thanatmet-t/.axiom-runtime/py313/lib/python3.13/asyncio/locks.py", line 213, in wait
+    await fut
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/d/SP-Billy/axiom-worktrees/axiom-mcp-w10-v2031/src/axiom_mcp/stdio.py", line 284, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/mnt/d/SP-Billy/axiom-worktrees/axiom-mcp-w10-v2031/src/axiom_mcp/stdio.py", line 280, in main
+    return anyio.run(functools.partial(serve_stdio, server, banner=banner))
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/_core/_eventloop.py", line 83, in run
+    return async_backend.run(func, args, {}, backend_options)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py", line 2481, in run
+    return runner.run(wrapper())
+           ~~~~~~~~~~^^^^^^^^^^^
+  File "/home/thanatmet-t/.axiom-runtime/py313/lib/python3.13/asyncio/runners.py", line 124, in run
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+/home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+  warnings.warn(
+axiom-mcp: stdio_start banner=True component=axiom-mcp sdk=1.28.1
+axiom-mcp: axiom-mcp stdio transport
+axiom-mcp: component=axiom-mcp version=0.0.0.dev0
+axiom-mcp: spec_version=2.0.0-draft.1 spec_revision=80f44e836ced442e8f3ea33d167bd369ed6796bc
+axiom-mcp: sdk=mcp==1.28.1 protocol_min=2025-11-25
+axiom-mcp: protocol=2025-11-25
+axiom-mcp: stdout=protocol-only stderr=diagnostics

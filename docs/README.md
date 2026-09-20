@@ -38,6 +38,11 @@ canonical contracts live there and must not be forked as an editable copy here.
 - [Update check and approved-plan delegation](update-plan-delegation.md)
 - [Release packaging into versioned environments](release-packaging.md)
 
+## Verification evidence
+
+- [Native query and host process matrix (V2-031)](../tests/native/README.md) - what was executed on
+  each host, the real exit codes, and the targets that stay `not_run`.
+
 ## Ownership
 
 Documentation for code is owned here and changes in the same branch as the code.

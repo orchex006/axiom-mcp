@@ -1,0 +1,83 @@
+[
+  {
+    "check": "graph_query.search.envelope",
+    "kind": "positive",
+    "outcome": "pass",
+    "observed": {
+      "schema_version": 1,
+      "solution_id": "demo-solution",
+      "node_count": 2,
+      "coverage": "partial",
+      "freshness": "unknown",
+      "verification": {
+        "mode": "none"
+      },
+      "project_generations": [
+        {
+          "project_id": "auth-api",
+          "generation_id": "7319237fdf1ce4ff27ea377c8bc3ae8cf1f115cffc71de369a373e1870ba9d1a"
+        },
+        {
+          "project_id": "web-app",
+          "generation_id": "f570a6d6c7ae1bcffcec7a9c8cb3248dbadab432a30aec09a3223c5c5784c73f"
+        }
+      ],
+      "envelope_keys_within_contract": true
+    }
+  },
+  {
+    "check": "graph_query.callers.envelope",
+    "kind": "positive",
+    "outcome": "pass",
+    "observed": {
+      "target": "7ff3a347ce2f66d59e181e6658f5c3786a98e865988a965e8e92f0c6fd07ceca",
+      "node_count": 1,
+      "edge_count": 1,
+      "truncated": false
+    }
+  },
+  {
+    "check": "graph_query.unknown_operation",
+    "kind": "negative",
+    "outcome": "pass",
+    "observed": {
+      "refused": true,
+      "code": "UNSUPPORTED_OPERATION",
+      "message": "UNSUPPORTED_OPERATION: operation is not one of the documented query operations"
+    }
+  },
+  {
+    "check": "graph_query.unscoped_solution",
+    "kind": "negative",
+    "outcome": "pass",
+    "observed": {
+      "refused": true,
+      "code": "NOT_FOUND",
+      "message": "NOT_FOUND: no such solution is visible to this caller"
+    }
+  },
+  {
+    "check": "graph_query.arbitrary_sql_refused",
+    "kind": "negative",
+    "outcome": "pass",
+    "observed": {
+      "refused": true,
+      "code": "VALIDATION_ERROR",
+      "message": "VALIDATION_ERROR: the request carries fields this tool does not accept"
+    }
+  },
+  {
+    "check": "graph_query.out_of_contract_limit",
+    "kind": "boundary",
+    "outcome": "pass",
+    "observed": {
+      "answered_with": "refusal",
+      "code": "VALIDATION_ERROR",
+      "details": {
+        "unexpected_fields": [
+          "limit"
+        ]
+      }
+    }
+  }
+]

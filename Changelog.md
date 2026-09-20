@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+- **test** (V2-031) Record the native query and host-process matrix for the mandatory targets and
+  state plainly which legs did not run. `tests/native/` now holds the executable evidence:
+  `capture_native_matrix.py` (a real `graph_query` over the shipped `demo-solution` bundle through
+  the native guard; a real `python -m axiom_mcp.stdio` process driven through a JSON-RPC handshake,
+  an injected stdout-noise failure case, a bounded silent-server read deadline and an interrupt
+  delivery; and the composed gateway served by uvicorn on a real loopback socket with
+  host/origin/credential/capability/oversize checks and a stalled-body client timeout),
+  `stdio_noise_probe.py`, `http_security_server.py`, `capture_gates.py` and `tests/native/README.md`.
+  Windows 11 x64 (Python 3.13.14, guard backend `windows`) ran all six legs to completion and exited
+  0; Ubuntu 26.04.1 LTS x64 **on WSL2** (provisioned CPython 3.13.15, guard backend `posix`) passed
+  five of six. The POSIX interrupt leg **failed** as a real finding: `SIGINT` delivered to the idle
+  stdio process was never serviced inside the bounded window, while `SIGINT` after a later frame
+  exited `-2` and `SIGTERM` exited `-15`, so CP-08's bounded graceful drain is not implemented in
+  `src/axiom_mcp/stdio.py`; the check was recorded as a failure rather than weakened. Required
+  checks on Windows x64: `python -m pytest tests -q` exit 0 (`753 passed, 2 skipped, 230 subtests
+  passed`), `python -m ruff check .` exit 0, `python -m ruff format --check .` exit 0 (`107 files
+  already formatted`). On WSL2 the required pytest exited **2**, not green:
+  `tests/test_guard_windows.py` imports `locks_windows` -> `msvcrt` before its `importorskip`, so
+  collection aborts; the two ruff gates exited 0 and an explicitly non-canonical diagnostic
+  (`--ignore=tests/test_guard_windows.py`) exited 1 with `12 failed, 738 passed, 1 skipped, 7
+  errors`. Recorded and not changed: **no released core fixture set exists** - the only bundle
+  self-labels `generator_version: "synthetic-fixture-v2-not-runtime"` (read off the real manifests,
+  and asserted by `tests/test_catalog.py`), so the released-core certification is `not_run` rather
+  than claimed; `macos-arm64` and `macos-x64` are `not_run` because no macOS host exists and a
+  container or cross-build may not substitute; `linux-x64` stays `not_run` because a WSL2 run is not
+  native Linux evidence per `compatibility/platform-matrix.json`; and the POSIX guard backend stays
+  outside this matrix. 0 of 4 mandatory targets are certified by this task.
+
 - **docs** (I-005) Publish the installation and upgrade guide and make the README a real package
   README. The card recorded that `README.md` was empty and that no installation guide existed; the
   first half was stale, but the gap behind it was real and sharper. `README.md` was repository

@@ -1,0 +1,121 @@
+{
+  "canonical_failures": [],
+  "gates": [
+    {
+      "command": "C:\\Users\\006006\\AppData\\Local\\Programs\\Python\\Python313\\python.exe -m pytest tests -q",
+      "diagnostic": false,
+      "duration_seconds": 95.269,
+      "exit_code": 0,
+      "gate": "pytest",
+      "stderr": {
+        "bytes": 0,
+        "path": "raw/gates-pytest-stderr.bin",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_path": "raw/gates-pytest-stderr.txt"
+      },
+      "stdout": {
+        "bytes": 941,
+        "path": "raw/gates-pytest-stdout.bin",
+        "sha256": "e98353b09c78157dfc29e7303ce26c39f2ec83b332c1a1dfae1afde3a0d4435c",
+        "text_path": "raw/gates-pytest-stdout.txt"
+      },
+      "tail": [
+        "................................................ [  6%]",
+        "....................................................................... [ 15%]",
+        ".....................................................................s. [ 25%]",
+        "................................................................................. [ 35%]",
+        "...................................................................... [ 45%]",
+        "........................................................................ [ 54%]",
+        "........................................................ [ 62%]",
+        "........................................................................ [ 71%]",
+        "........................................................................ [ 81%]",
+        "........................................................................ [ 90%]",
+        ".....................................................................                         [100%]",
+        "753 passed, 2 skipped, 230 subtests passed in 94.42s (0:01:34)"
+      ]
+    },
+    {
+      "command": "C:\\Users\\006006\\AppData\\Local\\Programs\\Python\\Python313\\python.exe -m ruff check .",
+      "diagnostic": false,
+      "duration_seconds": 0.175,
+      "exit_code": 0,
+      "gate": "ruff-check",
+      "stderr": {
+        "bytes": 0,
+        "path": "raw/gates-ruff-check-stderr.bin",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_path": "raw/gates-ruff-check-stderr.txt"
+      },
+      "stdout": {
+        "bytes": 19,
+        "path": "raw/gates-ruff-check-stdout.bin",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "text_path": "raw/gates-ruff-check-stdout.txt"
+      },
+      "tail": [
+        "All checks passed!"
+      ]
+    },
+    {
+      "command": "C:\\Users\\006006\\AppData\\Local\\Programs\\Python\\Python313\\python.exe -m ruff format --check .",
+      "diagnostic": false,
+      "duration_seconds": 0.159,
+      "exit_code": 0,
+      "gate": "ruff-format-check",
+      "stderr": {
+        "bytes": 0,
+        "path": "raw/gates-ruff-format-check-stderr.bin",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_path": "raw/gates-ruff-format-check-stderr.txt"
+      },
+      "stdout": {
+        "bytes": 28,
+        "path": "raw/gates-ruff-format-check-stdout.bin",
+        "sha256": "e540c8427c224fd685bda71cb704448f5f98f01496a5ad22e5c656a56a0955ae",
+        "text_path": "raw/gates-ruff-format-check-stdout.txt"
+      },
+      "tail": [
+        "107 files already formatted"
+      ]
+    }
+  ],
+  "generated_utc": "2026-09-20T06:59:27Z",
+  "identity": {
+    "component": "axiom-mcp",
+    "cpu_count": 12,
+    "guard_backend": "windows",
+    "machine": "AMD64",
+    "os_name": "nt",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "pointer_bits": 64,
+    "processor": "Intel64 Family 6 Model 186 Stepping 3, GenuineIntel",
+    "protocol_minimum": "2025-11-25",
+    "python_executable": "C:\\Users\\006006\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+    "python_implementation": "CPython",
+    "python_requires": ">=3.13,<3.14",
+    "python_supported": true,
+    "python_version": "3.13.14",
+    "release": "11",
+    "runtime_pin_reasons": [],
+    "runtime_pins": {
+      "anyio": "4.14.2",
+      "fastapi": "0.139.2",
+      "httpx": "0.28.1",
+      "mcp": "1.28.1",
+      "pydantic": "2.13.4",
+      "starlette": "1.3.1",
+      "uvicorn": "0.51.0"
+    },
+    "spec_revision": "80f44e836ced442e8f3ea33d167bd369ed6796bc",
+    "sys_platform": "win32",
+    "system": "Windows",
+    "target": "windows-x64",
+    "version": "10.0.26200"
+  },
+  "interpreter": "C:\\Users\\006006\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+  "note": "Required checks are the three named by Development.md. A non-zero exit is recorded as a failure, not repaired; a diagnostic entry is not a required check.",
+  "passed": true,
+  "repository": "axiom-mcp",
+  "target": "windows-x64",
+  "task": "V2-031"
+}

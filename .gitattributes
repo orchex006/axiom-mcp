@@ -7,3 +7,7 @@
 *.py text eol=lf
 *.rs text eol=lf
 *.ps1 text eol=crlf
+# V2-031: native host captures are byte-exact evidence - never normalize their line endings.
+# The Windows stderr/stdout captures legitimately contain CR bytes; normalization would
+# change the committed bytes and invalidate every SHA256 in tests/native/evidence/*/SHA256SUMS.
+tests/native/evidence/** -text

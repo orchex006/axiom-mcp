@@ -1,0 +1,18 @@
+
+==================================== ERRORS ====================================
+_________________ ERROR collecting tests/test_guard_windows.py _________________
+ImportError while importing test module '/mnt/d/SP-Billy/axiom-worktrees/axiom-mcp-w10-v2031/tests/test_guard_windows.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/home/thanatmet-t/.axiom-runtime/py313/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_guard_windows.py:37: in <module>
+    ???
+src/axiom_mcp/guard/locks_windows.py:32: in <module>
+    import msvcrt
+E   ModuleNotFoundError: No module named 'msvcrt'
+=========================== short test summary info ============================
+ERROR tests/test_guard_windows.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 14.06s

@@ -1,0 +1,156 @@
+{
+  "canonical_failures": [
+    "pytest"
+  ],
+  "gates": [
+    {
+      "command": "/home/thanatmet-t/.axiom-runtime/venv/bin/python -m pytest tests -q",
+      "diagnostic": false,
+      "duration_seconds": 15.802,
+      "exit_code": 2,
+      "gate": "pytest",
+      "stderr": {
+        "bytes": 0,
+        "path": "raw/gates-pytest-stderr.bin",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_path": "raw/gates-pytest-stderr.txt"
+      },
+      "stdout": {
+        "bytes": 1025,
+        "path": "raw/gates-pytest-stdout.bin",
+        "sha256": "1c20e87524fb3e5dd0f76cb7b106aeb6a5ba49675e11722af7f390e8b2a6e55f",
+        "text_path": "raw/gates-pytest-stdout.txt"
+      },
+      "tail": [
+        "/home/thanatmet-t/.axiom-runtime/py313/lib/python3.13/importlib/__init__.py:88: in import_module",
+        "    return _bootstrap._gcd_import(name[level:], package, level)",
+        "           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "D:\\SP-Billy\\axiom-worktrees\\axiom-mcp-w10-v2031\\tests\\test_guard_windows.py:37: in <module>",
+        "    ???",
+        "src/axiom_mcp/guard/locks_windows.py:32: in <module>",
+        "    import msvcrt",
+        "E   ModuleNotFoundError: No module named 'msvcrt'",
+        "=========================== short test summary info ============================",
+        "ERROR tests/test_guard_windows.py",
+        "!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!",
+        "1 error in 14.06s"
+      ]
+    },
+    {
+      "command": "/home/thanatmet-t/.axiom-runtime/venv/bin/python -m ruff check .",
+      "diagnostic": false,
+      "duration_seconds": 0.267,
+      "exit_code": 0,
+      "gate": "ruff-check",
+      "stderr": {
+        "bytes": 0,
+        "path": "raw/gates-ruff-check-stderr.bin",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_path": "raw/gates-ruff-check-stderr.txt"
+      },
+      "stdout": {
+        "bytes": 19,
+        "path": "raw/gates-ruff-check-stdout.bin",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "text_path": "raw/gates-ruff-check-stdout.txt"
+      },
+      "tail": [
+        "All checks passed!"
+      ]
+    },
+    {
+      "command": "/home/thanatmet-t/.axiom-runtime/venv/bin/python -m ruff format --check .",
+      "diagnostic": false,
+      "duration_seconds": 0.407,
+      "exit_code": 0,
+      "gate": "ruff-format-check",
+      "stderr": {
+        "bytes": 0,
+        "path": "raw/gates-ruff-format-check-stderr.bin",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_path": "raw/gates-ruff-format-check-stderr.txt"
+      },
+      "stdout": {
+        "bytes": 28,
+        "path": "raw/gates-ruff-format-check-stdout.bin",
+        "sha256": "e540c8427c224fd685bda71cb704448f5f98f01496a5ad22e5c656a56a0955ae",
+        "text_path": "raw/gates-ruff-format-check-stdout.txt"
+      },
+      "tail": [
+        "107 files already formatted"
+      ]
+    },
+    {
+      "command": "/home/thanatmet-t/.axiom-runtime/venv/bin/python -m pytest tests -q --ignore=tests/test_guard_windows.py",
+      "diagnostic": true,
+      "duration_seconds": 249.795,
+      "exit_code": 1,
+      "gate": "pytest-ignoring-windows-guard-tests",
+      "stderr": {
+        "bytes": 0,
+        "path": "raw/gates-pytest-ignoring-windows-guard-tests-stderr.bin",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_path": "raw/gates-pytest-ignoring-windows-guard-tests-stderr.txt"
+      },
+      "stdout": {
+        "bytes": 53834,
+        "path": "raw/gates-pytest-ignoring-windows-guard-tests-stdout.bin",
+        "sha256": "48a89a9f585983477e7af09bfeecd0893cf9d08192882d5dbaab423760dbfd4c",
+        "text_path": "raw/gates-pytest-ignoring-windows-guard-tests-stdout.txt"
+      },
+      "tail": [
+        "FAILED tests/test_update.py::ApplyTests::test_apply_without_a_plan_path_is_unavailable",
+        "FAILED tests/test_update.py::ApplyTests::test_approved_plan_is_delegated_as_an_argument_list",
+        "FAILED tests/test_update.py::ApplyTests::test_approved_plan_without_a_runner_reports_an_unexecuted_delegation",
+        "FAILED tests/test_update.py::ApplyTests::test_delegated_failure_is_reported_with_its_exit_code",
+        "ERROR tests/test_entrypoints.py::test_the_stdio_plan_is_an_argv_array_with_an_absolute_interpreter",
+        "ERROR tests/test_entrypoints.py::test_the_host_document_never_offers_a_shell_string",
+        "ERROR tests/test_entrypoints.py::test_the_plan_environment_is_sorted_so_the_digest_can_be_written_down",
+        "ERROR tests/test_entrypoints.py::test_the_locked_stdio_plan_starts_and_answers_without_an_activation_script",
+        "ERROR tests/test_entrypoints.py::test_a_recorded_lock_describes_the_plans_until_something_moves",
+        "ERROR tests/test_entrypoints.py::test_two_plans_for_one_mode_are_refused - ax...",
+        "ERROR tests/test_release_package.py::test_real_isolated_environments_and_rollback",
+        "12 failed, 738 passed, 1 skipped, 1 warning, 7 errors, 230 subtests passed in 248.88s (0:04:08)"
+      ]
+    }
+  ],
+  "generated_utc": "2026-09-20T07:04:24Z",
+  "identity": {
+    "component": "axiom-mcp",
+    "cpu_count": 12,
+    "guard_backend": "posix",
+    "machine": "x86_64",
+    "os_name": "posix",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "pointer_bits": 64,
+    "processor": "",
+    "protocol_minimum": "2025-11-25",
+    "python_executable": "/home/thanatmet-t/.axiom-runtime/venv/bin/python",
+    "python_implementation": "CPython",
+    "python_requires": ">=3.13,<3.14",
+    "python_supported": true,
+    "python_version": "3.13.15",
+    "release": "6.18.33.2-microsoft-standard-WSL2",
+    "runtime_pin_reasons": [],
+    "runtime_pins": {
+      "anyio": "4.14.2",
+      "fastapi": "0.139.2",
+      "httpx": "0.28.1",
+      "mcp": "1.28.1",
+      "pydantic": "2.13.4",
+      "starlette": "1.3.1",
+      "uvicorn": "0.51.0"
+    },
+    "spec_revision": "80f44e836ced442e8f3ea33d167bd369ed6796bc",
+    "sys_platform": "linux",
+    "system": "Linux",
+    "target": "ubuntu-x64",
+    "version": "#1 SMP PREEMPT_DYNAMIC Thu Jun 18 21:54:43 UTC 2026"
+  },
+  "interpreter": "/home/thanatmet-t/.axiom-runtime/venv/bin/python",
+  "note": "Required checks are the three named by Development.md. A non-zero exit is recorded as a failure, not repaired; a diagnostic entry is not a required check.",
+  "passed": false,
+  "repository": "axiom-mcp",
+  "target": "ubuntu-x64",
+  "task": "V2-031"
+}

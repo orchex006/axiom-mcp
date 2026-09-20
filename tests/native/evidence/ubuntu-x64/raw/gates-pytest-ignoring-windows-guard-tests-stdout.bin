@@ -1,0 +1,1043 @@
+................................................ [  6%]
+.....................................F..FEEEE.......................... [ 15%]
+.....E..E.FF..F.................................................F..F.s. [ 25%]
+................................................................. [ 33%]
+...................................................................................... [ 44%]
+........................................................................ [ 54%]
+..............................................E......... [ 61%]
+........................................................................ [ 71%]
+........................................................................ [ 80%]
+........................................................................ [ 90%]
+..........................................................FFFFF..........                     [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_the_stdio_plan_is_an_argv_array_with_an_absolute_interpreter _
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/entrypoints.py:770: in launch_plan
+    runtime = resolve_runtime(install_root, mode=mode, parent=parent, probe=probe)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ")
+mode = 'stdio', parent = None, probe = None
+
+    def resolve_runtime(
+        install_root: str | os.PathLike[str],
+        *,
+        mode: str = MODE_STDIO,
+        parent: Mapping[str, str] | None = None,
+        probe: Runner | None = None,
+    ) -> RuntimeLock:
+        """Verify which environment this host would actually launch, and refuse a guess.
+    
+        A lockfile naming an interpreter is not proof that the interpreter is in the
+        locked environment: the recorded path is therefore required to resolve inside
+        this version's own ``venv`` directory, and the interpreter is then asked what
+        it is. A bare interpreter, an interpreter outside the environment, an
+        unsupported Python line or an SDK that is not the pin are all refusals rather
+        than warnings, because every one of them means the running code is not the
+        code the lock names.
+        """
+    
+        if mode not in MODES:
+            raise EntrypointRefused("mode_unknown", str(mode))
+        run = probe or _run
+    
+        root = pathlib.Path(paths.bind_native_root(install_root))
+        if not root.is_dir():
+            raise EntrypointRefused("install_root_missing", str(root))
+        current = read_current(root)
+        if current is None:
+            raise EntrypointRefused("current_missing", str(root / CURRENT_FILENAME))
+        installed = validate_version(current.get("active"))
+    
+        directory = version_directory(root, installed)
+        lockfile_path = directory / LOCKFILE_FILENAME
+        document = read_lockfile(directory)
+        recorded_version = str(document.get("version", ""))
+        if recorded_version != installed:
+            raise EntrypointRefused(
+                "lockfile_version_mismatch", f"{recorded_version or 'absent'}!={installed}"
+            )
+    
+        venv_dir = directory / VENV_DIRNAME
+        python_section = document.get("python")
+        recorded_python = ""
+        component_version = ""
+        if isinstance(python_section, Mapping):
+            recorded_python = str(python_section.get("executable", "") or "")
+            component_version = str(python_section.get("marker", "") or "")
+    
+        interpreter = pathlib.Path(recorded_python) if recorded_python else venv_python(venv_dir)
+        if not interpreter.is_file():
+            fallback = venv_python(venv_dir)
+            if not fallback.is_file():
+                raise EntrypointRefused("interpreter_missing", str(interpreter))
+            interpreter = fallback
+        try:
+            resolved_interpreter = interpreter.resolve()
+            resolved_venv = venv_dir.resolve()
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise EntrypointRefused("interpreter_unresolvable", str(interpreter)) from exc
+        if not _under(resolved_interpreter, resolved_venv):
+            raise EntrypointRefused("interpreter_outside_environment", str(resolved_interpreter))
+    
+        metadata = read_venv_metadata(venv_dir)
+        shared = shared_base_packages(metadata)
+        environment = scoped_environment(venv=venv_dir, shared=shared, mode=mode, parent=parent)
+    
+        result = run(
+            [str(resolved_interpreter), "-c", _PROBE_SOURCE, version.SDK_PACKAGE], env=environment
+        )
+        if result.returncode != 0:
+            raise EntrypointRefused("interpreter_probe_failed", _first_error_line(result))
+        report = _probe_report(result)
+    
+        python_version = str(report.get("version", ""))
+        if not version.python_supported(python_version):
+            raise EntrypointRefused("interpreter_version_unsupported", python_version)
+        prefix = str(report.get("prefix", ""))
+        base_prefix = str(report.get("base_prefix", ""))
+        if not prefix or not base_prefix:
+            raise EntrypointRefused("interpreter_probe_corrupt", _first_error_line(result))
+        if _same_path(prefix, base_prefix):
+            raise EntrypointRefused("interpreter_not_isolated", f"{prefix}")
+        if not _same_path(prefix, resolved_venv):
+            raise EntrypointRefused("interpreter_prefix_mismatch", f"{prefix}!={resolved_venv}")
+    
+        sdk_version = report.get("sdk")
+        if not sdk_version:
+>           raise EntrypointRefused("sdk_not_installed", version.SDK_PACKAGE)
+E           axiom_mcp.entrypoints.EntrypointRefused: sdk_not_installed:mcp
+
+src/axiom_mcp/entrypoints.py:562: EntrypointRefused
+_____ ERROR at setup of test_the_host_document_never_offers_a_shell_string _____
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/entrypoints.py:770: in launch_plan
+    runtime = resolve_runtime(install_root, mode=mode, parent=parent, probe=probe)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ")
+mode = 'stdio', parent = None, probe = None
+
+    def resolve_runtime(
+        install_root: str | os.PathLike[str],
+        *,
+        mode: str = MODE_STDIO,
+        parent: Mapping[str, str] | None = None,
+        probe: Runner | None = None,
+    ) -> RuntimeLock:
+        """Verify which environment this host would actually launch, and refuse a guess.
+    
+        A lockfile naming an interpreter is not proof that the interpreter is in the
+        locked environment: the recorded path is therefore required to resolve inside
+        this version's own ``venv`` directory, and the interpreter is then asked what
+        it is. A bare interpreter, an interpreter outside the environment, an
+        unsupported Python line or an SDK that is not the pin are all refusals rather
+        than warnings, because every one of them means the running code is not the
+        code the lock names.
+        """
+    
+        if mode not in MODES:
+            raise EntrypointRefused("mode_unknown", str(mode))
+        run = probe or _run
+    
+        root = pathlib.Path(paths.bind_native_root(install_root))
+        if not root.is_dir():
+            raise EntrypointRefused("install_root_missing", str(root))
+        current = read_current(root)
+        if current is None:
+            raise EntrypointRefused("current_missing", str(root / CURRENT_FILENAME))
+        installed = validate_version(current.get("active"))
+    
+        directory = version_directory(root, installed)
+        lockfile_path = directory / LOCKFILE_FILENAME
+        document = read_lockfile(directory)
+        recorded_version = str(document.get("version", ""))
+        if recorded_version != installed:
+            raise EntrypointRefused(
+                "lockfile_version_mismatch", f"{recorded_version or 'absent'}!={installed}"
+            )
+    
+        venv_dir = directory / VENV_DIRNAME
+        python_section = document.get("python")
+        recorded_python = ""
+        component_version = ""
+        if isinstance(python_section, Mapping):
+            recorded_python = str(python_section.get("executable", "") or "")
+            component_version = str(python_section.get("marker", "") or "")
+    
+        interpreter = pathlib.Path(recorded_python) if recorded_python else venv_python(venv_dir)
+        if not interpreter.is_file():
+            fallback = venv_python(venv_dir)
+            if not fallback.is_file():
+                raise EntrypointRefused("interpreter_missing", str(interpreter))
+            interpreter = fallback
+        try:
+            resolved_interpreter = interpreter.resolve()
+            resolved_venv = venv_dir.resolve()
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise EntrypointRefused("interpreter_unresolvable", str(interpreter)) from exc
+        if not _under(resolved_interpreter, resolved_venv):
+            raise EntrypointRefused("interpreter_outside_environment", str(resolved_interpreter))
+    
+        metadata = read_venv_metadata(venv_dir)
+        shared = shared_base_packages(metadata)
+        environment = scoped_environment(venv=venv_dir, shared=shared, mode=mode, parent=parent)
+    
+        result = run(
+            [str(resolved_interpreter), "-c", _PROBE_SOURCE, version.SDK_PACKAGE], env=environment
+        )
+        if result.returncode != 0:
+            raise EntrypointRefused("interpreter_probe_failed", _first_error_line(result))
+        report = _probe_report(result)
+    
+        python_version = str(report.get("version", ""))
+        if not version.python_supported(python_version):
+            raise EntrypointRefused("interpreter_version_unsupported", python_version)
+        prefix = str(report.get("prefix", ""))
+        base_prefix = str(report.get("base_prefix", ""))
+        if not prefix or not base_prefix:
+            raise EntrypointRefused("interpreter_probe_corrupt", _first_error_line(result))
+        if _same_path(prefix, base_prefix):
+            raise EntrypointRefused("interpreter_not_isolated", f"{prefix}")
+        if not _same_path(prefix, resolved_venv):
+            raise EntrypointRefused("interpreter_prefix_mismatch", f"{prefix}!={resolved_venv}")
+    
+        sdk_version = report.get("sdk")
+        if not sdk_version:
+>           raise EntrypointRefused("sdk_not_installed", version.SDK_PACKAGE)
+E           axiom_mcp.entrypoints.EntrypointRefused: sdk_not_installed:mcp
+
+src/axiom_mcp/entrypoints.py:562: EntrypointRefused
+_ ERROR at setup of test_the_plan_environment_is_sorted_so_the_digest_can_be_written_down _
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/entrypoints.py:770: in launch_plan
+    runtime = resolve_runtime(install_root, mode=mode, parent=parent, probe=probe)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ")
+mode = 'stdio', parent = None, probe = None
+
+    def resolve_runtime(
+        install_root: str | os.PathLike[str],
+        *,
+        mode: str = MODE_STDIO,
+        parent: Mapping[str, str] | None = None,
+        probe: Runner | None = None,
+    ) -> RuntimeLock:
+        """Verify which environment this host would actually launch, and refuse a guess.
+    
+        A lockfile naming an interpreter is not proof that the interpreter is in the
+        locked environment: the recorded path is therefore required to resolve inside
+        this version's own ``venv`` directory, and the interpreter is then asked what
+        it is. A bare interpreter, an interpreter outside the environment, an
+        unsupported Python line or an SDK that is not the pin are all refusals rather
+        than warnings, because every one of them means the running code is not the
+        code the lock names.
+        """
+    
+        if mode not in MODES:
+            raise EntrypointRefused("mode_unknown", str(mode))
+        run = probe or _run
+    
+        root = pathlib.Path(paths.bind_native_root(install_root))
+        if not root.is_dir():
+            raise EntrypointRefused("install_root_missing", str(root))
+        current = read_current(root)
+        if current is None:
+            raise EntrypointRefused("current_missing", str(root / CURRENT_FILENAME))
+        installed = validate_version(current.get("active"))
+    
+        directory = version_directory(root, installed)
+        lockfile_path = directory / LOCKFILE_FILENAME
+        document = read_lockfile(directory)
+        recorded_version = str(document.get("version", ""))
+        if recorded_version != installed:
+            raise EntrypointRefused(
+                "lockfile_version_mismatch", f"{recorded_version or 'absent'}!={installed}"
+            )
+    
+        venv_dir = directory / VENV_DIRNAME
+        python_section = document.get("python")
+        recorded_python = ""
+        component_version = ""
+        if isinstance(python_section, Mapping):
+            recorded_python = str(python_section.get("executable", "") or "")
+            component_version = str(python_section.get("marker", "") or "")
+    
+        interpreter = pathlib.Path(recorded_python) if recorded_python else venv_python(venv_dir)
+        if not interpreter.is_file():
+            fallback = venv_python(venv_dir)
+            if not fallback.is_file():
+                raise EntrypointRefused("interpreter_missing", str(interpreter))
+            interpreter = fallback
+        try:
+            resolved_interpreter = interpreter.resolve()
+            resolved_venv = venv_dir.resolve()
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise EntrypointRefused("interpreter_unresolvable", str(interpreter)) from exc
+        if not _under(resolved_interpreter, resolved_venv):
+            raise EntrypointRefused("interpreter_outside_environment", str(resolved_interpreter))
+    
+        metadata = read_venv_metadata(venv_dir)
+        shared = shared_base_packages(metadata)
+        environment = scoped_environment(venv=venv_dir, shared=shared, mode=mode, parent=parent)
+    
+        result = run(
+            [str(resolved_interpreter), "-c", _PROBE_SOURCE, version.SDK_PACKAGE], env=environment
+        )
+        if result.returncode != 0:
+            raise EntrypointRefused("interpreter_probe_failed", _first_error_line(result))
+        report = _probe_report(result)
+    
+        python_version = str(report.get("version", ""))
+        if not version.python_supported(python_version):
+            raise EntrypointRefused("interpreter_version_unsupported", python_version)
+        prefix = str(report.get("prefix", ""))
+        base_prefix = str(report.get("base_prefix", ""))
+        if not prefix or not base_prefix:
+            raise EntrypointRefused("interpreter_probe_corrupt", _first_error_line(result))
+        if _same_path(prefix, base_prefix):
+            raise EntrypointRefused("interpreter_not_isolated", f"{prefix}")
+        if not _same_path(prefix, resolved_venv):
+            raise EntrypointRefused("interpreter_prefix_mismatch", f"{prefix}!={resolved_venv}")
+    
+        sdk_version = report.get("sdk")
+        if not sdk_version:
+>           raise EntrypointRefused("sdk_not_installed", version.SDK_PACKAGE)
+E           axiom_mcp.entrypoints.EntrypointRefused: sdk_not_installed:mcp
+
+src/axiom_mcp/entrypoints.py:562: EntrypointRefused
+_ ERROR at setup of test_the_locked_stdio_plan_starts_and_answers_without_an_activation_script _
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/entrypoints.py:770: in launch_plan
+    runtime = resolve_runtime(install_root, mode=mode, parent=parent, probe=probe)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ")
+mode = 'stdio', parent = None, probe = None
+
+    def resolve_runtime(
+        install_root: str | os.PathLike[str],
+        *,
+        mode: str = MODE_STDIO,
+        parent: Mapping[str, str] | None = None,
+        probe: Runner | None = None,
+    ) -> RuntimeLock:
+        """Verify which environment this host would actually launch, and refuse a guess.
+    
+        A lockfile naming an interpreter is not proof that the interpreter is in the
+        locked environment: the recorded path is therefore required to resolve inside
+        this version's own ``venv`` directory, and the interpreter is then asked what
+        it is. A bare interpreter, an interpreter outside the environment, an
+        unsupported Python line or an SDK that is not the pin are all refusals rather
+        than warnings, because every one of them means the running code is not the
+        code the lock names.
+        """
+    
+        if mode not in MODES:
+            raise EntrypointRefused("mode_unknown", str(mode))
+        run = probe or _run
+    
+        root = pathlib.Path(paths.bind_native_root(install_root))
+        if not root.is_dir():
+            raise EntrypointRefused("install_root_missing", str(root))
+        current = read_current(root)
+        if current is None:
+            raise EntrypointRefused("current_missing", str(root / CURRENT_FILENAME))
+        installed = validate_version(current.get("active"))
+    
+        directory = version_directory(root, installed)
+        lockfile_path = directory / LOCKFILE_FILENAME
+        document = read_lockfile(directory)
+        recorded_version = str(document.get("version", ""))
+        if recorded_version != installed:
+            raise EntrypointRefused(
+                "lockfile_version_mismatch", f"{recorded_version or 'absent'}!={installed}"
+            )
+    
+        venv_dir = directory / VENV_DIRNAME
+        python_section = document.get("python")
+        recorded_python = ""
+        component_version = ""
+        if isinstance(python_section, Mapping):
+            recorded_python = str(python_section.get("executable", "") or "")
+            component_version = str(python_section.get("marker", "") or "")
+    
+        interpreter = pathlib.Path(recorded_python) if recorded_python else venv_python(venv_dir)
+        if not interpreter.is_file():
+            fallback = venv_python(venv_dir)
+            if not fallback.is_file():
+                raise EntrypointRefused("interpreter_missing", str(interpreter))
+            interpreter = fallback
+        try:
+            resolved_interpreter = interpreter.resolve()
+            resolved_venv = venv_dir.resolve()
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise EntrypointRefused("interpreter_unresolvable", str(interpreter)) from exc
+        if not _under(resolved_interpreter, resolved_venv):
+            raise EntrypointRefused("interpreter_outside_environment", str(resolved_interpreter))
+    
+        metadata = read_venv_metadata(venv_dir)
+        shared = shared_base_packages(metadata)
+        environment = scoped_environment(venv=venv_dir, shared=shared, mode=mode, parent=parent)
+    
+        result = run(
+            [str(resolved_interpreter), "-c", _PROBE_SOURCE, version.SDK_PACKAGE], env=environment
+        )
+        if result.returncode != 0:
+            raise EntrypointRefused("interpreter_probe_failed", _first_error_line(result))
+        report = _probe_report(result)
+    
+        python_version = str(report.get("version", ""))
+        if not version.python_supported(python_version):
+            raise EntrypointRefused("interpreter_version_unsupported", python_version)
+        prefix = str(report.get("prefix", ""))
+        base_prefix = str(report.get("base_prefix", ""))
+        if not prefix or not base_prefix:
+            raise EntrypointRefused("interpreter_probe_corrupt", _first_error_line(result))
+        if _same_path(prefix, base_prefix):
+            raise EntrypointRefused("interpreter_not_isolated", f"{prefix}")
+        if not _same_path(prefix, resolved_venv):
+            raise EntrypointRefused("interpreter_prefix_mismatch", f"{prefix}!={resolved_venv}")
+    
+        sdk_version = report.get("sdk")
+        if not sdk_version:
+>           raise EntrypointRefused("sdk_not_installed", version.SDK_PACKAGE)
+E           axiom_mcp.entrypoints.EntrypointRefused: sdk_not_installed:mcp
+
+src/axiom_mcp/entrypoints.py:562: EntrypointRefused
+_ ERROR at setup of test_a_recorded_lock_describes_the_plans_until_something_moves _
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/entrypoints.py:770: in launch_plan
+    runtime = resolve_runtime(install_root, mode=mode, parent=parent, probe=probe)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ")
+mode = 'stdio', parent = None, probe = None
+
+    def resolve_runtime(
+        install_root: str | os.PathLike[str],
+        *,
+        mode: str = MODE_STDIO,
+        parent: Mapping[str, str] | None = None,
+        probe: Runner | None = None,
+    ) -> RuntimeLock:
+        """Verify which environment this host would actually launch, and refuse a guess.
+    
+        A lockfile naming an interpreter is not proof that the interpreter is in the
+        locked environment: the recorded path is therefore required to resolve inside
+        this version's own ``venv`` directory, and the interpreter is then asked what
+        it is. A bare interpreter, an interpreter outside the environment, an
+        unsupported Python line or an SDK that is not the pin are all refusals rather
+        than warnings, because every one of them means the running code is not the
+        code the lock names.
+        """
+    
+        if mode not in MODES:
+            raise EntrypointRefused("mode_unknown", str(mode))
+        run = probe or _run
+    
+        root = pathlib.Path(paths.bind_native_root(install_root))
+        if not root.is_dir():
+            raise EntrypointRefused("install_root_missing", str(root))
+        current = read_current(root)
+        if current is None:
+            raise EntrypointRefused("current_missing", str(root / CURRENT_FILENAME))
+        installed = validate_version(current.get("active"))
+    
+        directory = version_directory(root, installed)
+        lockfile_path = directory / LOCKFILE_FILENAME
+        document = read_lockfile(directory)
+        recorded_version = str(document.get("version", ""))
+        if recorded_version != installed:
+            raise EntrypointRefused(
+                "lockfile_version_mismatch", f"{recorded_version or 'absent'}!={installed}"
+            )
+    
+        venv_dir = directory / VENV_DIRNAME
+        python_section = document.get("python")
+        recorded_python = ""
+        component_version = ""
+        if isinstance(python_section, Mapping):
+            recorded_python = str(python_section.get("executable", "") or "")
+            component_version = str(python_section.get("marker", "") or "")
+    
+        interpreter = pathlib.Path(recorded_python) if recorded_python else venv_python(venv_dir)
+        if not interpreter.is_file():
+            fallback = venv_python(venv_dir)
+            if not fallback.is_file():
+                raise EntrypointRefused("interpreter_missing", str(interpreter))
+            interpreter = fallback
+        try:
+            resolved_interpreter = interpreter.resolve()
+            resolved_venv = venv_dir.resolve()
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise EntrypointRefused("interpreter_unresolvable", str(interpreter)) from exc
+        if not _under(resolved_interpreter, resolved_venv):
+            raise EntrypointRefused("interpreter_outside_environment", str(resolved_interpreter))
+    
+        metadata = read_venv_metadata(venv_dir)
+        shared = shared_base_packages(metadata)
+        environment = scoped_environment(venv=venv_dir, shared=shared, mode=mode, parent=parent)
+    
+        result = run(
+            [str(resolved_interpreter), "-c", _PROBE_SOURCE, version.SDK_PACKAGE], env=environment
+        )
+        if result.returncode != 0:
+            raise EntrypointRefused("interpreter_probe_failed", _first_error_line(result))
+        report = _probe_report(result)
+    
+        python_version = str(report.get("version", ""))
+        if not version.python_supported(python_version):
+            raise EntrypointRefused("interpreter_version_unsupported", python_version)
+        prefix = str(report.get("prefix", ""))
+        base_prefix = str(report.get("base_prefix", ""))
+        if not prefix or not base_prefix:
+            raise EntrypointRefused("interpreter_probe_corrupt", _first_error_line(result))
+        if _same_path(prefix, base_prefix):
+            raise EntrypointRefused("interpreter_not_isolated", f"{prefix}")
+        if not _same_path(prefix, resolved_venv):
+            raise EntrypointRefused("interpreter_prefix_mismatch", f"{prefix}!={resolved_venv}")
+    
+        sdk_version = report.get("sdk")
+        if not sdk_version:
+>           raise EntrypointRefused("sdk_not_installed", version.SDK_PACKAGE)
+E           axiom_mcp.entrypoints.EntrypointRefused: sdk_not_installed:mcp
+
+src/axiom_mcp/entrypoints.py:562: EntrypointRefused
+__________ ERROR at setup of test_two_plans_for_one_mode_are_refused ___________
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/entrypoints.py:770: in launch_plan
+    runtime = resolve_runtime(install_root, mode=mode, parent=parent, probe=probe)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ")
+mode = 'stdio', parent = None, probe = None
+
+    def resolve_runtime(
+        install_root: str | os.PathLike[str],
+        *,
+        mode: str = MODE_STDIO,
+        parent: Mapping[str, str] | None = None,
+        probe: Runner | None = None,
+    ) -> RuntimeLock:
+        """Verify which environment this host would actually launch, and refuse a guess.
+    
+        A lockfile naming an interpreter is not proof that the interpreter is in the
+        locked environment: the recorded path is therefore required to resolve inside
+        this version's own ``venv`` directory, and the interpreter is then asked what
+        it is. A bare interpreter, an interpreter outside the environment, an
+        unsupported Python line or an SDK that is not the pin are all refusals rather
+        than warnings, because every one of them means the running code is not the
+        code the lock names.
+        """
+    
+        if mode not in MODES:
+            raise EntrypointRefused("mode_unknown", str(mode))
+        run = probe or _run
+    
+        root = pathlib.Path(paths.bind_native_root(install_root))
+        if not root.is_dir():
+            raise EntrypointRefused("install_root_missing", str(root))
+        current = read_current(root)
+        if current is None:
+            raise EntrypointRefused("current_missing", str(root / CURRENT_FILENAME))
+        installed = validate_version(current.get("active"))
+    
+        directory = version_directory(root, installed)
+        lockfile_path = directory / LOCKFILE_FILENAME
+        document = read_lockfile(directory)
+        recorded_version = str(document.get("version", ""))
+        if recorded_version != installed:
+            raise EntrypointRefused(
+                "lockfile_version_mismatch", f"{recorded_version or 'absent'}!={installed}"
+            )
+    
+        venv_dir = directory / VENV_DIRNAME
+        python_section = document.get("python")
+        recorded_python = ""
+        component_version = ""
+        if isinstance(python_section, Mapping):
+            recorded_python = str(python_section.get("executable", "") or "")
+            component_version = str(python_section.get("marker", "") or "")
+    
+        interpreter = pathlib.Path(recorded_python) if recorded_python else venv_python(venv_dir)
+        if not interpreter.is_file():
+            fallback = venv_python(venv_dir)
+            if not fallback.is_file():
+                raise EntrypointRefused("interpreter_missing", str(interpreter))
+            interpreter = fallback
+        try:
+            resolved_interpreter = interpreter.resolve()
+            resolved_venv = venv_dir.resolve()
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise EntrypointRefused("interpreter_unresolvable", str(interpreter)) from exc
+        if not _under(resolved_interpreter, resolved_venv):
+            raise EntrypointRefused("interpreter_outside_environment", str(resolved_interpreter))
+    
+        metadata = read_venv_metadata(venv_dir)
+        shared = shared_base_packages(metadata)
+        environment = scoped_environment(venv=venv_dir, shared=shared, mode=mode, parent=parent)
+    
+        result = run(
+            [str(resolved_interpreter), "-c", _PROBE_SOURCE, version.SDK_PACKAGE], env=environment
+        )
+        if result.returncode != 0:
+            raise EntrypointRefused("interpreter_probe_failed", _first_error_line(result))
+        report = _probe_report(result)
+    
+        python_version = str(report.get("version", ""))
+        if not version.python_supported(python_version):
+            raise EntrypointRefused("interpreter_version_unsupported", python_version)
+        prefix = str(report.get("prefix", ""))
+        base_prefix = str(report.get("base_prefix", ""))
+        if not prefix or not base_prefix:
+            raise EntrypointRefused("interpreter_probe_corrupt", _first_error_line(result))
+        if _same_path(prefix, base_prefix):
+            raise EntrypointRefused("interpreter_not_isolated", f"{prefix}")
+        if not _same_path(prefix, resolved_venv):
+            raise EntrypointRefused("interpreter_prefix_mismatch", f"{prefix}!={resolved_venv}")
+    
+        sdk_version = report.get("sdk")
+        if not sdk_version:
+>           raise EntrypointRefused("sdk_not_installed", version.SDK_PACKAGE)
+E           axiom_mcp.entrypoints.EntrypointRefused: sdk_not_installed:mcp
+
+src/axiom_mcp/entrypoints.py:562: EntrypointRefused
+________ ERROR at setup of test_real_isolated_environments_and_rollback ________
+
+packager = <module 'axiom_release_package' from '/mnt/d/SP-Billy/axiom-worktrees/axiom-mcp-w10-v2031/release/package.py'>
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7c88d1a36520>, _basetemp=PosixPath('/tmp/pytest-of-thanatmet-t/pytest-0'), _retention_count=3, _retention_policy='all')
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_release_package.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+source_dir = PosixPath('/tmp/pytest-of-thanatmet-t/pytest-0/c036-wheels0/project-1.0.0')
+out_dir = PosixPath('/tmp/pytest-of-thanatmet-t/pytest-0/c036-wheels0/dist-1.0.0')
+python = None, runner = None
+
+    def build_wheel(
+        source_dir: str | os.PathLike[str],
+        out_dir: str | os.PathLike[str],
+        *,
+        python: str | os.PathLike[str] | None = None,
+        runner: Runner | None = None,
+    ) -> pathlib.Path:
+        """Build one wheel from a source tree, without build isolation.
+    
+        No isolation means the build stays offline and depends on the build backend
+        already present in this interpreter instead of downloading one.
+        """
+        run = runner or _run
+        interpreter = python or sys.executable
+        out = pathlib.Path(out_dir)
+        out.mkdir(parents=True, exist_ok=True)
+        result = run(
+            [
+                str(interpreter),
+                "-m",
+                "build",
+                "--wheel",
+                "--no-isolation",
+                "--outdir",
+                str(out),
+                str(source_dir),
+            ]
+        )
+        if result.returncode != 0:
+>           raise PackageError("build_failed", _first_error_line(result))
+E           axiom_release_package.PackageError: build_failed:/home/thanatmet-t/.axiom-runtime/venv/bin/python: No module named build
+
+release/package.py:433: PackageError
+=================================== FAILURES ===================================
+______________ test_the_locked_runtime_is_the_version_environment ______________
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:388: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ")
+mode = 'stdio', parent = None, probe = None
+
+    def resolve_runtime(
+        install_root: str | os.PathLike[str],
+        *,
+        mode: str = MODE_STDIO,
+        parent: Mapping[str, str] | None = None,
+        probe: Runner | None = None,
+    ) -> RuntimeLock:
+        """Verify which environment this host would actually launch, and refuse a guess.
+    
+        A lockfile naming an interpreter is not proof that the interpreter is in the
+        locked environment: the recorded path is therefore required to resolve inside
+        this version's own ``venv`` directory, and the interpreter is then asked what
+        it is. A bare interpreter, an interpreter outside the environment, an
+        unsupported Python line or an SDK that is not the pin are all refusals rather
+        than warnings, because every one of them means the running code is not the
+        code the lock names.
+        """
+    
+        if mode not in MODES:
+            raise EntrypointRefused("mode_unknown", str(mode))
+        run = probe or _run
+    
+        root = pathlib.Path(paths.bind_native_root(install_root))
+        if not root.is_dir():
+            raise EntrypointRefused("install_root_missing", str(root))
+        current = read_current(root)
+        if current is None:
+            raise EntrypointRefused("current_missing", str(root / CURRENT_FILENAME))
+        installed = validate_version(current.get("active"))
+    
+        directory = version_directory(root, installed)
+        lockfile_path = directory / LOCKFILE_FILENAME
+        document = read_lockfile(directory)
+        recorded_version = str(document.get("version", ""))
+        if recorded_version != installed:
+            raise EntrypointRefused(
+                "lockfile_version_mismatch", f"{recorded_version or 'absent'}!={installed}"
+            )
+    
+        venv_dir = directory / VENV_DIRNAME
+        python_section = document.get("python")
+        recorded_python = ""
+        component_version = ""
+        if isinstance(python_section, Mapping):
+            recorded_python = str(python_section.get("executable", "") or "")
+            component_version = str(python_section.get("marker", "") or "")
+    
+        interpreter = pathlib.Path(recorded_python) if recorded_python else venv_python(venv_dir)
+        if not interpreter.is_file():
+            fallback = venv_python(venv_dir)
+            if not fallback.is_file():
+                raise EntrypointRefused("interpreter_missing", str(interpreter))
+            interpreter = fallback
+        try:
+            resolved_interpreter = interpreter.resolve()
+            resolved_venv = venv_dir.resolve()
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise EntrypointRefused("interpreter_unresolvable", str(interpreter)) from exc
+        if not _under(resolved_interpreter, resolved_venv):
+            raise EntrypointRefused("interpreter_outside_environment", str(resolved_interpreter))
+    
+        metadata = read_venv_metadata(venv_dir)
+        shared = shared_base_packages(metadata)
+        environment = scoped_environment(venv=venv_dir, shared=shared, mode=mode, parent=parent)
+    
+        result = run(
+            [str(resolved_interpreter), "-c", _PROBE_SOURCE, version.SDK_PACKAGE], env=environment
+        )
+        if result.returncode != 0:
+            raise EntrypointRefused("interpreter_probe_failed", _first_error_line(result))
+        report = _probe_report(result)
+    
+        python_version = str(report.get("version", ""))
+        if not version.python_supported(python_version):
+            raise EntrypointRefused("interpreter_version_unsupported", python_version)
+        prefix = str(report.get("prefix", ""))
+        base_prefix = str(report.get("base_prefix", ""))
+        if not prefix or not base_prefix:
+            raise EntrypointRefused("interpreter_probe_corrupt", _first_error_line(result))
+        if _same_path(prefix, base_prefix):
+            raise EntrypointRefused("interpreter_not_isolated", f"{prefix}")
+        if not _same_path(prefix, resolved_venv):
+            raise EntrypointRefused("interpreter_prefix_mismatch", f"{prefix}!={resolved_venv}")
+    
+        sdk_version = report.get("sdk")
+        if not sdk_version:
+>           raise EntrypointRefused("sdk_not_installed", version.SDK_PACKAGE)
+E           axiom_mcp.entrypoints.EntrypointRefused: sdk_not_installed:mcp
+
+src/axiom_mcp/entrypoints.py:562: EntrypointRefused
+___________ test_python_no_user_site_is_what_removes_the_ambient_sdk ___________
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+
+>   ???
+E   AssertionError: Traceback (most recent call last):
+E       File "<string>", line 1, in <module>
+E         import mcp, sys; print(sys.prefix != sys.base_prefix)
+E         ^^^^^^^^^^^^^^^
+E     ModuleNotFoundError: No module named 'mcp'
+E     
+E   assert 1 == 0
+E    +  where 1 = CompletedProcess(args=["/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/ven...t mcp, sys; print(sys.prefix != sys.base_prefix)\n    ^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named \'mcp\'\n').returncode
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:440: AssertionError
+________________ test_the_module_cli_prints_one_launch_document ________________
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+capsys = <_pytest.capture.CaptureFixture object at 0x7c88cfe03b60>
+
+>   ???
+E   assert 2 == 0
+E    +  where 0 = entrypoints.EXIT_SUCCESS
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:1060: AssertionError
+----------------------------- Captured stderr call -----------------------------
+{"ok": false, "code": "sdk_not_installed", "detail": "mcp"}
+____________ test_the_module_cli_records_and_then_verifies_the_lock ____________
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+capsys = <_pytest.capture.CaptureFixture object at 0x7c88cfcb74d0>
+
+>   ???
+E   assert 2 == 0
+E    +  where 0 = entrypoints.EXIT_SUCCESS
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:1085: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"ok": false, "reasons": ["lock_absent"]}
+_____________ test_the_module_entrypoint_is_reachable_as_a_process _____________
+
+locked = {'root': PosixPath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ"), 'version_dir': Posi...ath("/tmp/pytest-of-thanatmet-t/pytest-0/locked0/axiom mcp (locked) & 'v2' ทดสอบ/versions/9.9.9/venv/bin/python"), ...}
+
+>   ???
+E   AssertionError: {"ok": false, "code": "sdk_not_installed", "detail": "mcp"}
+E     
+E   assert 2 == 0
+E    +  where 2 = CompletedProcess(args=['/home/thanatmet-t/.axiom-runtime/venv/bin/python', '-m', 'axiom_mcp.entrypoints', 'plan', '--m...ocked) & 'v2' ทดสอบ"], returncode=2, stdout='', stderr='{"ok": false, "code": "sdk_not_installed", "detail": "mcp"}\n').returncode
+E    +  and   0 = entrypoints.EXIT_SUCCESS
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_entrypoints.py:1146: AssertionError
+_________ test_exclusive_holder_in_another_process_excludes_both_modes _________
+
+tmp_path = PosixPath('/tmp/pytest-of-thanatmet-t/pytest-0/test_exclusive_holder_in_anoth0')
+
+>   ???
+E   AssertionError: exclusive: {"backend": "posix", "event": "acquired", "locks": ["data.lock"], "mode": "exclusive", "pid": 584, "platform": "linux"}
+E     {"event": "released", "locks": ["data.lock"], "pid": 584, "platform": "linux"}
+E     
+E   assert 0 == 3
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_guard_cross_language.py:124: AssertionError
+__ test_released_handles_are_reacquirable_and_closed_handles_refuse_identity ___
+
+tmp_path = PosixPath('/tmp/pytest-of-thanatmet-t/pytest-0/test_released_handles_are_reac0')
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_guard_cross_language.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixLockHandle(path='/tmp/pytest-of-thanatmet-t/pytest-0/test_released_handles_are_reac0/solution.guard/data.lock', fd=15)
+
+    def identity(self) -> str:
+>       return protocol.identity_of_stat(os.fstat(self._fd))
+                                         ^^^^^^^^^^^^^^^^^^
+E       OSError: [Errno 9] Bad file descriptor
+
+src/axiom_mcp/guard/locks_posix.py:95: OSError
+____________ ApplyTests.test_a_versioned_component_root_is_accepted ____________
+
+self = <test_update.ApplyTests testMethod=test_a_versioned_component_root_is_accepted>
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_update.py:340: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = 'C:/Users/demo/.axiom/components/axiom-mcp/0.2.0'
+protected = [PosixPath('/home/thanatmet-t/.axiom-runtime/venv')]
+
+    def guard_install_root(
+        install_root: str,
+        protected: Sequence[pathlib.Path] | None = None,
+    ) -> None:
+        """Refuse an install root that would rewrite the running installation."""
+        text = str(install_root or "").strip()
+        if text == "":
+            raise InPlaceUpgradeRefused(["install_root_empty"])
+        candidate = pathlib.Path(text)
+        if not candidate.is_absolute():
+>           raise InPlaceUpgradeRefused([f"install_root_not_absolute:{text}"])
+E           axiom_mcp.update.InPlaceUpgradeRefused: plan rejected: install_root_not_absolute:C:/Users/demo/.axiom/components/axiom-mcp/0.2.0
+
+src/axiom_mcp/update.py:424: InPlaceUpgradeRefused
+___________ ApplyTests.test_apply_without_a_plan_path_is_unavailable ___________
+
+self = <test_update.ApplyTests testMethod=test_apply_without_a_plan_path_is_unavailable>
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_update.py:344: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/update.py:524: in apply_plan
+    guard_install_root(install_root, protected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def guard_install_root(
+        install_root: str,
+        protected: Sequence[pathlib.Path] | None = None,
+    ) -> None:
+        """Refuse an install root that would rewrite the running installation."""
+        text = str(install_root or "").strip()
+        if text == "":
+            raise InPlaceUpgradeRefused(["install_root_empty"])
+        candidate = pathlib.Path(text)
+        if not candidate.is_absolute():
+>           raise InPlaceUpgradeRefused([f"install_root_not_absolute:{text}"])
+E           axiom_mcp.update.InPlaceUpgradeRefused: plan rejected: install_root_not_absolute:C:/Users/demo/.axiom/components/axiom-mcp/0.2.0
+
+src/axiom_mcp/update.py:424: InPlaceUpgradeRefused
+________ ApplyTests.test_approved_plan_is_delegated_as_an_argument_list ________
+
+self = <test_update.ApplyTests testMethod=test_approved_plan_is_delegated_as_an_argument_list>
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_update.py:263: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/update.py:524: in apply_plan
+    guard_install_root(install_root, protected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = 'C:/Users/demo/.axiom/components/axiom-mcp/0.2.0'
+protected = None
+
+    def guard_install_root(
+        install_root: str,
+        protected: Sequence[pathlib.Path] | None = None,
+    ) -> None:
+        """Refuse an install root that would rewrite the running installation."""
+        text = str(install_root or "").strip()
+        if text == "":
+            raise InPlaceUpgradeRefused(["install_root_empty"])
+        candidate = pathlib.Path(text)
+        if not candidate.is_absolute():
+>           raise InPlaceUpgradeRefused([f"install_root_not_absolute:{text}"])
+E           axiom_mcp.update.InPlaceUpgradeRefused: plan rejected: install_root_not_absolute:C:/Users/demo/.axiom/components/axiom-mcp/0.2.0
+
+src/axiom_mcp/update.py:424: InPlaceUpgradeRefused
+_ ApplyTests.test_approved_plan_without_a_runner_reports_an_unexecuted_delegation _
+
+self = <test_update.ApplyTests testMethod=test_approved_plan_without_a_runner_reports_an_unexecuted_delegation>
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_update.py:273: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/update.py:524: in apply_plan
+    guard_install_root(install_root, protected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = 'C:/Users/demo/.axiom/components/axiom-mcp/0.2.0'
+protected = None
+
+    def guard_install_root(
+        install_root: str,
+        protected: Sequence[pathlib.Path] | None = None,
+    ) -> None:
+        """Refuse an install root that would rewrite the running installation."""
+        text = str(install_root or "").strip()
+        if text == "":
+            raise InPlaceUpgradeRefused(["install_root_empty"])
+        candidate = pathlib.Path(text)
+        if not candidate.is_absolute():
+>           raise InPlaceUpgradeRefused([f"install_root_not_absolute:{text}"])
+E           axiom_mcp.update.InPlaceUpgradeRefused: plan rejected: install_root_not_absolute:C:/Users/demo/.axiom/components/axiom-mcp/0.2.0
+
+src/axiom_mcp/update.py:424: InPlaceUpgradeRefused
+_______ ApplyTests.test_delegated_failure_is_reported_with_its_exit_code _______
+
+self = <test_update.ApplyTests testMethod=test_delegated_failure_is_reported_with_its_exit_code>
+
+>   ???
+
+D:\SP-Billy\axiom-worktrees\axiom-mcp-w10-v2031\tests\test_update.py:281: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/axiom_mcp/update.py:524: in apply_plan
+    guard_install_root(install_root, protected)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+install_root = 'C:/Users/demo/.axiom/components/axiom-mcp/0.2.0'
+protected = None
+
+    def guard_install_root(
+        install_root: str,
+        protected: Sequence[pathlib.Path] | None = None,
+    ) -> None:
+        """Refuse an install root that would rewrite the running installation."""
+        text = str(install_root or "").strip()
+        if text == "":
+            raise InPlaceUpgradeRefused(["install_root_empty"])
+        candidate = pathlib.Path(text)
+        if not candidate.is_absolute():
+>           raise InPlaceUpgradeRefused([f"install_root_not_absolute:{text}"])
+E           axiom_mcp.update.InPlaceUpgradeRefused: plan rejected: install_root_not_absolute:C:/Users/demo/.axiom/components/axiom-mcp/0.2.0
+
+src/axiom_mcp/update.py:424: InPlaceUpgradeRefused
+=============================== warnings summary ===============================
+tests/test_entrypoints.py::test_the_planned_allowlist_is_the_one_the_middleware_enforces
+  /home/thanatmet-t/.axiom-runtime/venv/lib/python3.13/site-packages/pydantic_settings/sources/utils.py:47: IncompleteFieldDefinitionWarning: Field 'lifespan' has an incomplete definition: its annotation contains an unresolved forward reference, so settings sources may fail to correctly resolve its value. Call `model_rebuild()` on the model where the field is defined, once all the referenced types are defined.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_entrypoints.py::test_the_locked_runtime_is_the_version_environment
+FAILED tests/test_entrypoints.py::test_python_no_user_site_is_what_removes_the_ambient_sdk
+FAILED tests/test_entrypoints.py::test_the_module_cli_prints_one_launch_document
+FAILED tests/test_entrypoints.py::test_the_module_cli_records_and_then_verifies_the_lock
+FAILED tests/test_entrypoints.py::test_the_module_entrypoint_is_reachable_as_a_process
+FAILED tests/test_guard_cross_language.py::test_exclusive_holder_in_another_process_excludes_both_modes
+FAILED tests/test_guard_cross_language.py::test_released_handles_are_reacquirable_and_closed_handles_refuse_identity
+FAILED tests/test_update.py::ApplyTests::test_a_versioned_component_root_is_accepted
+FAILED tests/test_update.py::ApplyTests::test_apply_without_a_plan_path_is_unavailable
+FAILED tests/test_update.py::ApplyTests::test_approved_plan_is_delegated_as_an_argument_list
+FAILED tests/test_update.py::ApplyTests::test_approved_plan_without_a_runner_reports_an_unexecuted_delegation
+FAILED tests/test_update.py::ApplyTests::test_delegated_failure_is_reported_with_its_exit_code
+ERROR tests/test_entrypoints.py::test_the_stdio_plan_is_an_argv_array_with_an_absolute_interpreter
+ERROR tests/test_entrypoints.py::test_the_host_document_never_offers_a_shell_string
+ERROR tests/test_entrypoints.py::test_the_plan_environment_is_sorted_so_the_digest_can_be_written_down
+ERROR tests/test_entrypoints.py::test_the_locked_stdio_plan_starts_and_answers_without_an_activation_script
+ERROR tests/test_entrypoints.py::test_a_recorded_lock_describes_the_plans_until_something_moves
+ERROR tests/test_entrypoints.py::test_two_plans_for_one_mode_are_refused - ax...
+ERROR tests/test_release_package.py::test_real_isolated_environments_and_rollback
+12 failed, 738 passed, 1 skipped, 1 warning, 7 errors, 230 subtests passed in 248.88s (0:04:08)

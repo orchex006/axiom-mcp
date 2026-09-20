@@ -1,0 +1,32 @@
+{
+  "component": "axiom-mcp",
+  "cpu_count": 12,
+  "guard_backend": "posix",
+  "machine": "x86_64",
+  "os_name": "posix",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "pointer_bits": 64,
+  "processor": "",
+  "protocol_minimum": "2025-11-25",
+  "python_executable": "/home/thanatmet-t/.axiom-runtime/venv/bin/python",
+  "python_implementation": "CPython",
+  "python_requires": ">=3.13,<3.14",
+  "python_supported": true,
+  "python_version": "3.13.15",
+  "release": "6.18.33.2-microsoft-standard-WSL2",
+  "runtime_pin_reasons": [],
+  "runtime_pins": {
+    "anyio": "4.14.2",
+    "fastapi": "0.139.2",
+    "httpx": "0.28.1",
+    "mcp": "1.28.1",
+    "pydantic": "2.13.4",
+    "starlette": "1.3.1",
+    "uvicorn": "0.51.0"
+  },
+  "spec_revision": "80f44e836ced442e8f3ea33d167bd369ed6796bc",
+  "sys_platform": "linux",
+  "system": "Linux",
+  "target": "ubuntu-x64",
+  "version": "#1 SMP PREEMPT_DYNAMIC Thu Jun 18 21:54:43 UTC 2026"
+}

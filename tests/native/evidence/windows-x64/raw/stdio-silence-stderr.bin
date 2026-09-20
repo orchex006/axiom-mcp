@@ -1,0 +1,8 @@
+axiom-mcp: stdio_start banner=True component=axiom-mcp sdk=1.28.1
+axiom-mcp: axiom-mcp stdio transport
+axiom-mcp: component=axiom-mcp version=0.0.0.dev0
+axiom-mcp: spec_version=2.0.0-draft.1 spec_revision=80f44e836ced442e8f3ea33d167bd369ed6796bc
+axiom-mcp: sdk=mcp==1.28.1 protocol_min=2025-11-25
+axiom-mcp: protocol=2025-11-25
+axiom-mcp: stdout=protocol-only stderr=diagnostics
+axiom-mcp: stdio_stop protocol_bytes=330 protocol_writes=2 violations=0
