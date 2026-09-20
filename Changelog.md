@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **release** Prepare experimental unsigned `0.1.0` Python wheel for Windows testing.
+  The package and runtime version now agree; native macOS Intel and cross-component
+  operation remain unverified.
+
 - **test** (V2-031) Record the native query and host-process matrix for the mandatory targets and
   state plainly which legs did not run. `tests/native/` now holds the executable evidence:
   `capture_native_matrix.py` (a real `graph_query` over the shipped `demo-solution` bundle through

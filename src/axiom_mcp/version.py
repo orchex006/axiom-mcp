@@ -21,7 +21,7 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import Any
 
 COMPONENT = "axiom-mcp"
-VERSION = "0.0.0.dev0"
+VERSION = "0.1.0"
 
 SPEC_VERSION = "2.0.0-draft.1"
 SPEC_REPOSITORY = "axiom-specs"
