@@ -236,7 +236,7 @@ than promised.
     "graph_schema": 1,
     "control_api": 1,
     "queue_schema": 1,
-    "build_revision": "80f44e8",
+    "build_revision": "80f44e836ced442e8f3ea33d167bd369ed6796bc",
     "update_status": "not_checked"
   },
   "compatibility": {"compatible": true, "runtime": {}, "sdk": {}, "reasons": []},
@@ -593,16 +593,22 @@ the old identity.
 - **Tool registration and the SDK mount.** `src/axiom_mcp/tools/` exists and
   `graph_status` and `graph_query` are implemented, but the handlers are not yet wired into
   the SDK's tool registration, so a client that lists tools still sees an empty catalog.
-  Registration is part of the remaining C-030..C-035 work.
+  The six registering tasks (`C-028`..`C-033`) are done; what this revision still does not
+  carry is the SDK registration adapter itself.
 - **The `changes` diff detail.** `graph_query` carries head-side added and modified facts;
   the removed facts and the engine's per-kind totals are not part of the envelope. The
   bundled `demo-solution` declares no schema major, so `changes` legitimately answers
   `unknown_schema` there and a comparable diff is only reachable for a generation that
   declares one.
-- **Freshness, coverage and verification computation.** The fields are specified; the
-  component that computes them (C-027) is not implemented.
-- **Cursors and byte-budget packing.** Specified in C-026 and C-025; not implemented, so
-  `next_cursor`, `truncated` and the budget behaviour are contract-only.
+- **Freshness, coverage and verification computation.** The fields are specified and the
+  component that computes them (C-027) is implemented: `src/axiom_mcp/tools/status.py`
+  projects freshness, coverage and verification and `query/envelope.py` resolves the
+  aggregate. What remains unverified is the daemon evidence a `fresh` claim needs, not the
+  computation.
+- **Cursors and byte-budget packing.** C-026 and C-025 are implemented: `graph_query`
+  re-checks a presented cursor through `query/cursor.py` and enforces the byte cap through
+  `query/budget.py`, so `truncated` and the budget behaviour are live. `next_cursor` is the
+  part still contract-only - the query path resolves a cursor but never issues one.
 - **A live graphd daemon.** The concrete control client exists (C-034,
   `src/axiom_mcp/control_client.py`) and its audience handling, bounded retries and outage
   behaviour are covered by tests over `httpx.MockTransport`, but no real daemon was reached from

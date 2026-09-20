@@ -6,7 +6,7 @@ edit of a fixture is a test failure rather than a quiet weakening of the evidenc
 
 * ``fixtures/canonical/`` holds the four ``metadata``-form canonical vectors from
   ``axiom-specs`` (``conformance/fixtures/canonical/``, pinned specification revision
-  ``1bf754298ba1bb266a77f13cded4bfe69484906f``). Each ``input.json`` is deliberately
+  ``80f44e836ced442e8f3ea33d167bd369ed6796bc``). Each ``input.json`` is deliberately
   non-canonical and each ``expected.canonical.json`` is the pinned expected byte
   sequence, so re-serializing the input proves this module agrees with the canonical
   rule byte for byte. The two ``identity-tuple`` vectors of that corpus are a different
