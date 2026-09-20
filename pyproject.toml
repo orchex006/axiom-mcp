@@ -36,6 +36,12 @@ package-dir = { "" = "src" }
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# The package README ships inside the payload: `readme = "README.md"` only puts the text in
+# METADATA, which is not a file a package-only consumer can read. `src/axiom_mcp/README.md` is a
+# copy of the repository README and `tests/test_package_readme.py` fails when the two diverge.
+[tool.setuptools.package-data]
+axiom_mcp = ["README.md"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

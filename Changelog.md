@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+- **docs** (I-005) Publish the installation and upgrade guide and make the README a real package
+  README. The card recorded that `README.md` was empty and that no installation guide existed; the
+  first half was stale, but the gap behind it was real and sharper. `README.md` was repository
+  facing, and the **built wheel carried no README at all**: `readme = "README.md"` places the text
+  inside `dist-info/METADATA` only, and the measured baseline artifact
+  (`axiom_mcp-0.0.0.dev0-py3-none-any.whl`, 209274 bytes, sha256 `b610139a...0ad6`, 54 entries) held
+  **zero** `.md` entries, so a person who installed only the package had nothing to read. Added
+  `docs/install-and-upgrade.md`: prerequisites that *reference* `pyproject.toml` rather than
+  restate it, what the payload contains, the scratch and versioned-environment install paths,
+  `doctor` verification with its exit-code table, the environment variables the server actually
+  reads, both transports (stdio and Streamable HTTP), the host hand-off through
+  `axiom-mcp-entrypoints`, upgrade, rollback, an observed refusal table, and explicit
+  "not implemented" and "unverified on this host" sections. Rewrote `README.md` as a package
+  README that installs, verifies, launches and links out instead of duplicating normative text, and
+  stated in it that the `docs/` tree does not travel with the wheel so its links resolve against a
+  checkout. The README now ships: `src/axiom_mcp/README.md` is declared through
+  `[tool.setuptools.package-data]`, and `tests/test_package_readme.py` fails if the packaged copy
+  drifts from the repository README or if the declaration is dropped. `docs/README.md` indexes the
+  new guide under Operations. Verified on Windows x64, Python 3.13.14, `mcp==1.28.1`: the rebuilt
+  wheel (`axiom_mcp-0.0.0.dev0-py3-none-any.whl`, 212431 bytes, sha256 `1373f899...0ca6`, 55
+  entries) contains `axiom_mcp/README.md` (sha256 `d9b210f9...ba77`), and a fresh scratch install
+  exposes it at `site-packages/axiom_mcp/README.md` with the same digest; from a directory outside
+  the checkout, `axiom-mcp version` exits 0, `axiom-mcp doctor` exits 4 (`not_ready`, correct for a
+  bare install), `axiom-mcp update check` and `--offline` exit 0, and
+  `axiom-mcp update apply --plan <missing>` exits 2. Required checks on the final bytes:
+  `python -m pytest tests -q` exit 0 with `753 passed, 2 skipped, 230 subtests passed`,
+  `python -m ruff check .` exit 0 with `All checks passed!`, and `python -m ruff format --check .`
+  exit 0 with `152 files already formatted`. Recorded and not changed: `release/package.py` stays
+  operator tooling outside the wheel; no Linux, macOS or POSIX-guard leg was run, and no host
+  product was launched through the entrypoint, so those stay `unverified` in the guide rather than
+  passing.
 - **docs** (W10-B) Write the repository README and the documentation index, and correct a stale
   status line in the development contract. `README.md` was a **0-byte file** at this revision even
   though `pyproject.toml` declares `readme = "README.md"`, so the distribution would have shipped an
@@ -722,4 +753,3 @@
   `pyproject.toml`, `axiom_mcp.version` and the installed interpreter/SDK, and a boundary
   test proves a legacy-only SDK surface fails the spike.
 - The release gate stays closed. No tag, release branch or publish was created.
-
