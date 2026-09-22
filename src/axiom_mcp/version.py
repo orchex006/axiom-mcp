@@ -64,8 +64,11 @@ RUNTIME_PINS: dict[str, str] = {
 }
 
 DEV_PINS: dict[str, str] = {
+    "build": "1.3.0",
     "pytest": "9.1.1",
     "ruff": "0.15.22",
+    "setuptools": "80.9.0",
+    "wheel": "0.46.3",
 }
 
 # Minimum protocol revision the pin must be able to negotiate. The SDK may

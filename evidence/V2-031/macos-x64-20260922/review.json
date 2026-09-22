@@ -6,10 +6,10 @@
   "reviewer": "senior root; independent junior peer review incorporated",
   "checks": {
     "full_pytest_exit": 0,
-    "passed": 760,
+    "passed": 762,
     "skipped": 2,
     "subtests": 230,
-    "warning": "pydantic_settings IncompleteFieldDefinitionWarning retained in log",
+    "warning": "pydantic_settings IncompleteFieldDefinitionWarning retained in logs; catalog-final-pytest.log is the 762-pass final record",
     "entrypoints_after_final_fixture_checks": 57,
     "ruff_check_exit": 0,
     "ruff_format_exit": 0,
@@ -18,7 +18,7 @@
     "immutable_spec_pin_exit": 0
   },
   "certified": false,
-  "remaining": "Other native targets and released-core fixtures absent; final real-source catalog-backed gateway integration remains unverified. Parent task remains blocked; no main merge.",
+  "remaining": "Other active execution lanes and released-core fixtures remain absent. The latest combined local lifecycle separately proves an installed-wheel catalog query over analyzer output in a temporary development fixture; it is not released-fixture or four-lane certification. Parent task remains blocked; no main merge.",
   "source_sha256": {
     "src/axiom_mcp/stdio.py": "7228f79de83fe05efe3ce09e764756de43feed68a93224253698dfb2359e2677",
     "src/axiom_mcp/guard/locks_posix.py": "411dcd048b2605c1abde8cf095cf451fc81e170f08758cc9a792ec93bcfeafef",

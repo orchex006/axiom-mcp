@@ -267,6 +267,18 @@ class GuardedSnapshotSource:
         finally:
             guard.close()
 
+    def load_pinned(self, location: SnapshotLocation, generation_id: str) -> LoadedSnapshot:
+        """Copy a catalog-pinned immutable generation without consulting current.json."""
+        guard = SolutionGuard(self.guard_dir, timeout_ms=self.timeout_ms)
+        guard.ensure_directory()
+        try:
+            session = ReadSession(
+                guard, location, limits=self.limits, pinned_generation_id=generation_id
+            )
+            return session.load()
+        finally:
+            guard.close()
+
 
 class ControlPlane(Protocol):
     """The control-plane surface the delegation tools use.
@@ -361,6 +373,28 @@ class ToolContext:
             raise AxiomError(
                 "SNAPSHOT_UNAVAILABLE",
                 "the registered lane has no published generation",
+                details={"project_id": project_id},
+            ) from exc
+
+    def load_pinned_project(
+        self, solution_id: str, project_id: str, lane: str, generation_id: str
+    ) -> LoadedSnapshot:
+        """Load the catalog-selected generation, never the project's latest pointer."""
+        self.principal.require(
+            security.CAPABILITY_READ, solution_id=solution_id, project_ids=(project_id,)
+        )
+        try:
+            location = self.registry.location(solution_id, project_id, lane)
+            loader = getattr(self.source, "load_pinned", None)
+            if loader is None:
+                raise RuntimeError("snapshot source does not implement pinned generation reads")
+            return loader(location, generation_id)
+        except RegistryError as exc:
+            raise AxiomError("NOT_FOUND", str(exc)) from exc
+        except FileNotFoundError as exc:
+            raise AxiomError(
+                "SNAPSHOT_UNAVAILABLE",
+                "the catalog-pinned generation is unavailable",
                 details={"project_id": project_id},
             ) from exc
 

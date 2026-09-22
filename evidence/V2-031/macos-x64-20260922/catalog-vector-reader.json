@@ -1,0 +1,22 @@
+{
+  "platform": "macos-x64",
+  "date": "2026-09-22",
+  "scope": "catalog-pinned graph_query reader",
+  "targeted": {
+    "command": ".venv/bin/python -m pytest tests/test_tools_query.py tests/test_catalog.py -q",
+    "result": "41 passed"
+  },
+  "full": {
+    "command": ".venv/bin/python -m pytest -q",
+    "result": "762 passed, 2 skipped, 230 subtests passed"
+  },
+  "lint": {
+    "command": ".venv/bin/ruff check src tests",
+    "result": "passed"
+  },
+  "assertions": [
+    "graph_query reads the registered catalog once and loads exact pinned member generations",
+    "a newer project current pointer cannot replace the catalog-pinned generation",
+    "a missing pinned member returns SNAPSHOT_UNAVAILABLE and never falls back to latest"
+  ]
+}

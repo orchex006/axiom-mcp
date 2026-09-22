@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **fix** (V2-031) `graph_query` now reads the solution catalog once and opens
+  only its exact pinned member generations. A project `current.json` that advances
+  after catalog publication cannot replace the vector, and a missing or corrupt
+  pinned member returns `SNAPSHOT_UNAVAILABLE` rather than falling back to latest.
+  The final catalog regression suite passed 762 tests with 2 skipped on local
+  macOS x64; it remains development evidence because the fixture is synthetic.
+
 - **maintenance** (V2-031) Complete immutable spec-lock coverage with the fixture-index digest from the existing pinned revision; no spec repin. Local verification and redacted native evidence are stored under `evidence/V2-031/macos-x64-20260922/`.
 
 - **fix** (V2-031) Make the Windows-only guard test skip before importing its
