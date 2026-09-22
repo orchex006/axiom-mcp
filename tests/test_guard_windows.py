@@ -31,6 +31,11 @@ from pathlib import Path
 
 import pytest
 
+# Skip the module before importing either the Windows-only backend or its stdlib
+# dependency.  Importing ``locks_windows`` first imports ``msvcrt``, which makes
+# collection fail on POSIX instead of reporting this as the intended skip.
+pytest.importorskip("msvcrt", reason="the Windows LockFileEx backend only exists on Windows")
+
 from axiom_mcp.guard import protocol
 from axiom_mcp.guard.engine import LockMode, SolutionGuard, load_backend
 from axiom_mcp.guard.errors import GuardBusy, GuardError, GuardTimeout
@@ -41,8 +46,6 @@ from axiom_mcp.guard.locks_windows import (
     create_file,
 )
 from axiom_mcp.guard.locks_windows import open as open_lock
-
-pytest.importorskip("msvcrt", reason="the Windows LockFileEx backend only exists on Windows")
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SRC = REPO_ROOT / "src"

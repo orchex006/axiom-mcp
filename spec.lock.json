@@ -2,7 +2,7 @@
   "spec_version": "2.0.0-draft.1",
   "spec_repository": "axiom-specs",
   "spec_revision": "80f44e836ced442e8f3ea33d167bd369ed6796bc",
-  "spec_content_sha256": "6b753446f0c499191d38dc2bd187e1de09c0d5d8c597ef781777a3d59cddd3e6",
+  "spec_content_sha256": "447ea3212a812f82824428d4a3bd6d352d5410c4c382b166680de8f4957387b6",
   "owner_repository": "axiom-mcp",
   "workspace_layout": 2,
   "graph_payload_schema": 1,
@@ -14,6 +14,7 @@
     "contracts/native-reader-writer-guards.md": "1c2eda17726c537e90fd75536dd3cd7951d6046354560b6d77fdabe8f19fafed",
     "contracts/redaction-policy.md": "f474a399d2308dba51ff9849d79b5598e69dd930387331b9b40fac681107dc5e",
     "contracts/schemas/query-request.schema.json": "57395f25fa99498f42d5591c70c202d4685258635852f7cd50e1437884dc1cff",
-    "contracts/schemas/query-response.schema.json": "fe444ce8319c0413b2ce5d4a208a40e9af5eb5323cad99493d2c1d25703a04b5"
+    "contracts/schemas/query-response.schema.json": "fe444ce8319c0413b2ce5d4a208a40e9af5eb5323cad99493d2c1d25703a04b5",
+    "conformance/fixture-index.json": "e889087c9468ab9ec4a5816d964bee516dc29445139c7fed955415781e393263"
   }
 }

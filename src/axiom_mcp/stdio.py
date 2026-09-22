@@ -27,11 +27,15 @@ from __future__ import annotations
 import argparse
 import functools
 import io
+import os
+import signal
+import stat
 import sys
 from collections.abc import Sequence
 from typing import Any, TextIO
 
 from mcp.server.fastmcp import FastMCP
+from mcp.server.stdio import stdio_server
 
 from axiom_mcp import version
 
@@ -223,6 +227,115 @@ def build_stdio_server(name: str = COMPONENT, **kwargs: Any) -> FastMCP:
     return FastMCP(name=name, **kwargs)
 
 
+class _CancellableStdin:
+    """Yield UTF-8 lines without leaving a worker thread blocked in ``readline``."""
+
+    def __init__(self, stream: TextIO) -> None:
+        self._fd = stream.fileno()
+        self._regular_file = stat.S_ISREG(os.fstat(self._fd).st_mode)
+        self._pending = b""
+        self._eof = False
+
+    def __aiter__(self) -> _CancellableStdin:
+        return self
+
+    async def __anext__(self) -> str:
+        import anyio
+
+        while True:
+            newline = self._pending.find(b"\n")
+            if newline >= 0:
+                line, self._pending = self._pending[: newline + 1], self._pending[newline + 1 :]
+                return line.decode("utf-8", errors="replace")
+            if self._eof:
+                if self._pending:
+                    line, self._pending = self._pending, b""
+                    return line.decode("utf-8", errors="replace")
+                raise StopAsyncIteration
+            if not self._regular_file:
+                await anyio.wait_readable(self._fd)
+            chunk = os.read(self._fd, 65536)
+            if chunk:
+                self._pending += chunk
+            else:
+                self._eof = True
+
+
+async def _run_posix_stdio_server(server: FastMCP) -> None:
+    """Use the pinned SDK parser with a cancellable POSIX stdin reader."""
+    try:
+        stdin = _CancellableStdin(sys.stdin)
+    except (AttributeError, io.UnsupportedOperation, OSError):
+        # In-memory test streams do not have a native descriptor. The production
+        # command always does, while this preserves the SDK behavior for tests.
+        await server.run_stdio_async()
+        return
+    async with stdio_server(stdin=stdin) as (read_stream, write_stream):
+        await server._mcp_server.run(  # noqa: SLF001 - FastMCP delegates identically.
+            read_stream,
+            write_stream,
+            server._mcp_server.create_initialization_options(),  # noqa: SLF001
+        )
+
+
+async def _run_stdio_until_finished(server: FastMCP, diagnostics: Diagnostics) -> None:
+    """Run the SDK server and cancel its idle receive wait on a POSIX interrupt.
+
+    Python's default signal handling only surfaced ``SIGINT`` after the MCP
+    receive loop woke up on the previous POSIX run.  A signal receiver keeps
+    that wait interruptible and lets AnyIO cancel the server task cleanly.  The
+    console-control handling on Windows remains owned by the host runtime.
+    """
+    if os.name == "nt":
+        await server.run_stdio_async()
+        return
+
+    import anyio
+
+    received_signals = tuple(
+        candidate
+        for candidate in (getattr(signal, "SIGINT", None), getattr(signal, "SIGTERM", None))
+        if candidate is not None
+    )
+    if not received_signals:
+        await server.run_stdio_async()
+        return
+
+    finished = anyio.Event()
+    server_error: BaseException | None = None
+
+    async with anyio.create_task_group() as task_group:
+
+        async def run_server() -> None:
+            nonlocal server_error
+            try:
+                if isinstance(server, FastMCP):
+                    await _run_posix_stdio_server(server)
+                else:
+                    await server.run_stdio_async()
+            except BaseException as error:
+                if not isinstance(error, anyio.get_cancelled_exc_class()):
+                    server_error = error
+            finally:
+                finished.set()
+
+        async def watch_interrupts() -> None:
+            with anyio.open_signal_receiver(*received_signals) as receiver:
+                async for received in receiver:
+                    signal_name = signal.Signals(received).name
+                    diagnostics.event("stdio_interrupt", signal=signal_name)
+                    task_group.cancel_scope.cancel()
+                    return
+
+        task_group.start_soon(run_server)
+        task_group.start_soon(watch_interrupts)
+        await finished.wait()
+        task_group.cancel_scope.cancel()
+
+    if server_error is not None:
+        raise server_error
+
+
 async def serve_stdio(
     server: FastMCP,
     *,
@@ -251,7 +364,7 @@ async def serve_stdio(
 
     sys.stdout = guard
     try:
-        await server.run_stdio_async()
+        await _run_stdio_until_finished(server, diagnostics)
     finally:
         sys.stdout = real_stdout
         guard.flush()

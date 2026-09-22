@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **maintenance** (V2-031) Complete immutable spec-lock coverage with the fixture-index digest from the existing pinned revision; no spec repin. Local verification and redacted native evidence are stored under `evidence/V2-031/macos-x64-20260922/`.
+
+- **fix** (V2-031) Make the Windows-only guard test skip before importing its
+  `msvcrt`-dependent backend, so POSIX collection records an intended skip rather
+  than aborting. The stdio transport now watches `SIGINT` and `SIGTERM` on POSIX
+  while the MCP server is idle, cancels the receive task through AnyIO, and emits
+  a diagnostic interrupt event. POSIX uses a cancellable descriptor reader for pipes
+  and redirected files, with split-UTF-8 and EOF regressions. The local macOS x64
+  matrix passed all six legs with CPython 3.13.15, but remains non-certified because
+  its fixture is synthetic and the other mandatory targets remain unverified.
+
 - **release** Prepare experimental unsigned `0.1.0` Python wheel for Windows testing.
   The package and runtime version now agree; native macOS Intel and cross-component
   operation remain unverified.

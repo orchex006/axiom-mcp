@@ -1,0 +1,31 @@
+{
+  "task": "V2-031",
+  "branch": "feature/v2-031-macos-x64",
+  "base_revision": "692dbdb1c0ffc2e0ff3b9293108f02dedede8788",
+  "scope": "Local Mac POSIX interruption, guard lifecycle and portable fixtures, immutable pin coverage",
+  "reviewer": "senior root; independent junior peer review incorporated",
+  "checks": {
+    "full_pytest_exit": 0,
+    "passed": 760,
+    "skipped": 2,
+    "subtests": 230,
+    "warning": "pydantic_settings IncompleteFieldDefinitionWarning retained in log",
+    "entrypoints_after_final_fixture_checks": 57,
+    "ruff_check_exit": 0,
+    "ruff_format_exit": 0,
+    "native_matrix_exit": 0,
+    "native_legs_passed": 6,
+    "immutable_spec_pin_exit": 0
+  },
+  "certified": false,
+  "remaining": "Other native targets and released-core fixtures absent; final real-source catalog-backed gateway integration remains unverified. Parent task remains blocked; no main merge.",
+  "source_sha256": {
+    "src/axiom_mcp/stdio.py": "7228f79de83fe05efe3ce09e764756de43feed68a93224253698dfb2359e2677",
+    "src/axiom_mcp/guard/locks_posix.py": "411dcd048b2605c1abde8cf095cf451fc81e170f08758cc9a792ec93bcfeafef",
+    "tests/test_entrypoints.py": "d009c4446a9f089c69c056097d8020dcfb21c70ea27dda57129f6c4d5c1c3c1a",
+    "tests/test_stdio_transport.py": "16f0fb71bc5c4dc4544fd89f8bce0bb83f045fe2618518afae812d842b220422",
+    "tests/test_guard_windows.py": "3001a0d6d9a5caa268a5c39505b578f37adec0824babe3bd2543fd88c4aae570",
+    "tests/test_update.py": "2f170c66a26065f7129636846f14f4f0303735e850380538e2f99f7632ce1e1f",
+    "spec.lock.json": "90c591e59937e42c9e68b20c132fdce01da3f9d0563dd00e4c81913e444a16b9"
+  }
+}

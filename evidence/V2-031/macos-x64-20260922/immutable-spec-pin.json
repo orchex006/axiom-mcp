@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "lock": "spec.lock.json",
+  "spec_root": "<IMMUTABLE_SPEC_SNAPSHOT>",
+  "release": true,
+  "reasons": [],
+  "checked_spec_revision": "80f44e836ced442e8f3ea33d167bd369ed6796bc",
+  "exit_code": 0
+}
