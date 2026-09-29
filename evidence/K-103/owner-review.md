@@ -1,0 +1,5 @@
+# K-103 owner review
+
+The K-012 mcp pin was checked against immutable Git bytes. The source diff updates the pin, runtime spec revision, Mac Intel dependency lock, checkout path guidance and Changelog. The wheel is pure Python (`py3-none-any`) and contains the new spec revision. Its METADATA direct pins match pyproject.toml; 31 resolved dependencies are hash-pinned for Python 3.13 on macOS x64. A clean isolated venv installed the lock and wheel, and executed both console entrypoints. A byte-corrupted wheel and Python 3.9 were refused.
+
+Compatibility: runtime dimensions stay graph/control/queue schema 1, Python range stays >=3.13,<3.14, and MCP SDK remains 1.28.1. Rollback is reverting the feature branch or restoring the prior wheel; no user profile, service, or existing version environment was changed. No native host-process or installed CLI suite is claimed here. Full pytest had 762 pass, 2 existing conditional skips, 1 warning. Independent review remains pending before main integration.

@@ -1,0 +1,101 @@
+$ uv venv --python 3.13 /tmp/axiom-k103-verify-env
+exit_code=0
+Using CPython 3.13.15
+Creating virtual environment at: /tmp/axiom-k103-verify-env
+Activate with: source /tmp/axiom-k103-verify-env/bin/activate
+
+$ uv pip install --python /tmp/axiom-k103-verify-env/bin/python --offline --require-hashes -r release/macos-x64-py313-requirements.txt
+exit_code=0
+Using Python 3.13.15 environment at: /tmp/axiom-k103-verify-env
+Resolved 31 packages in 15ms
+Installed 31 packages in 45ms
+ + annotated-doc==0.0.5
+ + annotated-types==0.8.0
+ + anyio==4.14.2
+ + attrs==26.1.0
+ + certifi==2026.7.22
+ + cffi==2.1.1
+ + click==8.5.0
+ + cryptography==48.0.1
+ + fastapi==0.139.2
+ + h11==0.16.0
+ + httpcore==1.0.9
+ + httpx==0.28.1
+ + httpx-sse==0.4.3
+ + idna==3.20
+ + jsonschema==4.26.0
+ + jsonschema-specifications==2025.9.1
+ + mcp==1.28.1
+ + pycparser==3.0
+ + pydantic==2.13.4
+ + pydantic-core==2.46.4
+ + pydantic-settings==2.15.0
+ + pyjwt==2.15.0
+ + python-dotenv==1.2.3
+ + python-multipart==0.0.32
+ + referencing==0.37.0
+ + rpds-py==2026.6.3
+ + sse-starlette==3.4.11
+ + starlette==1.3.1
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + uvicorn==0.51.0
+
+$ uv pip install --python /tmp/axiom-k103-verify-env/bin/python --no-deps evidence/K-103/axiom_mcp-0.1.0-py3-none-any.whl
+exit_code=0
+Using Python 3.13.15 environment at: /tmp/axiom-k103-verify-env
+Resolved 1 package in 2ms
+Installed 1 package in 6ms
+ + axiom-mcp==0.1.0 (from file:///Users/billy-mac/Developer/Projects/axiom/axiom-mcp/evidence/K-103/axiom_mcp-0.1.0-py3-none-any.whl)
+
+$ /tmp/axiom-k103-verify-env/bin/axiom-mcp version
+exit_code=0
+component: axiom-mcp
+version: 0.1.0
+spec_version: 2.0.0-draft.1
+graph_schema: 1
+control_api: 1
+queue_schema: 1
+build_revision: d92e71b25623132966b602b15ef5112c7eef7c96
+update_status: not_checked
+
+$ /tmp/axiom-k103-verify-env/bin/axiom-mcp-entrypoints --help
+exit_code=0
+usage: axiom-mcp-entrypoints [-h] {plan,verify} ...
+
+Locked native Python entrypoints for axiom-mcp. A host does not start the
+gateway by activating a shell; it launches one absolute interpreter with an
+argv array. This module owns that launch surface. The distribution pins a
+Python line and an SDK revision, and the install layout keeps one virtual
+environment per version. An entrypoint lock therefore has to answer three
+questions with evidence instead of assumption: * **which interpreter** - the
+one inside the locked version environment, never an ambient interpreter that
+merely happens to be reachable through ``PATH``; * **how it is launched** - an
+executable, an argument vector, a working directory and a scoped environment;
+never a shell string and never an activation script (cross-platform CP-02 and
+CP-09); * **what it may expose** - stdio by default, HTTP only as an explicit
+opt-in that binds loopback and carries a non-wildcard Host/Origin allowlist
+that admits its own bind address (CP-09). Everything here is a *plan*. This
+module starts no server and opens no socket: it resolves, verifies and
+refuses. The one subprocess it runs is the interpreter probe, because "this
+environment is the locked one" is exactly the claim a plan must not make on
+trust. The launched environment is built from scratch rather than inherited:
+handing a child process the caller's variables is how a locked environment
+stops being locked. ``PATH`` is therefore deterministic (the environment's own
+scripts directory, plus the Windows system directory) instead of the login
+shell's, which is also what makes a plan digest stable enough to write into a
+lock file. The version-directory layout (``current.json``,
+``versions/<version>/venv`` and ``lockfile.json``) is owned by the packaging
+tool in ``release/package.py``. Those names are repeated here rather than
+imported: ``release/`` is operator tooling and is not part of the installed
+distribution, so the installed package cannot import it.
+``tests/test_entrypoints.py`` asserts that the two definitions agree, so the
+copy cannot drift silently.
+
+positional arguments:
+  {plan,verify}
+    plan         Print the locked launch document.
+    verify       Re-verify a recorded lock.
+
+options:
+  -h, --help     show this help message and exit

@@ -1,0 +1,69 @@
+{
+  "candidate": true,
+  "dependency_lock": {
+    "names": [
+      "annotated-doc",
+      "annotated-types",
+      "anyio",
+      "attrs",
+      "certifi",
+      "cffi",
+      "click",
+      "cryptography",
+      "fastapi",
+      "h11",
+      "httpcore",
+      "httpx",
+      "httpx-sse",
+      "idna",
+      "jsonschema",
+      "jsonschema-specifications",
+      "mcp",
+      "pycparser",
+      "pydantic",
+      "pydantic-core",
+      "pydantic-settings",
+      "pyjwt",
+      "python-dotenv",
+      "python-multipart",
+      "referencing",
+      "rpds-py",
+      "sse-starlette",
+      "starlette",
+      "typing-extensions",
+      "typing-inspection",
+      "uvicorn"
+    ],
+    "packages": 31,
+    "path": "release/macos-x64-py313-requirements.txt",
+    "resolver": "uv 0.12.9, Python 3.13, x86_64-apple-darwin, hashes, wheels only",
+    "sha256": "4db70be8d9acb83b9309d64a21e3fd316e0b19450685d1ba1e538ae6153ea43a"
+  },
+  "kind": "unsigned-portable-wheel-input",
+  "platform": "macos-x64",
+  "publication": "not_published",
+  "signing": "unsigned",
+  "source_revision": "d92e71b25623132966b602b15ef5112c7eef7c96",
+  "spec_revision": "39759ac2311206059b00c44179a998f502e4e777",
+  "task_id": "K-103",
+  "wheel": {
+    "direct_dependencies": [
+      "mcp==1.28.1",
+      "fastapi==0.139.2",
+      "uvicorn==0.51.0",
+      "starlette==1.3.1",
+      "pydantic==2.13.4",
+      "anyio==4.14.2",
+      "httpx==0.28.1"
+    ],
+    "entrypoints": [
+      "axiom-mcp",
+      "axiom-mcp-entrypoints"
+    ],
+    "name": "axiom_mcp-0.1.0-py3-none-any.whl",
+    "requires_python": "<3.14,>=3.13",
+    "sha256": "ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b",
+    "size_bytes": 214242,
+    "tag": "py3-none-any"
+  }
+}
