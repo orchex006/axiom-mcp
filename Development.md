@@ -22,6 +22,12 @@ K-107 local Mac Intel candidate ใช้ `tests/native/capture_installed_k107.p
 สำหรับ process legs จาก versioned wheel interpreter. Evidence นี้เป็น local candidate
 เท่านั้น; การรับรอง release และ lane อื่นต้องใช้ release-phase run แยกต่างหาก.
 
+K-407 local Linux x64 container candidate ใช้ `capture_native_matrix.py` กับ
+`--target container-linux-x64 --task-id K-407 --installed-symbol K406WatcherB`
+และ K-406 installed volume. Query และ stdio tool subprocess ใช้ wheel interpreter
+ใน versioned environment; native identity และผล process/security อยู่ใน
+`evidence/K-407/`. Released-fixture certification ยังคงเป็น release-phase gate.
+
 ## Preflight — ก่อนเริ่มทุก task
 
 1. อ่าน workspace `AGENTS.md`, `Development.md` ของ repository นี้ และ task card/spec ที่เกี่ยวข้อง;

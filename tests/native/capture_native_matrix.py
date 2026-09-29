@@ -1,8 +1,9 @@
 """Capture the V2-031 native query and host-process matrix on this host.
 
 This is the executable half of :mod:`tests.native.README`. It runs three leg
-families on the *native* host it is started on - never in a substitute container -
-and writes raw artifacts plus a machine-readable summary:
+families on the host or container it is started in; the recorded platform identity
+must match the selected lane. It never claims a different host. The harness
+writes raw artifacts plus a machine-readable summary:
 
 ``python-query``
     The real ``graph_query`` dispatcher over the real ``demo-solution`` bundle the
@@ -384,11 +385,20 @@ def fixture_provenance_of(project_generations: Any) -> dict[str, Any]:
 
 
 def leg_installed_query(
-    python: str, home: Path, repo: Path, evidence: EvidenceWriter
+    python: str, home: Path, repo: Path, symbol: str, evidence: EvidenceWriter
 ) -> dict[str, Any]:
     """Run a query in the installed interpreter without a checkout import path."""
     result = subprocess.run(
-        [python, str(INSTALLED_PROBE), "--axiom-home", str(home), "--repo", str(repo)],
+        [
+            python,
+            str(INSTALLED_PROBE),
+            "--axiom-home",
+            str(home),
+            "--repo",
+            str(repo),
+            "--symbol",
+            symbol,
+        ],
         cwd=str(repo),
         env=child_env(),
         capture_output=True,
@@ -723,10 +733,18 @@ def stdio_leg(
 
 
 def leg_installed_stdio_tool_call(
-    python: str, home: Path, repo: Path, evidence: EvidenceWriter, deadline: float
+    python: str, home: Path, repo: Path, symbol: str, evidence: EvidenceWriter, deadline: float
 ) -> dict[str, Any]:
     """Call the installed query handler through the installed wheel's stdio server."""
-    argv = [str(INSTALLED_STDIO), "--axiom-home", str(home), "--repo", str(repo)]
+    argv = [
+        str(INSTALLED_STDIO),
+        "--axiom-home",
+        str(home),
+        "--repo",
+        str(repo),
+        "--symbol",
+        symbol,
+    ]
     process = spawn(python, argv)
     out = LineReader(process.stdout, "stdout")
     err = LineReader(process.stderr, "stderr")
@@ -745,7 +763,7 @@ def leg_installed_stdio_tool_call(
                     "arguments": {
                         "solution_id": "demo-solution",
                         "operation": "search",
-                        "query": "K107WatcherB",
+                        "query": symbol,
                     },
                 },
             )
@@ -769,7 +787,7 @@ def leg_installed_stdio_tool_call(
         and end.get("exit_code") == 0
         and not parsed["junk"]
         and "graph_query" in names
-        and "K107WatcherB" in json.dumps(call)
+        and symbol in json.dumps(call)
         and not call.get("result", {}).get("isError", False)
     )
     return {
@@ -1443,8 +1461,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--deadline", type=float, default=30.0, help="Per-step deadline in seconds."
     )
-    parser.add_argument("--installed-repo", type=Path, help="Real-source repository for K-107.")
-    parser.add_argument("--installed-axiom-home", type=Path, help="Installed AXIOM_HOME for K-107.")
+    parser.add_argument(
+        "--installed-repo", type=Path, help="Real-source repository for an installed candidate."
+    )
+    parser.add_argument(
+        "--installed-axiom-home", type=Path, help="Installed AXIOM_HOME for a candidate."
+    )
+    parser.add_argument(
+        "--installed-symbol",
+        default="K107WatcherB",
+        help="Symbol in the installed real-source catalog.",
+    )
+    parser.add_argument(
+        "--task-id", default=None, help="Candidate task identifier for the evidence report."
+    )
     args = parser.parse_args(list(sys.argv[1:] if argv is None else argv))
     if bool(args.installed_repo) != bool(args.installed_axiom_home):
         parser.error("--installed-repo and --installed-axiom-home must be given together")
@@ -1464,7 +1494,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             "python-query",
             lambda: (
                 leg_installed_query(
-                    args.python, args.installed_axiom_home, args.installed_repo, evidence
+                    args.python,
+                    args.installed_axiom_home,
+                    args.installed_repo,
+                    args.installed_symbol,
+                    evidence,
                 )
                 if INSTALLED_PROCESS_MODE
                 else leg_python_query(evidence, args.deadline)
@@ -1489,6 +1523,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     args.python,
                     args.installed_axiom_home,
                     args.installed_repo,
+                    args.installed_symbol,
                     evidence,
                     args.deadline,
                 )
@@ -1501,7 +1536,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     ordered = sorted(legs, key=lambda item: LEG_ORDER.get(item["leg"], 99))
     statuses = {item["leg"]: item["status"] for item in ordered}
     matrix = {
-        "task": "K-107" if INSTALLED_PROCESS_MODE else "V2-031",
+        "task": args.task_id or ("K-107" if INSTALLED_PROCESS_MODE else "V2-031"),
         "repository": "axiom-mcp",
         "target": args.target,
         "generated_utc": utc_now(),

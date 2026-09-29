@@ -1,5 +1,15 @@
 # Changelog
 
+## K-407 container Linux x64 installed MCP candidate
+
+- Run the installed wheel against K-406's real-source graph catalog on Debian 12
+  x86_64, then capture stdio process, HTTP security, native POSIX guard and
+  mismatch refusals.
+  Parameterize the native harness for the actual task and symbol, and resolve
+  registry paths with the host platform instead of a macOS constant.
+- Preserve the K-406 update and rollback provenance as an unsigned local
+  candidate; released-fixture certification remains pending.
+
 ## K-403 container Linux x64 wheel input
 
 - Reuse the byte-identical `py3-none-any` MCP wheel from K-103 because package

@@ -1,5 +1,25 @@
 # V2-031 - native query and host process matrix
 
+## K-407 container Linux x64 installed candidate
+
+The K-407 run uses the exact K-406 A/B kit and owned Debian 12 x86_64 volume.
+Pass `--target container-linux-x64 --task-id K-407`, the installed versioned
+Python, `--installed-repo`, `--installed-axiom-home`, and
+`--installed-symbol K406WatcherB` to `capture_native_matrix.py`. The installed
+query and stdio helpers now use the actual `sys.platform` for registry resolution;
+their subprocess imports must resolve inside the installed wheel environment.
+The process matrix captures stdio handshake/tool call, silence timeout, interrupt,
+stdout noise, HTTP credentials/Origin and stalled-body cancellation. The installed
+query probe also refuses SDK, Python and protocol version mismatches. Its catalog
+is produced by graphd from real C# source and is queried after K-406 rollback;
+the K-406 evidence records A, B and post-rollback watcher/query results. This is
+an unsigned local candidate. Released-fixture and independent release checks
+remain pending.
+
+`installed_guard_probe.py` uses the installed wheel in three independent Linux
+processes: an exclusive POSIX holder, a bounded refused shared reader, and a
+shared reader that succeeds after the holder is killed.
+
 ## K-107 installed Mac Intel candidate
 
 `capture_installed_k107.py --help` lists the required A/B archive paths and SHA-256

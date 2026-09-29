@@ -76,7 +76,7 @@ def main() -> int:
         raise SystemExit("installed MCP registry path is already occupied")
     config.write_text(json.dumps(document) + "\n")
     try:
-        registry = load_registry(config, env={"AXIOM_HOME": str(home)}, platform="darwin")
+        registry = load_registry(config, env={"AXIOM_HOME": str(home)}, platform=sys.platform)
         principal = ToolPrincipal(
             token_id="local-k107",
             capabilities=frozenset({security.CAPABILITY_READ}),

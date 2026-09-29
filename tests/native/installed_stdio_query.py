@@ -21,6 +21,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--axiom-home", type=Path, required=True)
     parser.add_argument("--repo", type=Path, required=True)
+    parser.add_argument("--symbol", default="K107WatcherB")
     args = parser.parse_args()
     home = args.axiom_home.resolve(strict=True)
     repo = args.repo.resolve(strict=True)
@@ -54,7 +55,7 @@ def main() -> int:
         + "\n"
     )
     try:
-        registry = load_registry(config, env={"AXIOM_HOME": str(home)}, platform="darwin")
+        registry = load_registry(config, env={"AXIOM_HOME": str(home)}, platform=sys.platform)
         principal = ToolPrincipal(
             token_id="local-k107",
             capabilities=frozenset({security.CAPABILITY_READ}),
