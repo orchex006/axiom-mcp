@@ -1,0 +1,429 @@
+{
+  "goal_id": "K-MacIntel-07",
+  "task_id": "K-107",
+  "parent_ids": [
+    "K-007"
+  ],
+  "owner": "axiom-mcp",
+  "lane": "macos-x64",
+  "status": "local_verified",
+  "certified": false,
+  "fixture_provenance": "candidate",
+  "environment": {
+    "os": "Darwin",
+    "arch": "x86_64",
+    "execution": "native",
+    "os_version": "26.7",
+    "runtime": "uv managed CPython 3.13.15; installed axiom-mcp wheel 0.1.0; A core 0.1.0; B core 0.1.1",
+    "toolchain": "macOS launchctl; official MCP SDK 1.28.1; graphd native x86_64"
+  },
+  "spec_revision": "39759ac2311206059b00c44179a998f502e4e777",
+  "source_revision": "a4a9c6f7b2f012f013fa9d7db00542f1bfbcaca1",
+  "input_reports": [
+    {
+      "task_id": "K-106",
+      "path": "axiom-specs/evidence/artifacts/K-106/scope-result.json",
+      "sha256": "57af2f58e557ea6d4a8d30d85a997587995b869bb5ec9032762522a097d235dc"
+    }
+  ],
+  "artifacts": [
+    {
+      "component": "axiom-skills",
+      "source_revision": "eade281614677f96fd86260dc28e1fe0cbdeac0a",
+      "path": "axiom-specs/evidence/artifacts/K-101/owner-source.tar",
+      "sha256": "e4b6a013b4971d93298886655debef5b11b912ca7a881c2ab1648477124b1a3a"
+    },
+    {
+      "component": "axiom-skills-manifest",
+      "source_revision": "eade281614677f96fd86260dc28e1fe0cbdeac0a",
+      "path": "axiom-specs/evidence/artifacts/K-101/skills-manifest.json",
+      "sha256": "ddba13d7d5608e58c6f8f4599c133b86f0ddbc62257b98bfe73d5c207bea8d1a"
+    },
+    {
+      "component": "axiom-skills-spec-pin",
+      "source_revision": "eade281614677f96fd86260dc28e1fe0cbdeac0a",
+      "path": "axiom-specs/evidence/artifacts/K-101/spec.lock.json",
+      "sha256": "288b2491d39762d8225315c976096ac51c1ea76ff50fd813e3b4ca7655269661"
+    },
+    {
+      "component": "axiom-core-candidate",
+      "source_revision": "e5a30e2ee6807ab36cecbc881be3ffb4259cba83",
+      "path": "axiom-specs/evidence/artifacts/K-102/axiom-0.1.0-macos-x64.tar.gz",
+      "sha256": "49ea03217b7099347808c7e023a592232fd70813f46cbc422cfddacb46a8bb94"
+    },
+    {
+      "component": "axiom-core-manifest",
+      "source_revision": "e5a30e2ee6807ab36cecbc881be3ffb4259cba83",
+      "path": "axiom-specs/evidence/artifacts/K-102/candidate-manifest.json",
+      "sha256": "c923680a3211986fa92eaa7cc3d62ee4cd465332ba52188968add4eda8471878"
+    },
+    {
+      "component": "axiom-core-sbom",
+      "source_revision": "e5a30e2ee6807ab36cecbc881be3ffb4259cba83",
+      "path": "axiom-specs/evidence/artifacts/K-102/axiom-0.1.0-macos-x64.sbom.json",
+      "sha256": "0aed3a3eacf18524d4c1a8305ff1633624d8e5d0bb58b0f01c2393b9ae3bda9f"
+    },
+    {
+      "component": "axiom-graph-fixture",
+      "source_revision": "e5a30e2ee6807ab36cecbc881be3ffb4259cba83",
+      "path": "axiom-specs/evidence/artifacts/K-102/real-source-fixture.tar",
+      "sha256": "cc9ae19cae2c1f08148daccfb5c3cd993db417a19a849747739ffc84a3599887"
+    },
+    {
+      "component": "axiom-graph-report",
+      "source_revision": "e5a30e2ee6807ab36cecbc881be3ffb4259cba83",
+      "path": "axiom-specs/evidence/artifacts/K-102/real-source-report.json",
+      "sha256": "89d8b648a9356ba621a8108aaf25f470d097b4f135a6c3316cc7af06a4bc3109"
+    },
+    {
+      "component": "axiom-owner-handoff",
+      "source_revision": "e5a30e2ee6807ab36cecbc881be3ffb4259cba83",
+      "path": "axiom-specs/evidence/artifacts/K-102/owner-handoff.json",
+      "sha256": "e53fec934e8f3ab454f7507fa777331e9c910d7188d2ac0b9125324b0e4984ca"
+    },
+    {
+      "component": "axiom-spec-pin",
+      "source_revision": "e5a30e2ee6807ab36cecbc881be3ffb4259cba83",
+      "path": "axiom-specs/evidence/artifacts/K-102/spec.lock.json",
+      "sha256": "810cb38caeeabc453b785bd63c13cd475dc9ed8212827740b5fc9fd5fccdaf44"
+    },
+    {
+      "component": "axiom-mcp-wheel",
+      "source_revision": "d92e71b25623132966b602b15ef5112c7eef7c96",
+      "path": "axiom-specs/evidence/artifacts/K-103/axiom_mcp-0.1.0-py3-none-any.whl",
+      "sha256": "ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b"
+    },
+    {
+      "component": "axiom-mcp-wheel-input",
+      "source_revision": "d92e71b25623132966b602b15ef5112c7eef7c96",
+      "path": "axiom-specs/evidence/artifacts/K-103/wheel-input.json",
+      "sha256": "0b77b8b3415b146b039ae3142a6df4732d4e04557b27a8c8a358d249574666ea"
+    },
+    {
+      "component": "axiom-mcp-macos-lock",
+      "source_revision": "d92e71b25623132966b602b15ef5112c7eef7c96",
+      "path": "axiom-specs/evidence/artifacts/K-103/macos-x64-py313-requirements.txt",
+      "sha256": "4db70be8d9acb83b9309d64a21e3fd316e0b19450685d1ba1e538ae6153ea43a"
+    },
+    {
+      "component": "axiom-mcp-handoff",
+      "source_revision": "d92e71b25623132966b602b15ef5112c7eef7c96",
+      "path": "axiom-specs/evidence/artifacts/K-103/owner-handoff.json",
+      "sha256": "f414e48f93d170460a85011ef054840508c0bc528c7868031a564a51e0ca4111"
+    },
+    {
+      "component": "axiom-mcp-spec-pin",
+      "source_revision": "d92e71b25623132966b602b15ef5112c7eef7c96",
+      "path": "axiom-specs/evidence/artifacts/K-103/spec.lock.json",
+      "sha256": "e54bdb7a0ae45a0d6d61ce518788cd53a9c47a61843f9ee94d83576072ff978b"
+    },
+    {
+      "component": "uv-managed-cpython-3.13.15-macos-x64",
+      "source_revision": "9ba9aa125c405e30c2216692ecece5a13bf2c692",
+      "path": "axiom-specs/evidence/artifacts/K-104/cpython-3.13.15-macos-x64-candidate.tar.gz",
+      "sha256": "070828a8d087053cf96c4534f66c84949ba2a3ef24d7bd2dac40dec86910cd2d"
+    },
+    {
+      "component": "axiom-mcp-wheelhouse-macos-x64-py313",
+      "source_revision": "9ba9aa125c405e30c2216692ecece5a13bf2c692",
+      "path": "axiom-specs/evidence/artifacts/K-104/wheelhouse.tar.gz",
+      "sha256": "5181bc44181c949b2f0171fab86ab1e3b4dd83f39669177bcc968ce4e9da7ce6"
+    },
+    {
+      "component": "axiom-mcp-wheelhouse-manifest",
+      "source_revision": "9ba9aa125c405e30c2216692ecece5a13bf2c692",
+      "path": "axiom-specs/evidence/artifacts/K-104/wheelhouse-manifest.json",
+      "sha256": "1ea251e5fc1a271eff226b1d7e0b2e118923f906cddc03908c622adf0b547fba"
+    },
+    {
+      "component": "axiom-mcp-runtime-input",
+      "source_revision": "9ba9aa125c405e30c2216692ecece5a13bf2c692",
+      "path": "axiom-specs/evidence/artifacts/K-104/runtime-input.json",
+      "sha256": "e1f5f61bc9c254333c6c3bf6fe9097a828795dadbe949954aa3c1cbef12d0e2f"
+    },
+    {
+      "component": "axiom-cli-macos-x64-candidate",
+      "source_revision": "9ba9aa125c405e30c2216692ecece5a13bf2c692",
+      "path": "axiom-specs/evidence/artifacts/K-104/axiom-cli-candidate",
+      "sha256": "90300b0c1f3e03e314222cf0e41dc5bb731f6398c6493340a8a94d147d60d17c"
+    },
+    {
+      "component": "axiom-cli-runtime-handoff",
+      "source_revision": "9ba9aa125c405e30c2216692ecece5a13bf2c692",
+      "path": "axiom-specs/evidence/artifacts/K-104/owner-handoff.json",
+      "sha256": "207950f7752e5fbb57ca689c05063401579b661f57da54040372ccaa1c79c4f4"
+    },
+    {
+      "component": "axiom-cli-spec-pin",
+      "source_revision": "9ba9aa125c405e30c2216692ecece5a13bf2c692",
+      "path": "axiom-specs/evidence/artifacts/K-104/spec.lock.json",
+      "sha256": "4f7a81d79bb5b0523f81b8a20d920a5f2f291001dd76fdd35cc598fe24f15561"
+    },
+    {
+      "component": "axiom-macos-x64-composed-distribution",
+      "source_revision": "f58f435e9592ea6c2480006de4b2c0119223ec92",
+      "path": "axiom-specs/evidence/artifacts/K-105/distribution-macos-x64-candidate.tar.gz",
+      "sha256": "caeee2470868b67367c27bbfc368171ba744bcf92c18afafe85d61a9fca2c86f"
+    },
+    {
+      "component": "axiom-cli-k105-release-set",
+      "source_revision": "f58f435e9592ea6c2480006de4b2c0119223ec92",
+      "path": "axiom-specs/evidence/artifacts/K-105/release-set.json",
+      "sha256": "902c2c70a033c19ac4587ba59a166b6eb01d029f6fe46a0cb2e4c7e87c4fa723"
+    },
+    {
+      "component": "axiom-cli-k105-channel",
+      "source_revision": "f58f435e9592ea6c2480006de4b2c0119223ec92",
+      "path": "axiom-specs/evidence/artifacts/K-105/channel.json",
+      "sha256": "2fe31a81ae2bbe5714971f56279b053b6335520054c454f6e94b5f794d4a7f7a"
+    },
+    {
+      "component": "axiom-cli-k105-runtime-manifest",
+      "source_revision": "f58f435e9592ea6c2480006de4b2c0119223ec92",
+      "path": "axiom-specs/evidence/artifacts/K-105/runtime-manifest.json",
+      "sha256": "068e2eee75f3d224f0815b5dab662e88e97451519a1f4640d3e29fef94bcfa72"
+    },
+    {
+      "component": "axiom-cli-k105-handoff",
+      "source_revision": "f58f435e9592ea6c2480006de4b2c0119223ec92",
+      "path": "axiom-specs/evidence/artifacts/K-105/owner-handoff.json",
+      "sha256": "20abbf0eacd29c6d300f01dd47e25281edf44a4031cf8f2cd231b2a30f1a62e7"
+    },
+    {
+      "component": "axiom-cli-k105-spec-pin",
+      "source_revision": "f58f435e9592ea6c2480006de4b2c0119223ec92",
+      "path": "axiom-specs/evidence/artifacts/K-105/spec.lock.json",
+      "sha256": "4f7a81d79bb5b0523f81b8a20d920a5f2f291001dd76fdd35cc598fe24f15561"
+    },
+    {
+      "component": "axiom-cli-k105-native-summary",
+      "source_revision": "f58f435e9592ea6c2480006de4b2c0119223ec92",
+      "path": "axiom-specs/evidence/artifacts/K-105/native-distribution.txt",
+      "sha256": "84d82f1c7cf8858f882f87cfb43c34a647ca81c1e78a9fca90b0164d7aec5a33"
+    },
+    {
+      "component": "axiom-distribution-b",
+      "source_revision": "e6b9d2086ba62b5b32c33fe2c3edc49353a22851",
+      "path": "axiom-specs/evidence/artifacts/K-106/distribution-macos-x64-b-0.1.1-candidate.tar.gz",
+      "sha256": "5e8c7efb2c40acf8c1b29af5061962090d12e02b391de5de5ea441cb67f1314e"
+    },
+    {
+      "component": "axiom-core-b",
+      "source_revision": "c4f643ebf7af95395d12cbba8572e7065254e8b4",
+      "path": "axiom-specs/evidence/artifacts/K-106/core-b-0.1.1-macos-x64.tar.gz",
+      "sha256": "edad423cba453c191dbebab2cc4ccd5b07aacd70a89c3245a89eb272d2c388f5"
+    },
+    {
+      "component": "axiom-core-b-manifest",
+      "source_revision": "c4f643ebf7af95395d12cbba8572e7065254e8b4",
+      "path": "axiom-specs/evidence/artifacts/K-106/core-b-candidate-manifest.json",
+      "sha256": "b062ad90e517b5b7040a59711615df7f15c4d1f174d7b4334a32c09e1674f556"
+    },
+    {
+      "component": "axiom-core-b-sbom",
+      "source_revision": "c4f643ebf7af95395d12cbba8572e7065254e8b4",
+      "path": "axiom-specs/evidence/artifacts/K-106/core-b-sbom.json",
+      "sha256": "8bd4ed8442e680b1f6fad479975e45a3c9522f42d73f60dc9f76ad4d7a7c108f"
+    },
+    {
+      "component": "axiom-b-release-set",
+      "source_revision": "e6b9d2086ba62b5b32c33fe2c3edc49353a22851",
+      "path": "axiom-specs/evidence/artifacts/K-106/release-set.json",
+      "sha256": "4938f5f3566b6171b51024ba1989c4a93696316b0c82f1e58b97cb25468cdf1d"
+    },
+    {
+      "component": "axiom-b-channel",
+      "source_revision": "e6b9d2086ba62b5b32c33fe2c3edc49353a22851",
+      "path": "axiom-specs/evidence/artifacts/K-106/channel.json",
+      "sha256": "5815f86294d8d56946ee07fd03bf9cdc40d090254ae7777f453c9ef52a8b39aa"
+    },
+    {
+      "component": "axiom-b-runtime-manifest",
+      "source_revision": "e6b9d2086ba62b5b32c33fe2c3edc49353a22851",
+      "path": "axiom-specs/evidence/artifacts/K-106/runtime-manifest.json",
+      "sha256": "7f0b3102f37035f0da9e17cce886bfff3fe9460243d7ac6ecf613dda6ff504c4"
+    },
+    {
+      "component": "axiom-k106-native-report",
+      "source_revision": "e6b9d2086ba62b5b32c33fe2c3edc49353a22851",
+      "path": "axiom-specs/evidence/artifacts/K-106/native-report.json",
+      "sha256": "2f12fa32c972a5ede13c44e8fd288860ec73d63787fb0cc02bce9c0f7fbce731"
+    },
+    {
+      "component": "axiom-k106-crash-report",
+      "source_revision": "e6b9d2086ba62b5b32c33fe2c3edc49353a22851",
+      "path": "axiom-specs/evidence/artifacts/K-106/crash-report.json",
+      "sha256": "e49265d8524dfd1302188e4ee1f753f0119fdd9049d03900240a3b19915bdd8e"
+    },
+    {
+      "component": "axiom-k106-owner-handoff",
+      "source_revision": "e6b9d2086ba62b5b32c33fe2c3edc49353a22851",
+      "path": "axiom-specs/evidence/artifacts/K-106/owner-handoff.json",
+      "sha256": "0b62c6258986e6b81111959c92581140de1bd235332a259d3cce57a18920b8d3"
+    },
+    {
+      "component": "axiom-mcp-k107-native-report",
+      "source_revision": "d9ebe55c703b58ca8652c09503d8c3689fce6de0",
+      "path": "axiom-specs/evidence/artifacts/K-107/native-report.json",
+      "sha256": "1cfb772dd66ac45d7e83ab56238c991e5dcaaf2f3c25b09e1ec030f24c0b2933"
+    },
+    {
+      "component": "axiom-mcp-k107-native-transcript",
+      "source_revision": "d9ebe55c703b58ca8652c09503d8c3689fce6de0",
+      "path": "axiom-specs/evidence/artifacts/K-107/native-transcript.json",
+      "sha256": "5ff3fee1feecd2b7f6fddf91929cf7c8773016c41f9a34e22e2ebc73d0c35124"
+    },
+    {
+      "component": "axiom-mcp-k107-process-matrix",
+      "source_revision": "d9ebe55c703b58ca8652c09503d8c3689fce6de0",
+      "path": "axiom-specs/evidence/artifacts/K-107/process-matrix.json",
+      "sha256": "4a0fd1949316d0515b1831500c2a5652543e7c69e55afa7c2efc32e564853e93"
+    },
+    {
+      "component": "axiom-mcp-k107-process-hashes",
+      "source_revision": "d9ebe55c703b58ca8652c09503d8c3689fce6de0",
+      "path": "axiom-specs/evidence/artifacts/K-107/process-SHA256SUMS",
+      "sha256": "56eaa38665bb7fb10e17e548f124357a0b7bc34047b4f4a7b7e1c2cb80f3328d"
+    },
+    {
+      "component": "axiom-mcp-k107-owner-handoff",
+      "source_revision": "a4a9c6f7b2f012f013fa9d7db00542f1bfbcaca1",
+      "path": "axiom-specs/evidence/artifacts/K-107/owner-handoff.json",
+      "sha256": "f8529846cc27181fcc76c036756778bedf7ef445f170359e4482331d34a03156"
+    }
+  ],
+  "scope_report": {
+    "path": "axiom-specs/evidence/artifacts/K-107/scope-result.json",
+    "sha256": "aec9ff2e33ea69cc9d4dd38d171c684a824f5053a689f4c764ad1ef955f651bf"
+  },
+  "commands": [
+    {
+      "id": "native",
+      "command": "Run .venv/bin/python tests/native/capture_installed_k107.py with exact K-105 A and K-106 B archive paths/SHA-256 (cwd axiom-mcp, native Darwin x86_64)",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "output": {
+        "path": "axiom-specs/evidence/artifacts/K-107/native-transcript.json",
+        "sha256": "5ff3fee1feecd2b7f6fddf91929cf7c8773016c41f9a34e22e2ebc73d0c35124"
+      }
+    },
+    {
+      "id": "matrix",
+      "command": "Installed versioned Python runs capture_native_matrix.py --target macos-x64 --installed-repo <real-source> --installed-axiom-home <isolated AXIOM_HOME> (cwd axiom-mcp)",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "output": {
+        "path": "axiom-specs/evidence/artifacts/K-107/process-matrix.json",
+        "sha256": "4a0fd1949316d0515b1831500c2a5652543e7c69e55afa7c2efc32e564853e93"
+      }
+    },
+    {
+      "id": "pytest",
+      "command": ".venv/bin/python -m pytest tests -q (cwd axiom-mcp)",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "output": {
+        "path": "axiom-specs/evidence/artifacts/K-107/pytest-final.txt",
+        "sha256": "f5347c4921dfab1b060dc5a6fd7860a0ef79e4ae0165a71f8ed95ca10a5de6e7"
+      }
+    },
+    {
+      "id": "ruff-check",
+      "command": ".venv/bin/python -m ruff check . (cwd axiom-mcp)",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "output": {
+        "path": "axiom-specs/evidence/artifacts/K-107/ruff-check-final.txt",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+      }
+    },
+    {
+      "id": "ruff-format",
+      "command": ".venv/bin/python -m ruff format --check . (cwd axiom-mcp)",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "output": {
+        "path": "axiom-specs/evidence/artifacts/K-107/ruff-format-final.txt",
+        "sha256": "c9572de1182ff9a0c4f57870e5328e649df7ba707cfc802e2cb7ff048643cb93"
+      }
+    },
+    {
+      "id": "review",
+      "command": "git diff --check; inspect scoped diff, matrix hashes, user-data preservation and token/key scan (cwd axiom-mcp)",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "output": {
+        "path": "axiom-specs/evidence/artifacts/K-107/owner-review.md",
+        "sha256": "40bacd7bac4f18cff2070e3d8299e6ac952520b3560aa3f083623943383abc03"
+      }
+    }
+  ],
+  "results": {
+    "positive_cases": [
+      "python-query",
+      "installed-catalog-query",
+      "stdio-handshake",
+      "stdio-timeout",
+      "stdio-interrupt",
+      "stdout-noise",
+      "http-auth",
+      "http-origin",
+      "http-cancel",
+      "version-mismatch",
+      "native-guard",
+      "restart-update-rollback"
+    ],
+    "negative_and_failure": "HTTP refused lookalike Host/Origin, missing/control credential, unscoped/mutating access and oversized body; stalled body timed out. Stdio rejected stdout noise into diagnostics and handled SIGINT. Installed compatibility refused mismatched SDK/Python/protocol. K-106 upstream archive and update refusal regressions remain referenced by exact input digest.",
+    "acceptance": [
+      {
+        "id": "AC1",
+        "passed": true,
+        "command_ids": [
+          "native",
+          "matrix"
+        ]
+      },
+      {
+        "id": "AC2",
+        "passed": true,
+        "command_ids": [
+          "matrix",
+          "native"
+        ]
+      },
+      {
+        "id": "AC3",
+        "passed": true,
+        "command_ids": [
+          "native",
+          "matrix"
+        ]
+      },
+      {
+        "id": "AC4",
+        "passed": true,
+        "command_ids": [
+          "pytest",
+          "ruff-check",
+          "ruff-format",
+          "review",
+          "native"
+        ]
+      }
+    ]
+  },
+  "delivery": {
+    "branch": "feature/k-107-macos-runtime",
+    "source_revision": "a4a9c6f7b2f012f013fa9d7db00542f1bfbcaca1",
+    "canonical_completion": "axiom-specs/evidence/completion/K-107.json",
+    "specs_branch": "feature/k-107-macos-mcp",
+    "main_integrated": false,
+    "release_state": "candidate",
+    "owner_commit": "a4a9c6f7b2f012f013fa9d7db00542f1bfbcaca1",
+    "owner_remote_verified": true,
+    "specs_commit": "9e9e5de219ad4f790f7d1f5befe7d93393382ed5",
+    "specs_remote_verified": true
+  },
+  "limitations": "Unsigned, unpublished local candidate. Released fixtures, other lanes and independent main integration review remain pending. HTTP stalled-body case proves client timeout/cancellation, not a distinct server cancellation trace. Two existing platform pytest skips are outside the twelve required K-107 local cases.",
+  "next_consumer": "K-501"
+}
