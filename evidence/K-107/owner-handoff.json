@@ -1,0 +1,18 @@
+{
+  "task_id": "K-107",
+  "lane": "macos-x64",
+  "status": "local_verified",
+  "certified": false,
+  "source_revision": "d9ebe55c703b58ca8652c09503d8c3689fce6de0",
+  "branch": "feature/k-107-macos-runtime",
+  "candidate_a_sha256": "caeee2470868b67367c27bbfc368171ba744bcf92c18afafe85d61a9fca2c86f",
+  "candidate_b_sha256": "5e8c7efb2c40acf8c1b29af5061962090d12e02b391de5de5ea441cb67f1314e",
+  "artifacts": {
+    "report.json": "1cfb772dd66ac45d7e83ab56238c991e5dcaaf2f3c25b09e1ec030f24c0b2933",
+    "transcript.json": "5ff3fee1feecd2b7f6fddf91929cf7c8773016c41f9a34e22e2ebc73d0c35124",
+    "process-matrix/raw/matrix.json": "4a0fd1949316d0515b1831500c2a5652543e7c69e55afa7c2efc32e564853e93",
+    "process-matrix/SHA256SUMS": "56eaa38665bb7fb10e17e548f124357a0b7bc34047b4f4a7b7e1c2cb80f3328d"
+  },
+  "verification": "Seven native process legs passed, installed real-source query passed A/restart/B/rollback, 762 pytest passed with two existing platform skips, Ruff check and format passed.",
+  "limitations": "Unsigned, unpublished local candidate only. Released fixtures, other lanes and independent main-integration review remain pending."
+}
