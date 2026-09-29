@@ -2,7 +2,7 @@
   "acceptance": {
     "AC1": "passed: actual wheel, metadata, entrypoints, 31 hash-pinned dependencies, interpreter range",
     "AC2": "passed: isolated install, 36 package/runtime pin tests and required owner checks",
-    "AC3": "pending canonical specctl after and Git delivery"
+    "AC3": "passed: owner review, canonical specctl after and K-103 completion; Git delivery recorded separately"
   },
   "artifacts": [
     {
@@ -93,7 +93,8 @@
     "main_integrated": false,
     "release_state": "candidate",
     "source_branch": "feature/k-103-macos-wheel-input",
-    "source_remote_verified": false
+    "source_commit": "0bb7b466f94f1bbd30543aed84d722983808f4c2",
+    "source_remote_verified": true
   },
   "environment": {
     "arch": "x86_64",
@@ -135,6 +136,6 @@
     "axiom-mcp": "d92e71b25623132966b602b15ef5112c7eef7c96",
     "axiom-specs": "39759ac2311206059b00c44179a998f502e4e777"
   },
-  "status": "in_progress",
+  "status": "local_verified",
   "task_id": "K-103"
 }
