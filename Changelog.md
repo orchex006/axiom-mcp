@@ -1,4 +1,9 @@
-# Changelog — axiom-mcp
+# Changelog
+
+## K-103 Mac Intel wheel input
+
+- Pin the immutable K-012 draft scope and prepare a source-built Python wheel, dependency inventory and interpreter compatibility handoff for the Mac Intel CLI candidate. This is local candidate evidence, not publication.
+ — axiom-mcp
 
 ## Unreleased
 
