@@ -17,6 +17,11 @@ Canonical workflow คือ `Development.md` ใน `axiom-specs` ณ revision 
 
 สถานะปัจจุบัน: `spec.lock.json` verify แล้ว (immutable revision และ contract digests ผ่าน `tools/spec-lock-check.py` ด้วย exit code 0) และ implementation ลงใน repository นี้แล้ว - `src/axiom_mcp/` 49 โมดูล และ `tests/` 44 โมดูล. Required checks `python -m pytest tests -q`, `python -m ruff check .` และ `python -m ruff format --check .` ถูกตั้งโดย `C-001` แล้ว ทุก task ถัดไป MUST รันทั้งสามกับ bytes สุดท้าย และ MUST บันทึก check ที่ยังไม่ได้รันเป็น unverified (ตัวอย่างที่บันทึกไว้จริง: POSIX guard backend, cross-language Rust-holder exclusion และ native host-process launch)
 
+K-107 local Mac Intel candidate ใช้ `tests/native/capture_installed_k107.py` กับ A/B archive
+ที่ระบุ SHA จริง และ `capture_native_matrix.py --installed-repo --installed-axiom-home`
+สำหรับ process legs จาก versioned wheel interpreter. Evidence นี้เป็น local candidate
+เท่านั้น; การรับรอง release และ lane อื่นต้องใช้ release-phase run แยกต่างหาก.
+
 ## Preflight — ก่อนเริ่มทุก task
 
 1. อ่าน workspace `AGENTS.md`, `Development.md` ของ repository นี้ และ task card/spec ที่เกี่ยวข้อง;

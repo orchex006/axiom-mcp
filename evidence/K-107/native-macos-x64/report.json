@@ -1,0 +1,124 @@
+{
+  "A_catalog_generation": "fe718f96722834bec2fed56458df2099423f2e2160e5940432883779f73ce7b0",
+  "B_catalog_generation": "9bb86c19c49d87f58295ecf863a6a8d44b41eccb684b0a4030476e1db4113b0a",
+  "candidate_a_sha256": "caeee2470868b67367c27bbfc368171ba744bcf92c18afafe85d61a9fca2c86f",
+  "candidate_b_sha256": "5e8c7efb2c40acf8c1b29af5061962090d12e02b391de5de5ea441cb67f1314e",
+  "certified": false,
+  "installed_process_matrix": {
+    "leg_status": {
+      "http-security": "passed",
+      "python-query": "passed",
+      "stdio-handshake": "passed",
+      "stdio-interrupt": "passed",
+      "stdio-noise": "passed",
+      "stdio-silence-deadline": "passed",
+      "stdio-tool-call": "passed"
+    },
+    "sha256sums": "/private/var/folders/8g/0bbtyh251jb7q66l1f4ttly40000gn/T/axiom-k107-native-jsv7nbpt/process-matrix/SHA256SUMS",
+    "target": "macos-x64"
+  },
+  "installed_query_A": {
+    "catalog_generation_id": "8dee24166c408f5ce102602330e2d0a0b1529ec422f9d350534975c6350d3b5c",
+    "catalog_manifest_sha256": "fe718f96722834bec2fed56458df2099423f2e2160e5940432883779f73ce7b0",
+    "catalog_pointer_sha256": "20cfb2d090e66cc2ee70a1473018a1c6c17ee8c4772c6e2fd53c6987d7985a68",
+    "coverage": "complete_for_profile",
+    "node_count": 1,
+    "query_symbol": "TokenSource",
+    "status": "passed",
+    "verification": {
+      "mode": "none"
+    },
+    "version_mismatch": {
+      "actual_runtime_pin_reasons": [],
+      "missing_protocol": [
+        "protocol_revision_missing:2025-11-25"
+      ],
+      "wrong_python": [
+        "python_version_unsupported:3.12.9"
+      ],
+      "wrong_sdk": [
+        "sdk_version_unsupported:1.28.0"
+      ]
+    },
+    "wheel_import_below_venv": true
+  },
+  "installed_query_B": {
+    "catalog_generation_id": "ba91f4dd150babd3dc8860cc67948dd6a43babddda24b79ddada29da2b827ed7",
+    "catalog_manifest_sha256": "9bb86c19c49d87f58295ecf863a6a8d44b41eccb684b0a4030476e1db4113b0a",
+    "catalog_pointer_sha256": "4493de9834e7cf93b1597d6344718f107d3add8affddb66b50360d61b332ad3e",
+    "coverage": "complete_for_profile",
+    "node_count": 1,
+    "query_symbol": "K107WatcherB",
+    "status": "passed",
+    "verification": {
+      "mode": "none"
+    },
+    "version_mismatch": {
+      "actual_runtime_pin_reasons": [],
+      "missing_protocol": [
+        "protocol_revision_missing:2025-11-25"
+      ],
+      "wrong_python": [
+        "python_version_unsupported:3.12.9"
+      ],
+      "wrong_sdk": [
+        "sdk_version_unsupported:1.28.0"
+      ]
+    },
+    "wheel_import_below_venv": true
+  },
+  "installed_query_after_restart": {
+    "catalog_generation_id": "8dee24166c408f5ce102602330e2d0a0b1529ec422f9d350534975c6350d3b5c",
+    "catalog_manifest_sha256": "fe718f96722834bec2fed56458df2099423f2e2160e5940432883779f73ce7b0",
+    "catalog_pointer_sha256": "20cfb2d090e66cc2ee70a1473018a1c6c17ee8c4772c6e2fd53c6987d7985a68",
+    "coverage": "complete_for_profile",
+    "node_count": 1,
+    "query_symbol": "TokenSource",
+    "status": "passed",
+    "verification": {
+      "mode": "none"
+    },
+    "version_mismatch": {
+      "actual_runtime_pin_reasons": [],
+      "missing_protocol": [
+        "protocol_revision_missing:2025-11-25"
+      ],
+      "wrong_python": [
+        "python_version_unsupported:3.12.9"
+      ],
+      "wrong_sdk": [
+        "sdk_version_unsupported:1.28.0"
+      ]
+    },
+    "wheel_import_below_venv": true
+  },
+  "installed_query_after_rollback": {
+    "catalog_generation_id": "ba91f4dd150babd3dc8860cc67948dd6a43babddda24b79ddada29da2b827ed7",
+    "catalog_manifest_sha256": "9bb86c19c49d87f58295ecf863a6a8d44b41eccb684b0a4030476e1db4113b0a",
+    "catalog_pointer_sha256": "4493de9834e7cf93b1597d6344718f107d3add8affddb66b50360d61b332ad3e",
+    "coverage": "complete_for_profile",
+    "node_count": 1,
+    "query_symbol": "K107WatcherB",
+    "status": "passed",
+    "verification": {
+      "mode": "none"
+    },
+    "version_mismatch": {
+      "actual_runtime_pin_reasons": [],
+      "missing_protocol": [
+        "protocol_revision_missing:2025-11-25"
+      ],
+      "wrong_python": [
+        "python_version_unsupported:3.12.9"
+      ],
+      "wrong_sdk": [
+        "sdk_version_unsupported:1.28.0"
+      ]
+    },
+    "wheel_import_below_venv": true
+  },
+  "lane": "macos-x64",
+  "status": "local_verified",
+  "task_id": "K-107",
+  "user_data_preserved": true
+}

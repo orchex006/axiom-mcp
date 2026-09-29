@@ -25,12 +25,17 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SRC_DIR = REPO_ROOT / "src"
-if str(SRC_DIR) not in sys.path:
+if os.environ.get("AXIOM_MCP_INSTALLED_PROBE") != "1" and str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 import uvicorn  # noqa: E402
 
 from axiom_mcp import http, sdk_compat, security  # noqa: E402
+
+if os.environ.get("AXIOM_MCP_INSTALLED_PROBE") == "1" and not Path(
+    http.__file__
+).resolve().is_relative_to(Path(sys.prefix).resolve()):
+    raise SystemExit("HTTP server did not import the installed wheel")
 
 #: Environment variable names holding the presented secrets. A name is not a value.
 READ_TOKEN_ENV = "V2031_READ_TOKEN"

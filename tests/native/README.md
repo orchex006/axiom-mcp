@@ -1,5 +1,18 @@
 # V2-031 - native query and host process matrix
 
+## K-107 installed Mac Intel candidate
+
+`capture_installed_k107.py --help` lists the required A/B archive paths and SHA-256
+digests. The harness creates an isolated user home, installs A, registers and indexes
+real C# source, queries through the installed wheel's versioned Python, restarts
+graphd, updates to B, runs the candidate process matrix, and rolls back to A.
+The candidate matrix accepts `--installed-repo` and `--installed-axiom-home` together;
+its stdio and HTTP subprocesses import from the installed wheel. The added stdio
+tool-call launcher composes the installed query handler with the installed transport;
+the bare transport entry point still exposes no application tools on its own.
+The earlier V2-031 synthetic fixture evidence and its release limitations remain
+historical records. K-107 output is a local candidate run, not release certification.
+
 This directory is the executable evidence for task **V2-031** ("Run native query and
 host process matrix") in repository `axiom-mcp`. It contains the harness
 (`capture_native_matrix.py`, `capture_gates.py`), the two boundary probes

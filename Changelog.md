@@ -1,5 +1,15 @@
 # Changelog
 
+## K-107 Mac Intel installed query and process candidate
+
+- Added an isolated A/B native harness that installs the exact K-105/K-106 archives,
+  builds a catalog from real C# source, queries with the versioned wheel interpreter,
+  and repeats after service restart, update, and rollback. The candidate matrix runs
+  stdio protocol boundaries and the HTTP security gateway with installed wheel
+  subprocess imports, including a composed stdio `graph_query` tool call.
+- This is unsigned local candidate evidence on macOS x64. Released fixture
+  certification, other lanes, and independent integration review remain pending.
+
 ## K-103 Mac Intel wheel input
 
 - Pin the immutable K-012 draft scope and prepare a source-built Python wheel, dependency inventory and interpreter compatibility handoff for the Mac Intel CLI candidate. This is local candidate evidence, not publication.
