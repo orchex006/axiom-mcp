@@ -1,0 +1,31 @@
+{
+  "task_id": "K-403",
+  "lane": "container-linux-x64",
+  "status": "local_candidate_handoff",
+  "certified": false,
+  "spec_revision": "39759ac2311206059b00c44179a998f502e4e777",
+  "wheel_source_revision": "d92e71b25623132966b602b15ef5112c7eef7c96",
+  "wheel": {
+    "path": "evidence/K-403/axiom_mcp-0.1.0-py3-none-any.whl",
+    "sha256": "ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b",
+    "requires_python": ">=3.13,<3.14",
+    "entrypoints": ["axiom-mcp", "axiom-mcp-entrypoints"]
+  },
+  "dependency_lock": {
+    "path": "release/container-linux-x64-py313-requirements.txt",
+    "sha256": "ce2e686592de779dd980a20474ed8a317cb05487b8e4388cebfea9a73e000cb6",
+    "packages": 31,
+    "target": "x86_64-unknown-linux-gnu CPython 3.13",
+    "resolver": "uv 0.12.9; wheels only; exact versions and hashes"
+  },
+  "container_validation": {
+    "image_id": "sha256:2325bb286ec344af3e5898cc224b5844e2707ac6e26b1632516fd3edc84a5e26",
+    "python": "3.13.15",
+    "os": "Debian GNU/Linux 12",
+    "arch": "x86_64",
+    "pip_check": "No broken requirements found.",
+    "installed_entrypoints": ["axiom-mcp", "axiom-mcp-entrypoints"]
+  },
+  "negative_cases": ["corrupt-wheel", "unsupported-python"],
+  "limitations": "Wheel and Linux dependency input only; CLI installed runtime, release signing, WSL2/Windows execution and certification remain unverified."
+}

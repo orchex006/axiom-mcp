@@ -1,5 +1,15 @@
 # Changelog
 
+## K-403 container Linux x64 wheel input
+
+- Reuse the byte-identical `py3-none-any` MCP wheel from K-103 because package
+  source, `pyproject.toml` and README have no changes since that source revision.
+  Resolve 31 wheel-only dependencies for Linux x86_64 CPython 3.13 with exact
+  versions and hashes. A temporary Linux x64 environment installed the locked
+  dependencies and wheel, imported the package and passed `pip check`.
+- Keep this as an unsigned local candidate. CLI-owned provisioning, installed
+  process/query checks and released provenance remain separate tasks.
+
 ## K-107 Mac Intel installed query and process candidate
 
 - Added an isolated A/B native harness that installs the exact K-105/K-106 archives,
