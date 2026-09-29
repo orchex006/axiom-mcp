@@ -148,5 +148,25 @@
     "axiom-specs": "39759ac2311206059b00c44179a998f502e4e777"
   },
   "status": "local_verified",
-  "task_id": "K-103"
+  "task_id": "K-103",
+  "spec_revision": "39759ac2311206059b00c44179a998f502e4e777",
+  "input_reports": [],
+  "negative_and_failure": "Corrupt wheel extraction and Python 3.9 install each exited 1. Isolated Python 3.13 install and both entrypoints passed. Full pytest 762 passed, 2 skipped, 230 subtests; targeted package/runtime pin 36 passed.",
+  "spec_lock": {
+    "path": "axiom-specs/evidence/artifacts/K-103/spec.lock.json",
+    "sha256": "e54bdb7a0ae45a0d6d61ce518788cd53a9c47a61843f9ee94d83576072ff978b"
+  },
+  "reference_bases": {
+    "artifacts": "owner_repo",
+    "commands": "owner_repo",
+    "scope_report": "workspace_root",
+    "input_reports": "workspace_root"
+  },
+  "spec_pins": [
+    {
+      "component": "axiom-mcp-spec-pin",
+      "path": "axiom-specs/evidence/artifacts/K-103/spec.lock.json",
+      "sha256": "e54bdb7a0ae45a0d6d61ce518788cd53a9c47a61843f9ee94d83576072ff978b"
+    }
+  ]
 }
