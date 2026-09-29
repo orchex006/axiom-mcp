@@ -1,0 +1,613 @@
+{
+  "disclaimer": "Command output captured with the installed candidate on this native host; local candidate evidence only, not released certification.",
+  "generated_utc": "2026-09-29T15:24:34Z",
+  "identity": {
+    "component": "axiom-mcp",
+    "cpu_count": 4,
+    "guard_backend": "posix",
+    "machine": "x86_64",
+    "os_name": "posix",
+    "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.36",
+    "pointer_bits": 64,
+    "processor": "",
+    "protocol_minimum": "2025-11-25",
+    "python_executable": "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python",
+    "python_implementation": "CPython",
+    "python_requires": ">=3.13,<3.14",
+    "python_supported": true,
+    "python_version": "3.13.15",
+    "release": "6.12.76-linuxkit",
+    "runtime_pin_reasons": [],
+    "runtime_pins": {
+      "anyio": "4.14.2",
+      "fastapi": "0.139.2",
+      "httpx": "0.28.1",
+      "mcp": "1.28.1",
+      "pydantic": "2.13.4",
+      "starlette": "1.3.1",
+      "uvicorn": "0.51.0"
+    },
+    "spec_revision": "39759ac2311206059b00c44179a998f502e4e777",
+    "sys_platform": "linux",
+    "system": "Linux",
+    "target": "container-linux-x64",
+    "version": "#1 SMP PREEMPT_DYNAMIC Thu Jun 25 13:48:49 UTC 2026"
+  },
+  "interpreter": "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python",
+  "leg_status": {
+    "http-security": "passed",
+    "python-query": "passed",
+    "stdio-handshake": "passed",
+    "stdio-interrupt": "passed",
+    "stdio-noise": "passed",
+    "stdio-silence-deadline": "passed",
+    "stdio-tool-call": "passed"
+  },
+  "legs": [
+    {
+      "checks": [
+        {
+          "check": "installed_wheel.real_source_query",
+          "kind": "positive",
+          "observed": {
+            "catalog_generation_id": "8c0351a775edfe736d89377ca979700d408dbacf75904d93f81b8315e2bdec3c",
+            "catalog_manifest_sha256": "d1def9926fd03a960cc097997ea9beafef970488b740149b6a05da32ea7bfda8",
+            "catalog_pointer_sha256": "8aebee5f3383b4cc88aae39e8737bbb2c8d15d949cd9aed348fd96d2823b9d93",
+            "coverage": "complete_for_profile",
+            "node_count": 2,
+            "query_symbol": "K406WatcherB",
+            "status": "passed",
+            "verification": {
+              "mode": "none"
+            },
+            "version_mismatch": {
+              "actual_runtime_pin_reasons": [],
+              "missing_protocol": [
+                "protocol_revision_missing:2025-11-25"
+              ],
+              "wrong_python": [
+                "python_version_unsupported:3.12.9"
+              ],
+              "wrong_sdk": [
+                "sdk_version_unsupported:1.28.0"
+              ]
+            },
+            "wheel_import_below_venv": true
+          },
+          "outcome": "pass"
+        }
+      ],
+      "command": [
+        "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python",
+        "/src/tests/native/installed_query_probe.py"
+      ],
+      "exit_code": 0,
+      "leg": "python-query",
+      "status": "passed",
+      "stderr": {
+        "bytes": 0,
+        "path": "raw/installed-query-stderr.bin",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "text_path": "raw/installed-query-stderr.txt"
+      },
+      "stdout": {
+        "bytes": 677,
+        "path": "raw/installed-query-stdout.bin",
+        "sha256": "d901f75d6c366e85cdeacec1ffe3d5f570d34bc26a83484f9e8e0aabc21d2832",
+        "text_path": "raw/installed-query-stdout.txt"
+      }
+    },
+    {
+      "artifacts": {
+        "stderr": {
+          "bytes": 919,
+          "path": "raw/stdio-handshake-stderr.bin",
+          "sha256": "c415ef5ab844313208fcf8757b0bc6ec3dc7de2505c048b27bac556924ae36bd",
+          "text_path": "raw/stdio-handshake-stderr.txt"
+        },
+        "stdout": {
+          "bytes": 326,
+          "path": "raw/stdio-handshake-stdout.bin",
+          "sha256": "fd7f141c3e30533f97b5326c455731312b5754ee2e4a561ad2c75fe7a4b7cb3a",
+          "text_path": "raw/stdio-handshake-stdout.txt"
+        }
+      },
+      "checks": [
+        {
+          "check": "stdio-handshake.stdout_protocol_only",
+          "kind": "positive",
+          "observed": {
+            "first_non_protocol_line": null,
+            "jsonrpc_frames": 2,
+            "non_protocol_lines": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-handshake.initialize",
+          "kind": "positive",
+          "observed": {
+            "protocol_version": "2025-11-25",
+            "server_name": "v2-031-native-stdio",
+            "server_version": "1.28.1"
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-handshake.tools_list_answer",
+          "kind": "positive",
+          "observed": {
+            "tools": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-handshake.exit_code",
+          "kind": "positive",
+          "observed": {
+            "exit_code": 0,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-handshake.stderr_diagnostics",
+          "kind": "positive",
+          "observed": {
+            "banner_present": true,
+            "diverted_writes": 0,
+            "stdio_stop": "axiom-mcp: stdio_stop protocol_bytes=326 protocol_writes=2 violations=0"
+          },
+          "outcome": "pass"
+        }
+      ],
+      "command": "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python -m axiom_mcp.stdio --name v2-031-native-stdio",
+      "duration_seconds": 0.683,
+      "leg": "stdio-handshake",
+      "status": "passed"
+    },
+    {
+      "artifacts": {
+        "stderr": {
+          "bytes": 1081,
+          "path": "raw/stdio-noise-stderr.bin",
+          "sha256": "abdb15ed2b9e1d8c309f2d88a817cb94a64a0452bc63bff6e4e3491f541543b1",
+          "text_path": "raw/stdio-noise-stderr.txt"
+        },
+        "stdout": {
+          "bytes": 326,
+          "path": "raw/stdio-noise-stdout.bin",
+          "sha256": "2ba4589ca1afac70bd06c2fadd5d13b97a03542dd649343d2a13e565441b30b5",
+          "text_path": "raw/stdio-noise-stdout.txt"
+        }
+      },
+      "checks": [
+        {
+          "check": "stdio-noise.stdout_protocol_only",
+          "kind": "positive",
+          "observed": {
+            "first_non_protocol_line": null,
+            "jsonrpc_frames": 2,
+            "non_protocol_lines": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.initialize",
+          "kind": "positive",
+          "observed": {
+            "protocol_version": "2025-11-25",
+            "server_name": "v2-031-native-noise",
+            "server_version": "1.28.1"
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.tools_list_answer",
+          "kind": "positive",
+          "observed": {
+            "tools": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.exit_code",
+          "kind": "positive",
+          "observed": {
+            "exit_code": 0,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.stderr_diagnostics",
+          "kind": "positive",
+          "observed": {
+            "banner_present": true,
+            "diverted_writes": 3,
+            "stdio_stop": "axiom-mcp: stdio_stop protocol_bytes=326 protocol_writes=2 violations=3"
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.stdout_noise_diverted",
+          "kind": "failure",
+          "observed": {
+            "diverted_writes": 3,
+            "injected_lines": 3,
+            "leaked_to_stdout": 0
+          },
+          "outcome": "pass"
+        }
+      ],
+      "command": "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python /src/tests/native/stdio_noise_probe.py --name v2-031-native-noise --noise-lines 3 --noise-delay 1.0",
+      "duration_seconds": 2.741,
+      "leg": "stdio-noise",
+      "status": "passed"
+    },
+    {
+      "artifacts": {
+        "stderr": {
+          "bytes": 919,
+          "path": "raw/stdio-silence-stderr.bin",
+          "sha256": "93b1b6abf5bee1aed225be4e7ed84402d0ca6606cef8166dddc7628f99055d17",
+          "text_path": "raw/stdio-silence-stderr.txt"
+        },
+        "stdout": {
+          "bytes": 0,
+          "path": "raw/stdio-silence-stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text_path": "raw/stdio-silence-stdout.txt"
+        }
+      },
+      "checks": [
+        {
+          "check": "stdio.silence.read_deadline",
+          "kind": "boundary",
+          "observed": {
+            "deadline_expired_without_data": true,
+            "read_deadline_seconds": 2.0,
+            "unsolicited_bytes": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio.silence.exit_code",
+          "kind": "boundary",
+          "observed": {
+            "exit_code": 0,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        }
+      ],
+      "command": "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python -m axiom_mcp.stdio --name v2-031-native-silence",
+      "duration_seconds": 2.684,
+      "leg": "stdio-silence-deadline",
+      "status": "passed"
+    },
+    {
+      "artifacts": {
+        "stderr": {
+          "bytes": 2881,
+          "path": "raw/stdio-interrupt-stderr.bin",
+          "sha256": "7b78064619008c407ef16a207c0b1f2e79ea77ce71d142050628f2995aebe708",
+          "text_path": "raw/stdio-interrupt-stderr.txt"
+        },
+        "stdout": {
+          "bytes": 0,
+          "path": "raw/stdio-interrupt-stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text_path": "raw/stdio-interrupt-stdout.txt"
+        }
+      },
+      "checks": [
+        {
+          "check": "stdio.interrupt.sigint",
+          "kind": "failure",
+          "observed": {
+            "delivered": "SIGINT",
+            "exit_code": 0,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio.interrupt.sigint.hard_stop",
+          "kind": "failure",
+          "observed": {
+            "exit_code": 0,
+            "stderr_tail": "axiom-mcp: stdio_stop protocol_bytes=327 protocol_writes=2 violations=0",
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio.interrupt.sigint_after_input",
+          "detail": "nudged_with=tools/list",
+          "kind": "failure",
+          "observed": {
+            "delivered": "SIGINT_AFTER_INPUT",
+            "exit_code": 0,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio.interrupt.sigint_after_input.hard_stop",
+          "kind": "failure",
+          "observed": {
+            "exit_code": 0,
+            "stderr_tail": "axiom-mcp: stdio_stop protocol_bytes=339 protocol_writes=2 violations=0",
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio.interrupt.sigterm",
+          "kind": "failure",
+          "observed": {
+            "delivered": "SIGTERM",
+            "exit_code": 0,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio.interrupt.sigterm.hard_stop",
+          "kind": "failure",
+          "observed": {
+            "exit_code": 0,
+            "stderr_tail": "axiom-mcp: stdio_stop protocol_bytes=328 protocol_writes=2 violations=0",
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        }
+      ],
+      "command": "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python -m axiom_mcp.stdio --name v2-031-native-sigint ; /home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python -m axiom_mcp.stdio --name v2-031-native-sigint_after_input ; /home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python -m axiom_mcp.stdio --name v2-031-native-sigterm",
+      "duration_seconds": 2.877,
+      "leg": "stdio-interrupt",
+      "status": "passed"
+    },
+    {
+      "artifacts": {
+        "stderr": {
+          "bytes": 920,
+          "path": "raw/stdio-tool-call-stderr.bin",
+          "sha256": "1a587848f6646db07d4125a90314b6e4e79035a9074c51955efdb0501e8f15fd",
+          "text_path": "raw/stdio-tool-call-stderr.txt"
+        },
+        "stdout": {
+          "bytes": 2338,
+          "path": "raw/stdio-tool-call-stdout.bin",
+          "sha256": "45d758d3b82f9fa81f29d1b2a82575175a856f4fb5db0472430b84809021c1f3",
+          "text_path": "raw/stdio-tool-call-stdout.txt"
+        }
+      },
+      "checks": [
+        {
+          "check": "installed_stdio.graph_query",
+          "kind": "positive",
+          "observed": {
+            "call_response": {
+              "id": 3,
+              "jsonrpc": "2.0",
+              "result": {
+                "content": [
+                  {
+                    "text": "{\n  \"schema_version\": 1,\n  \"solution_id\": \"demo-solution\",\n  \"catalog_generation_id\": \"8c0351a775edfe736d89377ca979700d408dbacf75904d93f81b8315e2bdec3c\",\n  \"project_generations\": [\n    {\n      \"project_id\": \"demo-project\",\n      \"generation_id\": \"987cc6887c4a16d7273d840551784f779b074ef09129fcb42474fdf31ab73185\"\n    }\n  ],\n  \"freshness\": \"unknown\",\n  \"coverage\": \"complete_for_profile\",\n  \"verification\": {\n    \"mode\": \"none\"\n  },\n  \"nodes\": [\n    {\n      \"id\": \"f1f49b3aedf3bd741189daf15e0a904b18ee9c8ea7d2358f9f979195d1732195\",\n      \"project_id\": \"demo-project\",\n      \"kind\": \"Class\",\n      \"name\": \"K406WatcherB\",\n      \"qualified_name\": \"Demo.K406WatcherB\",\n      \"language\": \"csharp\",\n      \"source\": {\n        \"file\": \"TokenSource.cs\",\n        \"start_line\": 4,\n        \"end_line\": 4\n      },\n      \"identity_quality\": \"semantic_key\",\n      \"attributes\": {}\n    },\n    {\n      \"id\": \"7168bbcde541f2f75b6f180559d0245aaeee2d51c958e21ab4f9d1ed2a93b587\",\n      \"project_id\": \"demo-project\",\n      \"kind\": \"Class\",\n      \"name\": \"K406WatcherB2\",\n      \"qualified_name\": \"Demo.K406WatcherB2\",\n      \"language\": \"csharp\",\n      \"source\": {\n        \"file\": \"TokenSource.cs\",\n        \"start_line\": 5,\n        \"end_line\": 5\n      },\n      \"identity_quality\": \"semantic_key\",\n      \"attributes\": {}\n    }\n  ],\n  \"edges\": [],\n  \"truncated\": false,\n  \"warnings\": [\n    \"freshness was not reported, so it is unknown rather than fresh\"\n  ]\n}",
+                    "type": "text"
+                  }
+                ],
+                "isError": false
+              }
+            },
+            "exit_code": 0,
+            "failure": null,
+            "protocol_junk": [],
+            "tool_names": [
+              "graph_query"
+            ]
+          },
+          "outcome": "pass"
+        }
+      ],
+      "command": [
+        "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python",
+        "/src/tests/native/installed_stdio_query.py",
+        "--axiom-home",
+        "/home/axiom/.local/share/axiom",
+        "--repo",
+        "/home/axiom/demo-repo",
+        "--symbol",
+        "K406WatcherB"
+      ],
+      "leg": "stdio-tool-call",
+      "status": "passed"
+    },
+    {
+      "artifacts": {
+        "launcher_stderr": {
+          "bytes": 527,
+          "path": "raw/http-launcher-stderr.bin",
+          "sha256": "b565b5afbe9ea74beb484257d66ef972d8cd71ef2aca4e904391480e7f67e17d",
+          "text_path": "raw/http-launcher-stderr.txt"
+        },
+        "launcher_stdout": {
+          "bytes": 0,
+          "path": "raw/http-launcher-stdout.bin",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text_path": "raw/http-launcher-stdout.txt"
+        }
+      },
+      "bind": "127.0.0.1:50653",
+      "checks": [
+        {
+          "check": "http.launcher_ready",
+          "kind": "positive",
+          "observed": {
+            "line": "READY http://127.0.0.1:50653",
+            "ready": true
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.probes.allowed_host_without_credential",
+          "kind": "positive",
+          "observed": {
+            "any_refused_by_policy": false,
+            "readyz_reported_readiness": "{\"ready\":false,\"query\":{\"available\":false,\"detail\":\"query data plane not wired\"},\"control\":{\"available\":false,\"detail\":\"graphd control client not wired\"},\"error\":\"NOT_READY\"}",
+            "statuses": {
+              "/healthz": 200,
+              "/readyz": 503
+            }
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.sdk_client.handshake",
+          "kind": "positive",
+          "observed": {
+            "capabilities": [
+              "experimental",
+              "prompts",
+              "resources",
+              "tools"
+            ],
+            "elapsed_seconds": 0.03,
+            "negotiated_is_pinned_minimum": true,
+            "protocol_version": "2025-11-25",
+            "server_name": "v2-031-native-http",
+            "server_version": "1.28.1"
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.lookalike_host.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"FORBIDDEN\", \"message\": \"the Host header is not on the transport allowlist\", \"retryable\": false, \"details\": {}, \"request_id\": \"eb7f90b9b01f45318554c59ca57bbfdf\"}",
+            "body_sha256": "a21cbf012bb0c968bea0e887a2b9ab594b0ec8066da1334ec22c945248ca8225",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.008,
+            "error_code": "FORBIDDEN",
+            "status_code": 403
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.lookalike_origin.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"FORBIDDEN\", \"message\": \"the Origin header is not on the transport allowlist\", \"retryable\": false, \"details\": {}, \"request_id\": \"1744c6f66cb745cb83f5b00906733c4d\"}",
+            "body_sha256": "6d85431835ce0b80508ee4384acbd8a39425edb466827cb81e93ce1f530aac95",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.009,
+            "error_code": "FORBIDDEN",
+            "status_code": 403
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.missing_credential.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"UNAUTHENTICATED\", \"message\": \"a bearer token is required\", \"retryable\": false, \"details\": {}, \"request_id\": \"c0ace71eb11a43098eb3e14bf221e09e\"}",
+            "body_sha256": "f49668614c3b5c7a48daa64aaae00308b8c94438065cb34e0c84996ceb7be349",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.008,
+            "error_code": "UNAUTHENTICATED",
+            "status_code": 401
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.control_audience_credential.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"UNAUTHENTICATED\", \"message\": \"the presented bearer token is not recognised\", \"retryable\": false, \"details\": {}, \"request_id\": \"6ad6690f3dd5405d8befc498ea8ff6e2\"}",
+            "body_sha256": "a0313789e47bccb2b0743955bc68790c34e8098c98698c2bd3e79c1c9ce101ee",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.008,
+            "error_code": "UNAUTHENTICATED",
+            "status_code": 401
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.read_token_mutating_tool.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"FORBIDDEN\", \"message\": \"the bearer token lacks the required capability\", \"retryable\": false, \"details\": {}, \"request_id\": \"5fea1cd3c81e42b1944ec1bd9b8708d0\"}",
+            "body_sha256": "50bcdd61a209cc993a668787aa809d6d386bd531dc47000140e6d072815d1bbd",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.008,
+            "error_code": "FORBIDDEN",
+            "status_code": 403
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.read_token_unscoped_solution.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"FORBIDDEN\", \"message\": \"the bearer token is not scoped to this solution\", \"retryable\": false, \"details\": {}, \"request_id\": \"7c4a14ed85a946bb9f86053c13de48e4\"}",
+            "body_sha256": "02ce025071901b398eb1ce70528d94c2e70babc180fa7fb8727953ba6543d894",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.008,
+            "error_code": "FORBIDDEN",
+            "status_code": 403
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.oversized_body.refused",
+          "kind": "boundary",
+          "observed": {
+            "body_excerpt": "{\"code\": \"VALIDATION_ERROR\", \"message\": \"request body exceeds the configured bound\", \"retryable\": false, \"details\": {}, \"request_id\": \"e0b6530891bb4e959a7cf8379d3ff305\"}",
+            "body_sha256": "24215754f53f9aa8aecc230862d8236637e2c8b9288ee8ed01ab66bfa1a98861",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.01,
+            "error_code": "VALIDATION_ERROR",
+            "status_code": 400
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.stalled_body.client_timeout",
+          "kind": "failure",
+          "observed": {
+            "bytes_received": 0,
+            "client_deadline_seconds": 6.0,
+            "client_timed_out": true,
+            "elapsed_seconds": 6.006
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.launcher_teardown",
+          "kind": "boundary",
+          "observed": {
+            "exit_code": -15,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        }
+      ],
+      "command": "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python /src/tests/native/http_security_server.py --port 50653",
+      "duration_seconds": 9.964,
+      "leg": "http-security",
+      "status": "passed"
+    }
+  ],
+  "passed": true,
+  "released_core_fixture": {
+    "fixture_self_label": "synthetic-fixture-v2-not-runtime",
+    "fixture_used": "real-source-installed-candidate",
+    "reason": "Installed real-source candidate was tested locally; no released fixture certification was performed.",
+    "status": "not_run"
+  },
+  "repository": "axiom-mcp",
+  "target": "container-linux-x64",
+  "task": "K-407"
+}

@@ -1,0 +1,239 @@
+{
+  "task_id": "K-407",
+  "owner": "axiom-mcp",
+  "source_branch": "feature/k-407-container-mcp",
+  "source_revision": "da57b6a4966c3def83b45af3a99294ea288175e5",
+  "lane": "container-linux-x64",
+  "status": "local_verified",
+  "certified": false,
+  "candidate": true,
+  "published": false,
+  "input_scope_report_sha256": "9bf97889e61b4710fb45cfdff4cdf34edcd003aac3b396097bfb64ad18b0cb1f",
+  "artifacts": [
+    {
+      "path": "evidence/K-407/.gitattributes",
+      "sha256": "89dddfc52a6d1b734a50dacfb9ba5ae46fbdd74c9e619fef3567a0301950b9f1"
+    },
+    {
+      "path": "evidence/K-407/input-map.json",
+      "sha256": "de4eee3bd3cc8571acf568abcaed06a5e862c7648b289c8f47f6a715a26c9068"
+    },
+    {
+      "path": "evidence/K-407/matrix/SHA256SUMS",
+      "sha256": "05275350185e10b3682eecefdf017addbeb0e81da37337bd4ad0a1b17de53535"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/http-launcher-stderr.bin",
+      "sha256": "b565b5afbe9ea74beb484257d66ef972d8cd71ef2aca4e904391480e7f67e17d"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/http-launcher-stderr.txt",
+      "sha256": "b565b5afbe9ea74beb484257d66ef972d8cd71ef2aca4e904391480e7f67e17d"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/http-launcher-stdout.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/http-launcher-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/identity.json",
+      "sha256": "884332acf49313ee4328570df0dc3412c7a3b8a097607eb521819f53f62a1cab"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/installed-query-stderr.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/installed-query-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/installed-query-stdout.bin",
+      "sha256": "d901f75d6c366e85cdeacec1ffe3d5f570d34bc26a83484f9e8e0aabc21d2832"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/installed-query-stdout.txt",
+      "sha256": "d901f75d6c366e85cdeacec1ffe3d5f570d34bc26a83484f9e8e0aabc21d2832"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/matrix.json",
+      "sha256": "a2dce5083fbbbb2cc223a02c0085c4bce947cabc1b15a7713f9491f3c36949c4"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-handshake-stderr.bin",
+      "sha256": "c415ef5ab844313208fcf8757b0bc6ec3dc7de2505c048b27bac556924ae36bd"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-handshake-stderr.txt",
+      "sha256": "c415ef5ab844313208fcf8757b0bc6ec3dc7de2505c048b27bac556924ae36bd"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-handshake-stdout.bin",
+      "sha256": "fd7f141c3e30533f97b5326c455731312b5754ee2e4a561ad2c75fe7a4b7cb3a"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-handshake-stdout.txt",
+      "sha256": "fd7f141c3e30533f97b5326c455731312b5754ee2e4a561ad2c75fe7a4b7cb3a"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-interrupt-stderr.bin",
+      "sha256": "7b78064619008c407ef16a207c0b1f2e79ea77ce71d142050628f2995aebe708"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-interrupt-stderr.txt",
+      "sha256": "7b78064619008c407ef16a207c0b1f2e79ea77ce71d142050628f2995aebe708"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-interrupt-stdout.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-interrupt-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-noise-stderr.bin",
+      "sha256": "abdb15ed2b9e1d8c309f2d88a817cb94a64a0452bc63bff6e4e3491f541543b1"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-noise-stderr.txt",
+      "sha256": "abdb15ed2b9e1d8c309f2d88a817cb94a64a0452bc63bff6e4e3491f541543b1"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-noise-stdout.bin",
+      "sha256": "2ba4589ca1afac70bd06c2fadd5d13b97a03542dd649343d2a13e565441b30b5"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-noise-stdout.txt",
+      "sha256": "2ba4589ca1afac70bd06c2fadd5d13b97a03542dd649343d2a13e565441b30b5"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-silence-stderr.bin",
+      "sha256": "93b1b6abf5bee1aed225be4e7ed84402d0ca6606cef8166dddc7628f99055d17"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-silence-stderr.txt",
+      "sha256": "93b1b6abf5bee1aed225be4e7ed84402d0ca6606cef8166dddc7628f99055d17"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-silence-stdout.bin",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-silence-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-tool-call-stderr.bin",
+      "sha256": "1a587848f6646db07d4125a90314b6e4e79035a9074c51955efdb0501e8f15fd"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-tool-call-stderr.txt",
+      "sha256": "1a587848f6646db07d4125a90314b6e4e79035a9074c51955efdb0501e8f15fd"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-tool-call-stdout.bin",
+      "sha256": "45d758d3b82f9fa81f29d1b2a82575175a856f4fb5db0472430b84809021c1f3"
+    },
+    {
+      "path": "evidence/K-407/matrix/raw/stdio-tool-call-stdout.txt",
+      "sha256": "45d758d3b82f9fa81f29d1b2a82575175a856f4fb5db0472430b84809021c1f3"
+    },
+    {
+      "path": "evidence/K-407/matrix-hashes.txt",
+      "sha256": "fcb143f7bf3deec1f0648a0edbf853e35fbbe2fbdcebae8ef9c896984f3eb52c"
+    },
+    {
+      "path": "evidence/K-407/matrix-run.txt",
+      "sha256": "c3f1e777001f46db6d5779c44dc6996648138c89ab1e73340df7b4e5a9af98fb"
+    },
+    {
+      "path": "evidence/K-407/native-guard.json",
+      "sha256": "e15e1d1c2ff6add6edb06caf1be34ff7abd92e699bd848fc8282653e5de1e2e6"
+    },
+    {
+      "path": "evidence/K-407/owner-review.md",
+      "sha256": "11cc43ee74e139c2a46998b1c4bee481a7a6666e7b00926c52eed0a5847a364f"
+    },
+    {
+      "path": "evidence/K-407/pytest.txt",
+      "sha256": "566bf2417b7c896c8d54d5fe4febabcf0aa2f4203c6ca3c0cb15c4dc6792fae5"
+    },
+    {
+      "path": "evidence/K-407/ruff-check.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "path": "evidence/K-407/ruff-format.txt",
+      "sha256": "f4d501ad7405c927e0a57b16f24ccd530ee06a8c4da5838f861086d20077e073"
+    }
+  ],
+  "commands": [
+    {
+      "id": "matrix",
+      "command": "docker run --rm --init --platform linux/amd64 --user 10001:10001 with K-406 B OCI image and owned volume; installed CPython capture_native_matrix.py --target container-linux-x64 --task-id K-407 --installed-symbol K406WatcherB",
+      "exit_code": 0,
+      "output": "evidence/K-407/matrix-run.txt",
+      "output_sha256": "c3f1e777001f46db6d5779c44dc6996648138c89ab1e73340df7b4e5a9af98fb"
+    },
+    {
+      "id": "guard",
+      "command": "docker run --rm --init --platform linux/amd64 --user 10001:10001 with K-406 installed wheel; installed CPython installed_guard_probe.py",
+      "exit_code": 0,
+      "output": "evidence/K-407/native-guard.json",
+      "output_sha256": "e15e1d1c2ff6add6edb06caf1be34ff7abd92e699bd848fc8282653e5de1e2e6"
+    },
+    {
+      "id": "matrix-hashes",
+      "command": "shasum -a 256 -c evidence/K-407/matrix/SHA256SUMS",
+      "exit_code": 0,
+      "output": "evidence/K-407/matrix-hashes.txt",
+      "output_sha256": "fcb143f7bf3deec1f0648a0edbf853e35fbbe2fbdcebae8ef9c896984f3eb52c"
+    },
+    {
+      "id": "pytest",
+      "command": ".venv/bin/python -m pytest tests -q",
+      "exit_code": 0,
+      "output": "evidence/K-407/pytest.txt",
+      "output_sha256": "566bf2417b7c896c8d54d5fe4febabcf0aa2f4203c6ca3c0cb15c4dc6792fae5"
+    },
+    {
+      "id": "ruff-check",
+      "command": ".venv/bin/python -m ruff check .",
+      "exit_code": 0,
+      "output": "evidence/K-407/ruff-check.txt",
+      "output_sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    },
+    {
+      "id": "ruff-format",
+      "command": ".venv/bin/python -m ruff format --check .",
+      "exit_code": 0,
+      "output": "evidence/K-407/ruff-format.txt",
+      "output_sha256": "f4d501ad7405c927e0a57b16f24ccd530ee06a8c4da5838f861086d20077e073"
+    },
+    {
+      "id": "owner-review",
+      "command": "scoped source, native identity, raw evidence, secrets, compatibility and residual gate review",
+      "exit_code": 0,
+      "output": "evidence/K-407/owner-review.md",
+      "output_sha256": "11cc43ee74e139c2a46998b1c4bee481a7a6666e7b00926c52eed0a5847a364f"
+    }
+  ],
+  "results": {
+    "matrix_legs": 7,
+    "matrix_checks": 33,
+    "required_case_skips": 0,
+    "installed_wheel_query": true,
+    "stdio_tool_query": true,
+    "native_posix_guard": true,
+    "k406_restart_update_rollback_queries": true
+  },
+  "limitations": [
+    "Unsigned local candidate and no released fixture.",
+    "K-406 foreground supervisor; no systemd user manager in container.",
+    "Foreign Rust-holder guard leg, independent main review and release publication remain open."
+  ]
+}
