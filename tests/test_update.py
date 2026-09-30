@@ -27,7 +27,9 @@ from axiom_mcp import update  # noqa: E402
 FIXTURE_RELATIVE = pathlib.Path("tests") / "fixtures" / "update-plan-contract"
 ACCEPTED_DOCUMENT = FIXTURE_RELATIVE / "documents" / "accepted.document.json"
 
-VERSIONED_MCP_ROOT = "C:/Users/demo/.axiom/components/axiom-mcp/0.2.0"
+# Apply guards execute on this host, so accepted roots must use its native path
+# grammar.  Windows paths belong in native-Windows coverage, not a POSIX apply test.
+VERSIONED_MCP_ROOT = str((pathlib.Path(sys.prefix).parent / "axiom-mcp-test" / "0.2.0").resolve())
 
 _SPECS_ROOT = update.find_specs_root()
 

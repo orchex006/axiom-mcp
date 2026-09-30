@@ -1,0 +1,22 @@
+case=corrupt-wheel
+exit_code=1
+Using Python 3.13.15 environment at: <isolated-test-root>/corrupt-wheel
+  × No solution found when resolving dependencies:
+  ╰─▶ Because axiom-mcp has an invalid package format and you require
+      axiom-mcp, we can conclude that your requirements are unsatisfiable.
+
+hint: The structure of `axiom-mcp` was invalid
+  Caused by: Failed to read from zip file
+  Caused by: unable to locate the end of central directory record
+
+
+
+case=unsupported-python
+exit_code=1
+Using Python 3.9.6 environment at: /private<isolated-test-root>/unsupported-python
+  × No solution found when resolving dependencies:
+  ╰─▶ Because the current Python version (3.9.6) does not satisfy
+      Python>=3.13,<3.14 and axiom-mcp==0.1.0 depends on Python>=3.13,<3.14,
+      we can conclude that axiom-mcp==0.1.0 cannot be used.
+      And because only axiom-mcp==0.1.0 is available and you require
+      axiom-mcp, we can conclude that your requirements are unsatisfiable.

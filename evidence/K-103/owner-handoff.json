@@ -1,0 +1,141 @@
+{
+  "acceptance": {
+    "AC1": "passed: actual wheel, metadata, entrypoints, 31 hash-pinned dependencies, interpreter range",
+    "AC2": "passed: isolated install, 36 package/runtime pin tests and required owner checks",
+    "AC3": "passed: owner review, canonical specctl after and K-103 completion; Git delivery recorded separately"
+  },
+  "artifacts": [
+    {
+      "path": "evidence/K-103/axiom_mcp-0.1.0-py3-none-any.whl",
+      "sha256": "ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b"
+    },
+    {
+      "path": "evidence/K-103/wheel-input.json",
+      "sha256": "0b77b8b3415b146b039ae3142a6df4732d4e04557b27a8c8a358d249574666ea"
+    },
+    {
+      "path": "release/macos-x64-py313-requirements.txt",
+      "sha256": "4db70be8d9acb83b9309d64a21e3fd316e0b19450685d1ba1e538ae6153ea43a"
+    },
+    {
+      "path": "spec.lock.json",
+      "sha256": "e54bdb7a0ae45a0d6d61ce518788cd53a9c47a61843f9ee94d83576072ff978b"
+    }
+  ],
+  "certified": false,
+  "commands": [
+    {
+      "command": ".venv/bin/python -m build --wheel --no-isolation --outdir evidence/K-103 .",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "id": "build",
+      "output": "evidence/K-103/build.txt",
+      "output_sha256": "62bf0d3073d240de996aac7b591be701e6a004ae08d5196f020ac0f09b81647e"
+    },
+    {
+      "command": "Python zipfile wheel metadata, entrypoints, spec revision and SHA inspection",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "id": "wheel-check",
+      "output": "evidence/K-103/wheel-check.txt",
+      "output_sha256": "0c21cd09a9c708b5debb946a18a81a111f22f4ea968fa81c288f0ec718e5eb85"
+    },
+    {
+      "command": "uv venv Python 3.13; uv pip install --require-hashes dependencies; install wheel; execute entrypoints",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "id": "isolated-install",
+      "output": "evidence/K-103/isolated-install.txt",
+      "output_sha256": "f35014361d039ce9cf204da3331a01b82ad831453a66198539d37170ac949ae8"
+    },
+    {
+      "command": "uv pip install corrupted wheel (exit 1); uv pip install under Python 3.9 (exit 1)",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "id": "negative",
+      "output": "evidence/K-103/negative.txt",
+      "output_sha256": "dffe043f347131e6542860dbd8357ae0697ce13fd915d1f0a5e9d8ee1b966bdb"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests -q",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "id": "pytest",
+      "output": "evidence/K-103/pytest.txt",
+      "output_sha256": "b672cda95475d07375ba2c7a146d67a4296ffc769bb4ae5618eb2c682cbe24e3"
+    },
+    {
+      "command": ".venv/bin/python -m ruff check .",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "id": "ruff-check",
+      "output": "evidence/K-103/ruff-check.txt",
+      "output_sha256": "a0e6cd5a4825edc74aee39a9e71e7768005fdfd5b8987f7bd871b8e6a8c71806"
+    },
+    {
+      "command": ".venv/bin/python -m ruff format --check .",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "id": "ruff-format",
+      "output": "evidence/K-103/ruff-format.txt",
+      "output_sha256": "c73d3fc742deeb768240257a04e8b7f3c2e97079bb93d79963732a32a026a243"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/test_release_package.py tests/test_runtime_pin.py -q",
+      "cwd": "axiom-mcp",
+      "exit_code": 0,
+      "id": "package-pin-tests",
+      "output": "evidence/K-103/package-pin-tests.txt",
+      "output_sha256": "209aec2b713ebcdd75647f0a7d424599dc3f110b425e2f1a3ecc64097ff741d6"
+    }
+  ],
+  "delivery": {
+    "main_integrated": false,
+    "release_state": "candidate",
+    "source_branch": "feature/k-103-macos-wheel-input",
+    "source_commit": "0bb7b466f94f1bbd30543aed84d722983808f4c2",
+    "source_remote_verified": true
+  },
+  "environment": {
+    "arch": "x86_64",
+    "execution": "artifact build and isolated venv install",
+    "os": "Darwin",
+    "os_version": "26.7",
+    "runtime": "CPython 3.13.15; Python 3.9.6 negative probe",
+    "toolchain": "uv 0.12.9; build 1.3.0; setuptools 80.9.0; ruff 0.15.22; pytest 9.1.1"
+  },
+  "fixture_provenance": "candidate",
+  "goal_id": "K-MacIntel-03",
+  "lane": "macos-x64",
+  "limitations": [
+    "Portable wheel proof is not installed MCP query/process suite K-107.",
+    "No release signing, publication, or main integration claimed.",
+    "Two existing pytest cases skipped by their own conditions; neither is the K-103 wheel input acceptance."
+  ],
+  "next_consumer": "K-104 isolated MCP runtime and K-105 distribution install",
+  "owner": "axiom-mcp",
+  "parent_ids": [
+    "K-002",
+    "K-007"
+  ],
+  "results": {
+    "candidate_wheel_installed": true,
+    "corrupt_wheel_refused": true,
+    "entrypoints": [
+      "axiom-mcp",
+      "axiom-mcp-entrypoints"
+    ],
+    "hash_locked_dependencies_installed": true,
+    "locked_packages": 31,
+    "owner_tests": "762 passed, 2 skipped, 230 subtests, 1 warning",
+    "supported_python": ">=3.13,<3.14",
+    "unsupported_python_refused": true,
+    "wheel_portable_tag": "py3-none-any"
+  },
+  "source_revisions": {
+    "axiom-mcp": "d92e71b25623132966b602b15ef5112c7eef7c96",
+    "axiom-specs": "39759ac2311206059b00c44179a998f502e4e777"
+  },
+  "status": "local_verified",
+  "task_id": "K-103"
+}

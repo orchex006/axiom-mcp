@@ -85,14 +85,23 @@ class PosixLockHandle(LockHandle):
         fcntl.flock(self._fd, fcntl.LOCK_UN)
 
     def close(self) -> None:
-        os.close(self._fd)
+        if self._fd >= 0:
+            os.close(self._fd)
+            self._fd = -1
 
     def descriptor(self) -> int:
         """The descriptor this handle opened, opened ``O_CLOEXEC``."""
         return self._fd
 
     def identity(self) -> str:
-        return protocol.identity_of_stat(os.fstat(self._fd))
+        try:
+            return protocol.identity_of_stat(os.fstat(self._fd))
+        except OSError as exc:
+            raise GuardError(
+                "identity_unreadable",
+                f"cannot read the identity of {self._path}: {exc}",
+                lock=self._path.name,
+            ) from exc
 
 
 def open(path: Path) -> PosixLockHandle:

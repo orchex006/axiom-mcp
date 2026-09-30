@@ -14,6 +14,10 @@ from __future__ import annotations
 import asyncio
 import io
 import json
+import os
+import pathlib
+import signal
+import stat
 import sys
 from collections.abc import Iterator
 
@@ -194,6 +198,83 @@ def test_guard_is_restored_when_the_transport_raises(restore_streams: None) -> N
         )
 
     assert sys.stdout is real_stdout
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX signal delivery is covered by the native matrix")
+def test_idle_stdio_server_is_cancelled_when_a_posix_interrupt_arrives(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An idle receive wait must not postpone a delivered SIGINT indefinitely."""
+
+    class OneInterrupt:
+        def __enter__(self) -> OneInterrupt:
+            return self
+
+        def __exit__(self, *args: object) -> None:
+            return None
+
+        def __aiter__(self) -> OneInterrupt:
+            return self
+
+        async def __anext__(self) -> signal.Signals:
+            return signal.SIGINT
+
+    class IdleServer:
+        async def run_stdio_async(self) -> None:
+            await asyncio.Event().wait()
+
+    import anyio
+
+    monkeypatch.setattr(anyio, "open_signal_receiver", lambda *signals: OneInterrupt())
+    diagnostics = stdio.Diagnostics(io.StringIO())
+
+    asyncio.run(stdio._run_stdio_until_finished(IdleServer(), diagnostics))  # type: ignore[arg-type]
+
+    assert "stdio_interrupt signal=SIGINT" in diagnostics.stream.getvalue()
+
+
+@pytest.mark.skipif(os.name == "nt", reason="the descriptor reader is POSIX-only")
+def test_cancellable_stdin_preserves_split_utf8_lines_and_final_eof(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The native reader must not split a codepoint or drop an unterminated EOF line."""
+
+    class DescriptorStream:
+        def fileno(self) -> int:
+            return 42
+
+    chunks = iter([b'{"name":"\xe0\xb8', b'\x97\xe0\xb8\x94"}\nlast', b""])
+
+    async def readable(fd: int) -> None:
+        assert fd == 42
+
+    monkeypatch.setattr("anyio.wait_readable", readable)
+    monkeypatch.setattr(stdio.os, "fstat", lambda fd: type("Stat", (), {"st_mode": stat.S_IFIFO})())
+    monkeypatch.setattr(stdio.os, "read", lambda fd, size: next(chunks))
+    reader = stdio._CancellableStdin(DescriptorStream())  # type: ignore[arg-type]
+
+    async def collect() -> list[str]:
+        return [await reader.__anext__(), await reader.__anext__()]
+
+    assert asyncio.run(collect()) == ['{"name":"ทด"}\n', "last"]
+    with pytest.raises(StopAsyncIteration):
+        asyncio.run(reader.__anext__())
+
+
+@pytest.mark.skipif(os.name == "nt", reason="the descriptor reader is POSIX-only")
+def test_cancellable_stdin_reads_redirected_regular_file_to_eof(tmp_path: pathlib.Path) -> None:
+    """A redirected regular file is always readable without a selector registration."""
+    source = tmp_path / "stdin.jsonl"
+    source.write_bytes(b'{"name":"\xe0\xb8\x97\xe0\xb8\x94"}\nfinal')
+    with source.open("rb") as stream:
+        reader = stdio._CancellableStdin(stream)  # type: ignore[arg-type]
+
+        async def collect() -> list[str]:
+            return [await reader.__anext__(), await reader.__anext__()]
+
+        assert asyncio.run(collect()) == ['{"name":"ทด"}\n', "final"]
+        with pytest.raises(StopAsyncIteration):
+            asyncio.run(reader.__anext__())
 
 
 def test_serve_stdio_without_a_banner_still_reports_shutdown(restore_streams: None) -> None:

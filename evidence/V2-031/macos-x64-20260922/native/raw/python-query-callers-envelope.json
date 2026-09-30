@@ -1,0 +1,62 @@
+{
+  "catalog_generation_id": "5ef9f9c55d2ab829cde223e18f023fe85808efd3656b14bcd7ad393806116a9d",
+  "coverage": "partial",
+  "edges": [
+    {
+      "analyzer_id": "fixture-static-v1",
+      "evidence": [
+        {
+          "rule_id": "solution-http-route-match",
+          "source": {
+            "end_line": 8,
+            "file": "src/app/auth.service.ts",
+            "start_line": 8
+          }
+        }
+      ],
+      "id": "97acd3725b4be028b16e828a40665e4312d58796fcc50fae5f67c8dbc525e613",
+      "kind": "CALLS_ENDPOINT",
+      "resolution": "inferred_static",
+      "source_id": "8401d98ce5207c31bdfaf1621785475ac8a0707d0a3ee1f9b160f89c6c313904",
+      "target_id": "7ff3a347ce2f66d59e181e6658f5c3786a98e865988a965e8e92f0c6fd07ceca",
+      "target_project_id": "auth-api"
+    }
+  ],
+  "freshness": "unknown",
+  "nodes": [
+    {
+      "id": "8401d98ce5207c31bdfaf1621785475ac8a0707d0a3ee1f9b160f89c6c313904",
+      "identity_quality": "syntax_key",
+      "kind": "Method",
+      "language": "typescript",
+      "name": "AuthService.login",
+      "project_id": "web-app",
+      "qualified_name": "AuthService.login",
+      "source": {
+        "end_line": 9,
+        "file": "src/app/auth.service.ts",
+        "start_line": 7
+      }
+    }
+  ],
+  "project_generations": [
+    {
+      "generation_id": "7319237fdf1ce4ff27ea377c8bc3ae8cf1f115cffc71de369a373e1870ba9d1a",
+      "project_id": "auth-api"
+    },
+    {
+      "generation_id": "f570a6d6c7ae1bcffcec7a9c8cb3248dbadab432a30aec09a3223c5c5784c73f",
+      "project_id": "web-app"
+    }
+  ],
+  "schema_version": 1,
+  "solution_id": "demo-solution",
+  "truncated": false,
+  "verification": {
+    "mode": "none"
+  },
+  "warnings": [
+    "cross_project: 1 member(s) outside 'auth-api' hold callers of this node (web-app)",
+    "freshness was not reported, so it is unknown rather than fresh"
+  ]
+}

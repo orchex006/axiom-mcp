@@ -1,0 +1,33 @@
+{
+  "certified": false,
+  "dependency_lock": {
+    "packages": 31,
+    "path": "release/container-linux-x64-py313-requirements.txt",
+    "resolver": "uv 0.12.9; wheels only; hashes",
+    "sha256": "ce2e686592de779dd980a20474ed8a317cb05487b8e4388cebfea9a73e000cb6",
+    "target": "x86_64-unknown-linux-gnu CPython 3.13"
+  },
+  "source_diff_exit_code": 0,
+  "source_revision": "d92e71b25623132966b602b15ef5112c7eef7c96",
+  "task_id": "K-403",
+  "wheel": {
+    "direct_dependencies": [
+      "mcp==1.28.1",
+      "fastapi==0.139.2",
+      "uvicorn==0.51.0",
+      "starlette==1.3.1",
+      "pydantic==2.13.4",
+      "anyio==4.14.2",
+      "httpx==0.28.1"
+    ],
+    "entrypoints": [
+      "axiom-mcp",
+      "axiom-mcp-entrypoints"
+    ],
+    "name": "axiom-mcp",
+    "path": "evidence/K-403/axiom_mcp-0.1.0-py3-none-any.whl",
+    "requires_python": "<3.14,>=3.13",
+    "sha256": "ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b",
+    "version": "0.1.0"
+  }
+}

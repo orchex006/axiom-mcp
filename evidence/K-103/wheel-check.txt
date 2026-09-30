@@ -1,0 +1,8 @@
+cwd=axiom-mcp
+command=Python zipfile wheel metadata, entrypoints, spec revision and SHA inspection
+exit_code=0
+wheel_sha256=ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b
+source_revision=d92e71b25623132966b602b15ef5112c7eef7c96
+requires_python=>=3.13,<3.14
+entrypoints=axiom-mcp,axiom-mcp-entrypoints
+zip_integrity=pass

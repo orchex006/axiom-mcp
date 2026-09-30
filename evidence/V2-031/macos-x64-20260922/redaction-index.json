@@ -1,0 +1,33 @@
+{
+  "note": "Review copies with local paths redacted. Nested SHA256/byte records and SHA256SUMS recomputed for these copies. Original hashes below; native results are local synthetic-fixture evidence, not certified release evidence.",
+  "original_artifact_sha256": {
+    "SHA256SUMS": "148fea554f5c5a5a82d0b1315dbede9adbf37dd767ab9723cbb67ada48921f45",
+    "raw/python-query-fixture-provenance.json": "98216c8812723458c0fdc162d4f599f386011885783ece5be63c89a0ec604e7d",
+    "raw/stdio-handshake-stderr.txt": "8cde68126946a142fa16be26a9a38a428355653d318450d25f0cf438cd81d0b7",
+    "raw/stdio-handshake-stderr.bin": "8cde68126946a142fa16be26a9a38a428355653d318450d25f0cf438cd81d0b7",
+    "raw/python-query-summary.bin": "be8fceb44cdc9c22dc6f5343a59cc612e996350d27a7d1f88cbab9479bc92096",
+    "raw/python-query-summary.txt": "be8fceb44cdc9c22dc6f5343a59cc612e996350d27a7d1f88cbab9479bc92096",
+    "raw/http-launcher-stderr.txt": "1846724507170783773d658458ec86bfb7ff786279ff496b8905bd51c6ff6a93",
+    "raw/http-launcher-stderr.bin": "1846724507170783773d658458ec86bfb7ff786279ff496b8905bd51c6ff6a93",
+    "raw/python-query-search-envelope.json": "cc64ae5bfe8d9be74345ea234ac8f07a7acdf189a38a9425b0e5cbdab61d7cb6",
+    "raw/stdio-interrupt-stderr.bin": "032129f1d8600d3f51fee46a85add3b5a182ca5cef756f9ffbeaa1ff798226d2",
+    "raw/stdio-interrupt-stderr.txt": "032129f1d8600d3f51fee46a85add3b5a182ca5cef756f9ffbeaa1ff798226d2",
+    "raw/stdio-noise-stdout.bin": "2ba4589ca1afac70bd06c2fadd5d13b97a03542dd649343d2a13e565441b30b5",
+    "raw/stdio-noise-stdout.txt": "2ba4589ca1afac70bd06c2fadd5d13b97a03542dd649343d2a13e565441b30b5",
+    "raw/stdio-silence-stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw/stdio-silence-stdout.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw/identity.json": "ab0195a4e78f0a67a4c66f1a27309d1fdb530f221798bef651b46e3599cfe3aa",
+    "raw/stdio-handshake-stdout.txt": "fd7f141c3e30533f97b5326c455731312b5754ee2e4a561ad2c75fe7a4b7cb3a",
+    "raw/stdio-handshake-stdout.bin": "fd7f141c3e30533f97b5326c455731312b5754ee2e4a561ad2c75fe7a4b7cb3a",
+    "raw/matrix.json": "709193a14c9d33bcbba5da29d250743359b95a5682743e731f1e382828b79b98",
+    "raw/http-launcher-stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw/http-launcher-stdout.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw/stdio-noise-stderr.bin": "dd4636a691751b6c12f7d0e9d8042f20c94d07ee289d887cf803c5d28b576917",
+    "raw/python-query-callers-envelope.json": "0191e132cf1fd9d79392b3b8a7454e5e2fbb43f9be69469fedf37b59ffb25447",
+    "raw/stdio-noise-stderr.txt": "dd4636a691751b6c12f7d0e9d8042f20c94d07ee289d887cf803c5d28b576917",
+    "raw/stdio-silence-stderr.txt": "ac87ffed6d6bedfe01d441aa8fdc19ddd089d23fc3449a536093b1c400e4f422",
+    "raw/stdio-silence-stderr.bin": "ac87ffed6d6bedfe01d441aa8fdc19ddd089d23fc3449a536093b1c400e4f422",
+    "raw/stdio-interrupt-stdout.bin": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw/stdio-interrupt-stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

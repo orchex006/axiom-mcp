@@ -34,14 +34,17 @@ import importlib.util
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tomllib
 import venv
 from collections.abc import Callable, Mapping
+from importlib import metadata
 
 import httpx
 import pytest
+from packaging.requirements import Requirement
 
 from axiom_mcp import entrypoints, http, sdk_compat, security, version
 
@@ -94,6 +97,50 @@ def venv_site_packages(venv_dir: pathlib.Path) -> pathlib.Path:
     return matches[0]
 
 
+def _distribution_key(name: str) -> str:
+    return name.lower().replace("_", "-")
+
+
+def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+    """Copy only the pinned runtime distributions and their active dependencies."""
+    venv_root = next(
+        parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+    )
+    available = {
+        _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+    }
+    pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+    copied: set[str] = set()
+    while pending:
+        name, required = pending.pop()
+        key = _distribution_key(name)
+        if key in copied:
+            continue
+        distribution = available.get(key)
+        assert distribution is not None, f"active runtime misses {name}"
+        if required is not None:
+            assert required.specifier.contains(distribution.version), (
+                f"{required} selected {distribution.version}"
+            )
+        expected = version.RUNTIME_PINS.get(name)
+        if expected is not None:
+            assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+        copied.add(key)
+        for requirement in distribution.requires or ():
+            parsed = Requirement(requirement)
+            if parsed.marker is None or parsed.marker.evaluate():
+                pending.append((parsed.name, parsed))
+        for file in distribution.files or ():
+            source = pathlib.Path(distribution.locate_file(file))
+            target = destination / file
+            assert target.resolve().is_relative_to(venv_root.resolve()), file
+            if source.is_dir():
+                shutil.copytree(source, target, dirs_exist_ok=True)
+            elif source.is_file():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, target)
+
+
 def build_version_environment(
     root: pathlib.Path,
     *,
@@ -119,7 +166,12 @@ def build_version_environment(
     if link_source:
         site = venv_site_packages(venv_dir)
         site.mkdir(parents=True, exist_ok=True)
-        (site / "axiom_mcp_locked.pth").write_text(str(SRC_ROOT) + "\n", encoding="utf-8")
+        paths = [str(SRC_ROOT)]
+        if share_system_site:
+            # A nested venv shares ``sys.base_prefix``, not the test runner's
+            # active venv. Copy the pinned closure; never expose its whole site.
+            seed_runtime_dependencies(site)
+        (site / "axiom_mcp_locked.pth").write_text("\n".join(paths) + "\n", encoding="utf-8")
 
     lockfile = version_dir / entrypoints.LOCKFILE_FILENAME
     lockfile.write_text(
@@ -421,26 +473,31 @@ def test_a_real_environment_that_cannot_see_the_sdk_is_refused(
     assert refusal.detail == version.SDK_PACKAGE
 
 
-def test_python_no_user_site_is_what_removes_the_ambient_sdk(
-    locked: Mapping[str, pathlib.Path],
+def test_python_no_user_site_hides_an_ambient_user_module(
+    locked: Mapping[str, pathlib.Path], tmp_path: pathlib.Path
 ) -> None:
-    """Why the plan sets ``PYTHONNOUSERSITE``: without it the ambient SDK is reachable."""
+    """A user-site module is visible only when the launch policy allows it."""
     scoped = entrypoints.scoped_environment(
         venv=locked["venv"], shared=True, mode=entrypoints.MODE_STDIO, parent={}
     )
-    isolated_prefix = run_in(
-        locked["interpreter"],
-        "import mcp, sys; print(sys.prefix != sys.base_prefix)",
-        scoped,
-    )
+    user_base = tmp_path / "user-base"
+    visible = {**scoped, "PYTHONUSERBASE": str(user_base)}
+    user_site = run_in(locked["interpreter"], "import site; print(site.USER_SITE)", visible)
+    assert user_site.returncode == 0, user_site.stderr
+    sentinel = pathlib.Path(user_site.stdout.strip()) / "v2_024_user_sentinel.py"
+    sentinel.parent.mkdir(parents=True, exist_ok=True)
+    sentinel.write_text("VALUE = 'ambient'\n", encoding="utf-8")
+
+    with_user_site = run_in(locked["interpreter"], "import v2_024_user_sentinel", visible)
     without_user_site = run_in(
-        locked["interpreter"], "import mcp", {**scoped, "PYTHONNOUSERSITE": "1"}
+        locked["interpreter"],
+        "import v2_024_user_sentinel",
+        {**visible, "PYTHONNOUSERSITE": "1"},
     )
 
-    assert isolated_prefix.returncode == 0, isolated_prefix.stderr
-    assert isolated_prefix.stdout.strip() == "True"
+    assert with_user_site.returncode == 0, with_user_site.stderr
     assert without_user_site.returncode != 0
-    assert version.SDK_PACKAGE in without_user_site.stderr
+    assert "v2_024_user_sentinel" in without_user_site.stderr
 
 
 # --- the plan is an argv array, never a shell string ------------------------

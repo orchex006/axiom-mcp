@@ -159,6 +159,7 @@ class ReadSession:
         read: Callable[[Path, int], bytes] = read_bounded,
         clock: Callable[[], float] = time.monotonic,
         attempts: int = 1,
+        pinned_generation_id: str | None = None,
     ) -> None:
         if not isinstance(location, SnapshotLocation):
             raise ReadSessionError("a resolved snapshot location is required to open a session")
@@ -171,6 +172,7 @@ class ReadSession:
         self._read = read
         self._clock = clock
         self._attempts = attempts
+        self._pinned_generation_id = pinned_generation_id
 
     @property
     def guard(self) -> SolutionGuard:
@@ -192,25 +194,39 @@ class ReadSession:
 
     def _copy_generation(self) -> CopiedGeneration:
         """Copy pointer, manifest and required shards. Caller holds the shared guard."""
-        pointer_bytes = self._bounded(
-            self._location.pointer, self._limits.max_pointer_bytes, "the lane pointer"
+        pointer_bytes = b""
+        pointer = None
+        if self._pinned_generation_id is None:
+            pointer_bytes = self._bounded(
+                self._location.pointer, self._limits.max_pointer_bytes, "the lane pointer"
+            )
+            pointer = manifest_module.load_pointer_bytes(pointer_bytes)
+            generation_dir = self._location.generation_root(pointer.directory_name)
+        else:
+            generation_dir = self._location.generation_root(self._pinned_generation_id)
+        generation_label = (
+            pointer.directory_name if pointer is not None else self._pinned_generation_id
         )
-        pointer = manifest_module.load_pointer_bytes(pointer_bytes)
-        generation_dir = self._location.generation_root(pointer.directory_name)
         manifest_bytes = self._bounded(
             generation_dir / MANIFEST_FILENAME,
             self._limits.max_manifest_bytes,
-            f"manifest {pointer.directory_name[:12]}",
+            f"manifest {generation_label[:12]}",
         )
         manifest = manifest_module.load_manifest_bytes(
-            manifest_bytes, what=f"manifest {pointer.directory_name[:12]}"
+            manifest_bytes, what=f"manifest {generation_label[:12]}"
         )
         if generation_dir.name != manifest.generation_id:
             raise manifest_module.DigestMismatch(
                 f"generation directory {generation_dir.name} does not match the manifest bytes "
                 f"{manifest.generation_id}"
             )
-        manifest.verify_pointer(pointer)
+        if pointer is not None:
+            manifest.verify_pointer(pointer)
+        elif manifest.generation_id != self._pinned_generation_id:
+            raise manifest_module.DigestMismatch(
+                f"generation directory {self._pinned_generation_id} does not match manifest bytes "
+                f"{manifest.generation_id}"
+            )
         copied = shards_module.copy_shards(
             self._location,
             manifest,

@@ -1,8 +1,9 @@
 """Capture the V2-031 native query and host-process matrix on this host.
 
 This is the executable half of :mod:`tests.native.README`. It runs three leg
-families on the *native* host it is started on - never in a substitute container -
-and writes raw artifacts plus a machine-readable summary:
+families on the host or container it is started in; the recorded platform identity
+must match the selected lane. It never claims a different host. The harness
+writes raw artifacts plus a machine-readable summary:
 
 ``python-query``
     The real ``graph_query`` dispatcher over the real ``demo-solution`` bundle the
@@ -71,6 +72,9 @@ from axiom_mcp import security, version  # noqa: E402
 STDIO_MODULE = "axiom_mcp.stdio"
 NOISE_PROBE = NATIVE_DIR / "stdio_noise_probe.py"
 HTTP_SERVER = NATIVE_DIR / "http_security_server.py"
+INSTALLED_PROBE = NATIVE_DIR / "installed_query_probe.py"
+INSTALLED_STDIO = NATIVE_DIR / "installed_stdio_query.py"
+INSTALLED_PROCESS_MODE = False
 
 #: The label the vendored bundle declares for itself. It is read back off the fixture
 #: below rather than trusted, so tests/native/README.md can cite real bytes.
@@ -117,11 +121,15 @@ def relative(path: Path, root: Path) -> str:
 def child_env(extra: Mapping[str, str] | None = None) -> dict[str, str]:
     """A launch environment that does not need shell activation."""
     environment = dict(os.environ)
-    existing = environment.get("PYTHONPATH", "")
-    parts = [str(SRC_DIR), str(REPO_ROOT)]
-    if existing:
-        parts.append(existing)
-    environment["PYTHONPATH"] = os.pathsep.join(parts)
+    if INSTALLED_PROCESS_MODE:
+        environment.pop("PYTHONPATH", None)
+        environment["AXIOM_MCP_INSTALLED_PROBE"] = "1"
+    else:
+        existing = environment.get("PYTHONPATH", "")
+        parts = [str(SRC_DIR), str(REPO_ROOT)]
+        if existing:
+            parts.append(existing)
+        environment["PYTHONPATH"] = os.pathsep.join(parts)
     environment["PYTHONUTF8"] = "1"
     environment["PYTHONIOENCODING"] = "utf-8"
     environment.update(extra or {})
@@ -373,6 +381,49 @@ def fixture_provenance_of(project_generations: Any) -> dict[str, Any]:
             f'"{FIXTURE_SELF_LABEL}", so this leg exercises the real reader and engine on a '
             "synthetic fixture and is not a released-core runtime certification."
         ),
+    }
+
+
+def leg_installed_query(
+    python: str, home: Path, repo: Path, symbol: str, evidence: EvidenceWriter
+) -> dict[str, Any]:
+    """Run a query in the installed interpreter without a checkout import path."""
+    result = subprocess.run(
+        [
+            python,
+            str(INSTALLED_PROBE),
+            "--axiom-home",
+            str(home),
+            "--repo",
+            str(repo),
+            "--symbol",
+            symbol,
+        ],
+        cwd=str(repo),
+        env=child_env(),
+        capture_output=True,
+        timeout=60,
+    )
+    stdout = evidence.stream("installed-query-stdout", result.stdout)
+    stderr = evidence.stream("installed-query-stderr", result.stderr)
+    report = json.loads(result.stdout) if result.returncode == 0 else {}
+    return {
+        "leg": "python-query",
+        "status": "passed"
+        if result.returncode == 0 and report.get("status") == "passed"
+        else "failed",
+        "command": [python, str(INSTALLED_PROBE)],
+        "exit_code": result.returncode,
+        "checks": [
+            check(
+                "installed_wheel.real_source_query",
+                "positive",
+                "pass" if result.returncode == 0 and report.get("status") == "passed" else "fail",
+                report,
+            )
+        ],
+        "stdout": stdout,
+        "stderr": stderr,
     }
 
 
@@ -678,6 +729,89 @@ def stdio_leg(
         "duration_seconds": round(time.monotonic() - started, 3),
         "checks": checks,
         "artifacts": artifacts,
+    }
+
+
+def leg_installed_stdio_tool_call(
+    python: str, home: Path, repo: Path, symbol: str, evidence: EvidenceWriter, deadline: float
+) -> dict[str, Any]:
+    """Call the installed query handler through the installed wheel's stdio server."""
+    argv = [
+        str(INSTALLED_STDIO),
+        "--axiom-home",
+        str(home),
+        "--repo",
+        str(repo),
+        "--symbol",
+        symbol,
+    ]
+    process = spawn(python, argv)
+    out = LineReader(process.stdout, "stdout")
+    err = LineReader(process.stderr, "stderr")
+    frames: list[bytes] = []
+    failure = None
+    end: dict[str, Any] = {}
+    try:
+        exchange = stdio_exchange(process, out)
+        frames.extend(exchange.values())
+        process.stdin.write(
+            json_rpc_frame(
+                3,
+                "tools/call",
+                {
+                    "name": "graph_query",
+                    "arguments": {
+                        "solution_id": "demo-solution",
+                        "operation": "search",
+                        "query": symbol,
+                    },
+                },
+            )
+        )
+        process.stdin.flush()
+        frames.append(out.next_line(deadline))
+        close_stdin(process)
+        end = finish(process, deadline)
+    except Exception:
+        failure = traceback.format_exc()
+        process.kill()
+        end = finish(process, deadline)
+    stdout = b"".join(frames) + collect(out, 2.0)
+    stderr = collect(err, 2.0)
+    parsed = parse_frames(stdout)
+    call = next((row for row in parsed["frames"] if row.get("id") == 3), {})
+    tool_list = next((row for row in parsed["frames"] if row.get("id") == 2), {})
+    names = [row.get("name") for row in tool_list.get("result", {}).get("tools", [])]
+    passed = (
+        failure is None
+        and end.get("exit_code") == 0
+        and not parsed["junk"]
+        and "graph_query" in names
+        and symbol in json.dumps(call)
+        and not call.get("result", {}).get("isError", False)
+    )
+    return {
+        "leg": "stdio-tool-call",
+        "status": "passed" if passed else "failed",
+        "command": [python, *argv],
+        "checks": [
+            check(
+                "installed_stdio.graph_query",
+                "positive",
+                "pass" if passed else "fail",
+                {
+                    "exit_code": end.get("exit_code"),
+                    "tool_names": names,
+                    "protocol_junk": parsed["junk"],
+                    "call_response": call,
+                    "failure": failure,
+                },
+            )
+        ],
+        "artifacts": {
+            "stdout": evidence.stream("stdio-tool-call-stdout", stdout),
+            "stderr": evidence.stream("stdio-tool-call-stderr", stderr),
+        },
     }
 
 
@@ -1316,6 +1450,7 @@ def write_hashes(root: Path) -> Path:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    global INSTALLED_PROCESS_MODE
     parser = argparse.ArgumentParser(
         prog="v2-031-native-matrix",
         description="Capture the native query, stdio process and HTTP security matrix.",
@@ -1326,7 +1461,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--deadline", type=float, default=30.0, help="Per-step deadline in seconds."
     )
+    parser.add_argument(
+        "--installed-repo", type=Path, help="Real-source repository for an installed candidate."
+    )
+    parser.add_argument(
+        "--installed-axiom-home", type=Path, help="Installed AXIOM_HOME for a candidate."
+    )
+    parser.add_argument(
+        "--installed-symbol",
+        default="K107WatcherB",
+        help="Symbol in the installed real-source catalog.",
+    )
+    parser.add_argument(
+        "--task-id", default=None, help="Candidate task identifier for the evidence report."
+    )
     args = parser.parse_args(list(sys.argv[1:] if argv is None else argv))
+    if bool(args.installed_repo) != bool(args.installed_axiom_home):
+        parser.error("--installed-repo and --installed-axiom-home must be given together")
+    INSTALLED_PROCESS_MODE = args.installed_repo is not None
 
     out = Path(args.out) if args.out is not None else NATIVE_DIR / "evidence" / args.target
     out.mkdir(parents=True, exist_ok=True)
@@ -1338,7 +1490,20 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     legs: list[dict[str, Any]] = []
     for name, runner in (
-        ("python-query", lambda: leg_python_query(evidence, args.deadline)),
+        (
+            "python-query",
+            lambda: (
+                leg_installed_query(
+                    args.python,
+                    args.installed_axiom_home,
+                    args.installed_repo,
+                    args.installed_symbol,
+                    evidence,
+                )
+                if INSTALLED_PROCESS_MODE
+                else leg_python_query(evidence, args.deadline)
+            ),
+        ),
         ("http-security", lambda: leg_http_security(args.python, evidence, args.deadline)),
     ):
         try:
@@ -1351,11 +1516,27 @@ def main(argv: Sequence[str] | None = None) -> int:
         legs.append(
             {"leg": "stdio-process", "status": "error", "traceback": traceback.format_exc()}
         )
+    if INSTALLED_PROCESS_MODE:
+        try:
+            legs.append(
+                leg_installed_stdio_tool_call(
+                    args.python,
+                    args.installed_axiom_home,
+                    args.installed_repo,
+                    args.installed_symbol,
+                    evidence,
+                    args.deadline,
+                )
+            )
+        except Exception:
+            legs.append(
+                {"leg": "stdio-tool-call", "status": "error", "traceback": traceback.format_exc()}
+            )
 
     ordered = sorted(legs, key=lambda item: LEG_ORDER.get(item["leg"], 99))
     statuses = {item["leg"]: item["status"] for item in ordered}
     matrix = {
-        "task": "V2-031",
+        "task": args.task_id or ("K-107" if INSTALLED_PROCESS_MODE else "V2-031"),
         "repository": "axiom-mcp",
         "target": args.target,
         "generated_utc": utc_now(),
@@ -1366,17 +1547,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         "passed": all(status == "passed" for status in statuses.values()),
         "released_core_fixture": {
             "status": "not_run",
-            "fixture_used": relative(DEMO_SOLUTION, REPO_ROOT),
+            "fixture_used": "real-source-installed-candidate"
+            if INSTALLED_PROCESS_MODE
+            else relative(DEMO_SOLUTION, REPO_ROOT),
             "fixture_self_label": FIXTURE_SELF_LABEL,
             "reason": (
-                "No released core fixture set exists in this checkout or on this host. The only "
+                "Installed real-source candidate was tested locally; no released fixture "
+                "certification was performed."
+                if INSTALLED_PROCESS_MODE
+                else "No released core fixture set exists here. The only "
                 "solution bundle in the repository self-labels generator_version="
                 f'"{FIXTURE_SELF_LABEL}", so a released-core runtime certification was not '
                 "performed and is recorded as not_run."
             ),
         },
         "disclaimer": (
-            "Command output captured on the native host named above. The demo-solution bundle "
+            "Command output captured with the installed candidate on this native host; local "
+            "candidate evidence only, not released certification."
+            if INSTALLED_PROCESS_MODE
+            else "Command output captured on the native host named above. The demo-solution bundle "
             "is generated by synthetic-fixture-v2-not-runtime, so these legs are not a released "
             "core runtime certification."
         ),
@@ -1394,7 +1583,8 @@ LEG_ORDER = {
     "stdio-noise": 2,
     "stdio-silence-deadline": 3,
     "stdio-interrupt": 4,
-    "http-security": 5,
+    "stdio-tool-call": 5,
+    "http-security": 6,
 }
 
 

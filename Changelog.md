@@ -1,6 +1,63 @@
-# Changelog — axiom-mcp
+# 0.1.1 MacIntel test release
+
+Owner-authorized publication of current code; see release/v0.1.1-notes.md.
+
+# Changelog
+
+## K-407 container Linux x64 installed MCP candidate
+
+- Run the installed wheel against K-406's real-source graph catalog on Debian 12
+  x86_64, then capture stdio process, HTTP security, native POSIX guard and
+  mismatch refusals.
+  Parameterize the native harness for the actual task and symbol, and resolve
+  registry paths with the host platform instead of a macOS constant.
+- Preserve the K-406 update and rollback provenance as an unsigned local
+  candidate; released-fixture certification remains pending.
+
+## K-403 container Linux x64 wheel input
+
+- Reuse the byte-identical `py3-none-any` MCP wheel from K-103 because package
+  source, `pyproject.toml` and README have no changes since that source revision.
+  Resolve 31 wheel-only dependencies for Linux x86_64 CPython 3.13 with exact
+  versions and hashes. A temporary Linux x64 environment installed the locked
+  dependencies and wheel, imported the package and passed `pip check`.
+- Keep this as an unsigned local candidate. CLI-owned provisioning, installed
+  process/query checks and released provenance remain separate tasks.
+
+## K-107 Mac Intel installed query and process candidate
+
+- Added an isolated A/B native harness that installs the exact K-105/K-106 archives,
+  builds a catalog from real C# source, queries with the versioned wheel interpreter,
+  and repeats after service restart, update, and rollback. The candidate matrix runs
+  stdio protocol boundaries and the HTTP security gateway with installed wheel
+  subprocess imports, including a composed stdio `graph_query` tool call.
+- This is unsigned local candidate evidence on macOS x64. Released fixture
+  certification, other lanes, and independent integration review remain pending.
+
+## K-103 Mac Intel wheel input
+
+- Pin the immutable K-012 draft scope and prepare a source-built Python wheel, dependency inventory and interpreter compatibility handoff for the Mac Intel CLI candidate. This is local candidate evidence, not publication.
+ — axiom-mcp
 
 ## Unreleased
+
+- **fix** (V2-031) `graph_query` now reads the solution catalog once and opens
+  only its exact pinned member generations. A project `current.json` that advances
+  after catalog publication cannot replace the vector, and a missing or corrupt
+  pinned member returns `SNAPSHOT_UNAVAILABLE` rather than falling back to latest.
+  The final catalog regression suite passed 762 tests with 2 skipped on local
+  macOS x64; it remains development evidence because the fixture is synthetic.
+
+- **maintenance** (V2-031) Complete immutable spec-lock coverage with the fixture-index digest from the existing pinned revision; no spec repin. Local verification and redacted native evidence are stored under `evidence/V2-031/macos-x64-20260922/`.
+
+- **fix** (V2-031) Make the Windows-only guard test skip before importing its
+  `msvcrt`-dependent backend, so POSIX collection records an intended skip rather
+  than aborting. The stdio transport now watches `SIGINT` and `SIGTERM` on POSIX
+  while the MCP server is idle, cancels the receive task through AnyIO, and emits
+  a diagnostic interrupt event. POSIX uses a cancellable descriptor reader for pipes
+  and redirected files, with split-UTF-8 and EOF regressions. The local macOS x64
+  matrix passed all six legs with CPython 3.13.15, but remains non-certified because
+  its fixture is synthetic and the other mandatory targets remain unverified.
 
 - **release** Prepare experimental unsigned `0.1.0` Python wheel for Windows testing.
   The package and runtime version now agree; native macOS Intel and cross-component

@@ -1,0 +1,97 @@
+{
+  "task_id": "K-407",
+  "lane": "container-linux-x64",
+  "status": "local_verified",
+  "certified": false,
+  "source_revision": "da57b6a4966c3def83b45af3a99294ea288175e5",
+  "input_scope_path": "evidence/artifacts/K-406/scope-result.json",
+  "input_scope_sha256": "9bf97889e61b4710fb45cfdff4cdf34edcd003aac3b396097bfb64ad18b0cb1f",
+  "owner_input_map": {
+    "wheel_sha256": "ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b",
+    "runtime_sha256": "64f1f07d2f05ab6f7e670eb5e5d297f1429aa42c667a4360c33845471b7b55ea",
+    "skills_sha256": "e4b6a013b4971d93298886655debef5b11b912ca7a881c2ab1648477124b1a3a",
+    "core_a_sha256": "c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea",
+    "core_b_sha256": "87b6146ba9133b5cbdce2d42a4842b29b1eceb3fb3375201621ecb0a105c4f07",
+    "cli_a_sha256": "02d7c19861f5ef21b5a329298ca6c6080c8922f5cdca8e4cb2d86c4e3430dd6b",
+    "cli_b_sha256": "488ddfa41ea757a1e5e645e7764320d2547d654889fe1fcfa90f7970893f7d6d",
+    "candidate_b_sha256": "e51bcec8a7ae0c6c3c1fab846aa4b3de357e4163422644c344f41bc9e5ad0aff",
+    "update_kit_b_sha256": "ac13cfddeffbd720965b4415f65de8fb74bf9c457527eda9c4f5ac0e50452312",
+    "oci_b_image_id": "sha256:044ff2cc44f0248f98305f481b0f50b6980c23006600044c339d85809d0d4bb3"
+  },
+  "identity": {
+    "component": "axiom-mcp",
+    "cpu_count": 4,
+    "guard_backend": "posix",
+    "machine": "x86_64",
+    "os_name": "posix",
+    "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.36",
+    "pointer_bits": 64,
+    "processor": "",
+    "protocol_minimum": "2025-11-25",
+    "python_executable": "/home/axiom/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python",
+    "python_implementation": "CPython",
+    "python_requires": ">=3.13,<3.14",
+    "python_supported": true,
+    "python_version": "3.13.15",
+    "release": "6.12.76-linuxkit",
+    "runtime_pin_reasons": [],
+    "runtime_pins": {
+      "anyio": "4.14.2",
+      "fastapi": "0.139.2",
+      "httpx": "0.28.1",
+      "mcp": "1.28.1",
+      "pydantic": "2.13.4",
+      "starlette": "1.3.1",
+      "uvicorn": "0.51.0"
+    },
+    "spec_revision": "39759ac2311206059b00c44179a998f502e4e777",
+    "sys_platform": "linux",
+    "system": "Linux",
+    "target": "container-linux-x64",
+    "version": "#1 SMP PREEMPT_DYNAMIC Thu Jun 25 13:48:49 UTC 2026"
+  },
+  "installed_query": {
+    "symbol": "K406WatcherB",
+    "wheel_import_below_venv": true,
+    "catalog_pointer_sha256": "8aebee5f3383b4cc88aae39e8737bbb2c8d15d949cd9aed348fd96d2823b9d93",
+    "catalog_manifest_sha256": "d1def9926fd03a960cc097997ea9beafef970488b740149b6a05da32ea7bfda8",
+    "catalog_generation_id": "8c0351a775edfe736d89377ca979700d408dbacf75904d93f81b8315e2bdec3c",
+    "node_count": 2,
+    "version_mismatch": {
+      "actual_runtime_pin_reasons": [],
+      "missing_protocol": [
+        "protocol_revision_missing:2025-11-25"
+      ],
+      "wrong_python": [
+        "python_version_unsupported:3.12.9"
+      ],
+      "wrong_sdk": [
+        "sdk_version_unsupported:1.28.0"
+      ]
+    }
+  },
+  "matrix": {
+    "legs": {
+      "python-query": "passed",
+      "stdio-handshake": "passed",
+      "stdio-noise": "passed",
+      "stdio-silence-deadline": "passed",
+      "stdio-interrupt": "passed",
+      "stdio-tool-call": "passed",
+      "http-security": "passed"
+    },
+    "check_count": 33,
+    "failed_or_skipped_check_count": 0
+  },
+  "guard": {
+    "backend": "posix",
+    "refused_exit_code": 3,
+    "holder_exit_code": -9,
+    "released_exit_code": 0
+  },
+  "parent_query_evidence": [
+    "evidence/artifacts/K-406/query-a.json",
+    "evidence/artifacts/K-406/query-b.json",
+    "evidence/artifacts/K-406/query-rollback.json"
+  ]
+}

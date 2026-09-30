@@ -1,0 +1,24 @@
+{
+  "all_observed_are_synthetic": true,
+  "fixture_root": "tests/fixtures/solution/demo-solution",
+  "observed_generator_versions": [
+    "synthetic-fixture-v2-not-runtime"
+  ],
+  "projects": [
+    {
+      "generation_id": "7319237fdf1ce4ff27ea377c8bc3ae8cf1f115cffc71de369a373e1870ba9d1a",
+      "generator_version": "synthetic-fixture-v2-not-runtime",
+      "manifest": "tests/fixtures/solution/demo-solution/auth-api/checkpoint/generations/7319237fdf1ce4ff27ea377c8bc3ae8cf1f115cffc71de369a373e1870ba9d1a/manifest.json",
+      "project_id": "auth-api"
+    },
+    {
+      "generation_id": "f570a6d6c7ae1bcffcec7a9c8cb3248dbadab432a30aec09a3223c5c5784c73f",
+      "generator_version": "synthetic-fixture-v2-not-runtime",
+      "manifest": "tests/fixtures/solution/demo-solution/web-app/checkpoint/generations/f570a6d6c7ae1bcffcec7a9c8cb3248dbadab432a30aec09a3223c5c5784c73f/manifest.json",
+      "project_id": "web-app"
+    }
+  ],
+  "reason": "The envelope's own project generations resolve to manifests that self-label as \"synthetic-fixture-v2-not-runtime\", so this leg exercises the real reader and engine on a synthetic fixture and is not a released-core runtime certification.",
+  "released_core_certification": "not_run",
+  "synthetic_label": "synthetic-fixture-v2-not-runtime"
+}

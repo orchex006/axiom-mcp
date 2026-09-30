@@ -46,6 +46,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from axiom_mcp import security
+from axiom_mcp.catalog import load_solution_catalog, pin_catalog, project_member_opener
 from axiom_mcp.errors import AxiomError
 from axiom_mcp.query import callers as callers_operation
 from axiom_mcp.query import changes as changes_operation
@@ -339,10 +340,29 @@ def _resolve_cursor(
 
 
 def _load_scope(context: ToolContext, solution_id: str, projects: Sequence[str]) -> GraphSet:
-    """Load every resolved project's pinned generation through the trusted binding."""
-    snapshots: list[LoadedSnapshot] = [
-        context.load_project(solution_id, project_id, QUERY_LANE) for project_id in projects
-    ]
+    """Load one catalog vector, then only the exact member generations it pins."""
+    catalog = load_solution_catalog(context.registry.catalog_location(solution_id, QUERY_LANE))
+    vector = pin_catalog(
+        catalog,
+        open_member=project_member_opener(
+            lambda project_id: context.registry.location(solution_id, project_id, QUERY_LANE)
+        ),
+    )
+    selected = {pin.member.project_id: pin for pin in vector.pins}
+    snapshots: list[LoadedSnapshot] = []
+    for project_id in projects:
+        pin = selected.get(project_id)
+        if pin is None or not pin.available:
+            raise AxiomError(
+                "SNAPSHOT_UNAVAILABLE",
+                "the catalog-pinned generation is unavailable",
+                details={"project_id": project_id},
+            )
+        snapshots.append(
+            context.load_pinned_project(
+                solution_id, project_id, QUERY_LANE, pin.member.generation_id
+            )
+        )
     return GraphSet(graph_from_snapshot(snapshot) for snapshot in snapshots)
 
 

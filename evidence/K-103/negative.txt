@@ -1,0 +1,24 @@
+manifest digest: candidate match; corrupt wheel mismatch
+
+case=corrupt-wheel
+$ uv pip install --python /tmp/axiom-k103-verify-env/bin/python --no-deps --reinstall /tmp/axiom-k103-corrupt/axiom_mcp-0.1.0-py3-none-any.whl
+exit_code=1
+Using Python 3.13.15 environment at: /tmp/axiom-k103-verify-env
+Resolved 1 package in 2ms
+  × Failed to read `axiom-mcp @
+  │ file:///tmp/axiom-k103-corrupt/axiom_mcp-0.1.0-py3-none-any.whl`
+  ├─▶ Failed to extract archive:
+  │   /tmp/axiom-k103-corrupt/axiom_mcp-0.1.0-py3-none-any.whl
+  ╰─▶ Bad uncompressed size (got 00002af7, expected 00002af5) for file:
+      axiom_mcp/version.py
+
+case=unsupported-python
+$ uv pip install --python /tmp/axiom-k103-py39/bin/python --no-deps evidence/K-103/axiom_mcp-0.1.0-py3-none-any.whl
+exit_code=1
+Using Python 3.9.6 environment at: /private/tmp/axiom-k103-py39
+  × No solution found when resolving dependencies:
+  ╰─▶ Because the current Python version (3.9.6) does not satisfy
+      Python>=3.13,<3.14 and axiom-mcp==0.1.0 depends on Python>=3.13,<3.14,
+      we can conclude that axiom-mcp==0.1.0 cannot be used.
+      And because only axiom-mcp==0.1.0 is available and you require
+      axiom-mcp, we can conclude that your requirements are unsatisfiable.

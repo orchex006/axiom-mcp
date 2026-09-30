@@ -21,11 +21,11 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import Any
 
 COMPONENT = "axiom-mcp"
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 SPEC_VERSION = "2.0.0-draft.1"
 SPEC_REPOSITORY = "axiom-specs"
-SPEC_REVISION = "80f44e836ced442e8f3ea33d167bd369ed6796bc"
+SPEC_REVISION = "39759ac2311206059b00c44179a998f502e4e777"
 
 # Integer-major dimensions from contracts/version-dimensions.json (declared_value).
 GRAPH_SCHEMA = 1
@@ -64,8 +64,11 @@ RUNTIME_PINS: dict[str, str] = {
 }
 
 DEV_PINS: dict[str, str] = {
+    "build": "1.3.0",
     "pytest": "9.1.1",
     "ruff": "0.15.22",
+    "setuptools": "80.9.0",
+    "wheel": "0.46.3",
 }
 
 # Minimum protocol revision the pin must be able to negotiate. The SDK may

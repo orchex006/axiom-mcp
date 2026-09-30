@@ -17,6 +17,17 @@ Canonical workflow คือ `Development.md` ใน `axiom-specs` ณ revision 
 
 สถานะปัจจุบัน: `spec.lock.json` verify แล้ว (immutable revision และ contract digests ผ่าน `tools/spec-lock-check.py` ด้วย exit code 0) และ implementation ลงใน repository นี้แล้ว - `src/axiom_mcp/` 49 โมดูล และ `tests/` 44 โมดูล. Required checks `python -m pytest tests -q`, `python -m ruff check .` และ `python -m ruff format --check .` ถูกตั้งโดย `C-001` แล้ว ทุก task ถัดไป MUST รันทั้งสามกับ bytes สุดท้าย และ MUST บันทึก check ที่ยังไม่ได้รันเป็น unverified (ตัวอย่างที่บันทึกไว้จริง: POSIX guard backend, cross-language Rust-holder exclusion และ native host-process launch)
 
+K-107 local Mac Intel candidate ใช้ `tests/native/capture_installed_k107.py` กับ A/B archive
+ที่ระบุ SHA จริง และ `capture_native_matrix.py --installed-repo --installed-axiom-home`
+สำหรับ process legs จาก versioned wheel interpreter. Evidence นี้เป็น local candidate
+เท่านั้น; การรับรอง release และ lane อื่นต้องใช้ release-phase run แยกต่างหาก.
+
+K-407 local Linux x64 container candidate ใช้ `capture_native_matrix.py` กับ
+`--target container-linux-x64 --task-id K-407 --installed-symbol K406WatcherB`
+และ K-406 installed volume. Query และ stdio tool subprocess ใช้ wheel interpreter
+ใน versioned environment; native identity และผล process/security อยู่ใน
+`evidence/K-407/`. Released-fixture certification ยังคงเป็น release-phase gate.
+
 ## Preflight — ก่อนเริ่มทุก task
 
 1. อ่าน workspace `AGENTS.md`, `Development.md` ของ repository นี้ และ task card/spec ที่เกี่ยวข้อง;
@@ -92,7 +103,7 @@ Merge เข้า `release/vX.Y.Z`, การ tag และ publish MUST มี
 งานที่ทำใน worktree MUST NOT จบอยู่แค่ใน worktree เมื่อ task verified แล้ว MUST:
 
 1. integrate เข้า `main` ตาม merge gate ข้างต้น; และ
-2. อัปเดต checkout หลัก (`D:\SP-Billy\axiom\axiom-mcp`) ให้ตรงกับ branch ที่ integrate แล้ว เมื่อ working tree ของ checkout นั้นสะอาดพอ; หรือ
+2. อัปเดต checkout หลักที่ `git rev-parse --show-toplevel` แสดงให้ตรงกับ branch ที่ integrate แล้ว เมื่อ working tree ของ checkout นั้นสะอาดพอ; หรือ
 3. ถ้าทำไม่ได้เพราะมีงานที่ยังไม่ commit ของเจ้าของ checkout ให้ preserve งานนั้นไว้ และรายงานชัดเจนว่า checkout หลักยังไม่ได้รับงาน พร้อมขั้นตอนถัดไปที่เฉพาะเจาะจง
 
 ห้ามรายงานว่างาน "เสร็จ" โดยไม่ระบุว่า checkout หลักได้งานแล้วหรือยัง

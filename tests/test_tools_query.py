@@ -24,15 +24,19 @@ out-of-contract bounds, an unreadable cursor, and a pinned/``require_fresh`` pai
 
 from __future__ import annotations
 
+import json
+import shutil
 from pathlib import Path
 
 import pytest
 from test_query_support import generation_id, node_document
 
+from axiom_mcp import manifest as manifest_module
 from axiom_mcp.errors import AxiomError
 from axiom_mcp.query.changes import changes as changes_engine
 from axiom_mcp.query.envelope import ENVELOPE_KEYS, FRESHNESS, FRESHNESS_UNKNOWN, VERIFICATION_NONE
 from axiom_mcp.query.model import GraphSet, graph_from_documents
+from axiom_mcp.tools.context import GuardedSnapshotSource, ToolContext
 from axiom_mcp.tools.query import QUERY_OPERATIONS, _change_facts, graph_query
 from tests.test_tools_support import (
     AUTH_API,
@@ -42,6 +46,10 @@ from tests.test_tools_support import (
     WEB_APP_GENERATION,
     FakeControl,
     context_for,
+    guard_dir,
+    install_bundle,
+    load_registry_for,
+    principal,
 )
 
 #: The two pinned nodes of the vendored bundle (``tests/fixtures/solution/demo-solution``).
@@ -107,6 +115,40 @@ def assert_closed_envelope(document) -> None:
     ]
 
 
+def advance_live_pointer(repo: Path, project_id: str, pinned_generation: str) -> str:
+    """Install a valid newer project generation without changing the catalog."""
+    lane = repo / ".axiom" / "graph" / SOLUTION / project_id / "live"
+    pinned = lane / "generations" / pinned_generation
+    manifest = json.loads((pinned / "manifest.json").read_text(encoding="utf-8"))
+    manifest["generator_version"] = "newer-than-catalog"
+    raw = manifest_module.canonical_bytes(manifest)
+    newer = manifest_module.sha256_hex(raw)
+    destination = lane / "generations" / newer
+    destination.mkdir()
+    (destination / "manifest.json").write_bytes(raw)
+    for name in ("nodes", "edges"):
+        shutil.copytree(pinned / name, destination / name)
+    (lane / "current.json").write_bytes(
+        manifest_module.canonical_bytes(
+            {"schema_version": 1, "generation_id": newer, "manifest_sha256": newer}
+        )
+    )
+    return newer
+
+
+def catalog_context(tmp_path: Path) -> tuple[ToolContext, Path]:
+    repo = install_bundle(tmp_path)
+    home = tmp_path / "axiom-home"
+    return (
+        ToolContext(
+            registry=load_registry_for(home, repo),
+            principal=principal(),
+            source=GuardedSnapshotSource(guard_dir(home)),
+        ),
+        repo,
+    )
+
+
 def refuse(code: str, request, context, **details) -> AxiomError:
     """Assert one request is refused with ``code`` and the expected named details."""
     with pytest.raises(AxiomError) as caught:
@@ -146,6 +188,44 @@ def test_search_returns_the_pinned_nodes_with_their_source_locations(tmp_path: P
         assert node["source"]["end_line"] >= node["source"]["start_line"]
     # Two distinct identities match, so the answer names the ambiguity instead of picking one.
     assert any("ambiguous" in note for note in document["warnings"])
+
+
+def test_query_uses_catalog_member_when_project_current_advances(tmp_path: Path) -> None:
+    """A newer project pointer cannot replace the catalog vector mid-query."""
+    context, repo = catalog_context(tmp_path)
+    newer = advance_live_pointer(repo, AUTH_API, AUTH_API_GENERATION)
+    assert newer != AUTH_API_GENERATION
+
+    document = call(context, **arguments("search", query="login"))
+
+    assert_closed_envelope(document)
+    assert document["catalog_generation_id"] == PINNED_GENERATION
+    assert document["project_generations"] == [
+        {"project_id": AUTH_API, "generation_id": AUTH_API_GENERATION},
+        {"project_id": WEB_APP, "generation_id": WEB_APP_GENERATION},
+    ]
+
+
+def test_missing_catalog_member_refuses_instead_of_falling_back_to_latest(tmp_path: Path) -> None:
+    """A missing pinned member is unavailable even when a newer current generation exists."""
+    context, repo = catalog_context(tmp_path)
+    newer = advance_live_pointer(repo, AUTH_API, AUTH_API_GENERATION)
+    pinned_manifest = (
+        repo
+        / ".axiom"
+        / "graph"
+        / SOLUTION
+        / AUTH_API
+        / "live"
+        / "generations"
+        / AUTH_API_GENERATION
+        / "manifest.json"
+    )
+    pinned_manifest.unlink()
+
+    error = refuse("SNAPSHOT_UNAVAILABLE", arguments("search", query="login"), context)
+    assert error.details["project_id"] == AUTH_API
+    assert newer != AUTH_API_GENERATION
 
 
 def test_context_walks_exactly_the_requested_depth(tmp_path: Path) -> None:

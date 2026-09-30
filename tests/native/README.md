@@ -1,5 +1,38 @@
 # V2-031 - native query and host process matrix
 
+## K-407 container Linux x64 installed candidate
+
+The K-407 run uses the exact K-406 A/B kit and owned Debian 12 x86_64 volume.
+Pass `--target container-linux-x64 --task-id K-407`, the installed versioned
+Python, `--installed-repo`, `--installed-axiom-home`, and
+`--installed-symbol K406WatcherB` to `capture_native_matrix.py`. The installed
+query and stdio helpers now use the actual `sys.platform` for registry resolution;
+their subprocess imports must resolve inside the installed wheel environment.
+The process matrix captures stdio handshake/tool call, silence timeout, interrupt,
+stdout noise, HTTP credentials/Origin and stalled-body cancellation. The installed
+query probe also refuses SDK, Python and protocol version mismatches. Its catalog
+is produced by graphd from real C# source and is queried after K-406 rollback;
+the K-406 evidence records A, B and post-rollback watcher/query results. This is
+an unsigned local candidate. Released-fixture and independent release checks
+remain pending.
+
+`installed_guard_probe.py` uses the installed wheel in three independent Linux
+processes: an exclusive POSIX holder, a bounded refused shared reader, and a
+shared reader that succeeds after the holder is killed.
+
+## K-107 installed Mac Intel candidate
+
+`capture_installed_k107.py --help` lists the required A/B archive paths and SHA-256
+digests. The harness creates an isolated user home, installs A, registers and indexes
+real C# source, queries through the installed wheel's versioned Python, restarts
+graphd, updates to B, runs the candidate process matrix, and rolls back to A.
+The candidate matrix accepts `--installed-repo` and `--installed-axiom-home` together;
+its stdio and HTTP subprocesses import from the installed wheel. The added stdio
+tool-call launcher composes the installed query handler with the installed transport;
+the bare transport entry point still exposes no application tools on its own.
+The earlier V2-031 synthetic fixture evidence and its release limitations remain
+historical records. K-107 output is a local candidate run, not release certification.
+
 This directory is the executable evidence for task **V2-031** ("Run native query and
 host process matrix") in repository `axiom-mcp`. It contains the harness
 (`capture_native_matrix.py`, `capture_gates.py`), the two boundary probes
@@ -30,15 +63,12 @@ executed on the named host, or an explicit `not_run`.
 | `windows-x64` | native Windows 11 x64 | 6/6 passed | **not certified** | no released core fixture set; legs ran on the repository's synthetic bundle |
 | `linux-x64` | Ubuntu x64 on **WSL2** | 5/6 passed, `stdio-interrupt` failed | **not_run** | a WSL2 run is not a native Linux execution (platform-matrix `rules.wsl_is_windows_evidence` / `evidence_status.statement`) |
 | `macos-arm64` | none | 0 | **not_run** | no macOS host exists on this machine |
-| `macos-x64` | none | 0 | **not_run** | no macOS host exists on this machine |
+| `macos-x64` | native macOS 26.6.2 x64 | 6/6 passed | **not certified** | legs used the repository's synthetic bundle, not released core fixtures |
 | released core fixtures | none | 0 | **not_run** | the only bundle in the repository self-labels `synthetic-fixture-v2-not-runtime` |
 
-Two independent reasons keep this card short of AC1/AC2:
-
-1. **No released core fixture set exists** on this checkout or on either host, so the
-   card's "against released core fixtures" clause cannot be satisfied here (section 6).
-2. **No macOS host exists**, and a container or cross-build may never be substituted
-   for a native macOS run (section 5).
+No released core fixture set exists on this checkout or on either host, so AC1's
+"against released core fixtures" clause remains unverified (section 6). The local
+macOS x64 execution is development evidence only and does not certify a target.
 
 Nothing below weakens a check to make a host pass. A leg that could not be executed is
 `not_run` with its reason, and a signal the POSIX host refused to service is recorded
@@ -262,18 +292,19 @@ a27bb34a7013adba9240e7b850d71cf64429ea21078c977a51376c73631e5d70  raw/stdio-sile
 48a89a9f585983477e7af09bfeecd0893cf9d08192882d5dbaab423760dbfd4c  raw/gates-pytest-ignoring-windows-guard-tests-stdout.bin  (diagnostic, not a required check)
 ```
 
-## 5. Targets with no host: `macos-arm64`, `macos-x64` - `not_run`
+## 5. macOS targets
 
-There is no macOS host on this machine, so no macOS leg was executed:
+The macOS x64 matrix ran locally with CPython 3.13.15 and pinned dependencies. Its
+six legs passed, while the synthetic fixture provenance keeps it out of
+certification evidence.
 
 | Target | Status | Concrete reason |
 | --- | --- | --- |
 | `macos-arm64` | `not_run` | no macOS / Apple-silicon host is reachable from this checkout; a macOS `arm64` run requires native hardware |
-| `macos-x64` | `not_run` | same - and CP-01 forbids substituting a Rosetta/emulated run for the native architecture |
+| `macos-x64` | local development evidence | native macOS 26.6.2 x64, CPython 3.13.15; all six legs passed against the synthetic bundle, so released-fixture certification is `not_run` |
 
 A container, a cross-build or a "should work on macOS" argument is not macOS
-evidence. Both targets stay `not_run` and neither is reported as passing anywhere in
-this directory.
+evidence. `macos-arm64` stays `not_run`; macOS x64 is not certified.
 
 ## 6. Released core fixtures - `not_run`
 
@@ -376,15 +407,16 @@ required check. `capture_gates.py` therefore exited `1` on this host.
 
 ## 9. Findings and limitations
 
-1. **POSIX interrupt handling is incomplete (found by this matrix).** An idle
-   `SIGINT` is not serviced by the stdio transport; `SIGTERM` is a hard stop. CP-08
-   asks for a bounded graceful drain. Recorded as a failure in
-   `raw/matrix.json` (`stdio-interrupt` on `ubuntu-x64`), not as a pass.
-2. **A Windows-only test module aborts POSIX collection.** `tests/test_guard_windows.py`
-   imports `axiom_mcp.guard.locks_windows`, which imports `msvcrt` at module level; the
-   `pytest.importorskip("msvcrt")` sits *after* those imports, so on POSIX pytest exits
-   `2` before running anything else. This is why the Ubuntu pytest row above is a
-   collection error rather than a test failure count.
+1. **POSIX interrupt handling now has local macOS x64 evidence.** The SDK's threaded
+   stdin reader did not yield to cancellation while idle. The POSIX adapter retains
+   the official SDK parser and uses a cancellable descriptor reader; the local matrix
+   passed SIGINT and SIGTERM. This remains development evidence because its fixture is
+   synthetic.
+2. **A Windows-only test module aborted POSIX collection in the captured revision.**
+   `tests/test_guard_windows.py` imported `axiom_mcp.guard.locks_windows`, which imports
+   `msvcrt`, before `pytest.importorskip("msvcrt")`. The current branch moves the skip
+   before those imports; the historical Ubuntu result remains evidence of the earlier
+   failure until the required gates are rerun on a pinned POSIX host.
 3. **POSIX guard/watcher code is exercised only partially here.** The repository's own
    `Development.md` already lists "POSIX guard backend" as a recorded unverified leg;
    this matrix does not change that.
@@ -421,12 +453,12 @@ HTTP bodies carry only error codes, messages, retry flags and request ids.
 
 ```text
 [ ] target macos-arm64          not_run  - no macOS/Apple-silicon host available
-[ ] target macos-x64            not_run  - no macOS host; emulation/Rosetta is not native evidence
+[ ] target macos-x64            not certified - native local matrix passed, but fixture is synthetic
 [ ] target linux-x64            not_run  - ran on WSL2; WSL2 is not native Linux evidence
 [ ] released core fixtures      not_run  - only synthetic-fixture-v2-not-runtime exists in this checkout
-[ ] stdio-interrupt on POSIX    failed   - idle SIGINT never serviced within the bounded window
-[ ] POSIX guard backend         not_run  - covered elsewhere; not part of this matrix
-[ ] POSIX required pytest gate   exit 2   - tests/test_guard_windows.py aborts collection (msvcrt)
+[ ] stdio-interrupt on POSIX    local pass - macOS x64 matrix passed; released-fixture evidence remains unverified
+[ ] POSIX guard backend         not_run     - covered elsewhere; not part of this matrix
+[x] POSIX required pytest gate  passed      - macOS x64 final suite: 760 passed, 2 skipped, 230 subtests; Windows module skips cleanly
 ```
 
 Certified mandatory targets after this task: **0 of 4**. This directory records real
