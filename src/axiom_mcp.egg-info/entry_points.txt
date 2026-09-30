@@ -1,0 +1,3 @@
+[console_scripts]
+axiom-mcp = axiom_mcp.cli:main
+axiom-mcp-entrypoints = axiom_mcp.entrypoints:main
