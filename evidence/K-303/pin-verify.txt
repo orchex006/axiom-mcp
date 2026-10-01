@@ -1,0 +1,4 @@
+cwd=axiom-specs
+command=python tools/spec-lock-check.py --lock <axiom-mcp>/spec.lock.json --spec-root <exact-git-bytes> --release --json
+exit=0
+{"ok": true, "reasons": [], "revision": "6584470ffede0926029147efa40732f3d3a8bf16"}

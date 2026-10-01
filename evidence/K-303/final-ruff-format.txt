@@ -1,0 +1,4 @@
+cwd=axiom-mcp
+command=python -m ruff format --check .
+exit=0
+162 files already formatted

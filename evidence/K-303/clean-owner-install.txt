@@ -1,0 +1,6 @@
+cwd=<isolated-windows-consumer>
+command=clean-owner-install
+exit=0
+Processing .\inputs\axiom_mcp-0.1.1-py3-none-any.whl
+Installing collected packages: axiom-mcp
+Successfully installed axiom-mcp-0.1.1

@@ -1,0 +1,26 @@
+{
+  "task_id": "K-303",
+  "kind": "local_artifact",
+  "lane": "windows-x64",
+  "source_revision": "78f991622b52db86499c3031ed98c07a4d9d408e",
+  "spec_revision": "6584470ffede0926029147efa40732f3d3a8bf16",
+  "owner_version": "0.1.1",
+  "python_requires": ">=3.13,<3.14",
+  "bundle": {
+    "path": "evidence/K-303/windows-x64-py313-inputs.tar",
+    "sha256": "82e9ca2920f91f6b41d953d2b53a6d8f359c2958be7f0c7e781a5e6e76143190",
+    "members": 35
+  },
+  "owner_wheel": {
+    "path": "evidence/K-303/axiom_mcp-0.1.1-py3-none-any.whl",
+    "sha256": "36848a68ad4aa66932fbfd3773c020fab6267aa2e705ef624797745664409b56"
+  },
+  "dependency_count": 32,
+  "input_manifest_sha256": "5a39789a84c3f47efeed07fa5a3ce7fae3d39c2c081276c582fe86689395de83",
+  "requirements_sha256": "08f8afa2ed3020329852c929cb9eb93160dd31406b3f233202417d1fe308fd11",
+  "extraction": "Verify bundle SHA-256, require 35 regular safe relative members, extract in a new empty directory with Python 3.13 tarfile data filter, then run release/verify_windows_inputs.py --input-dir <directory>.",
+  "candidate": true,
+  "certified": false,
+  "consumer": "K-304",
+  "installed_catalog_claim": false
+}

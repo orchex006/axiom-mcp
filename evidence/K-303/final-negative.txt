@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "cases": [
+    {
+      "case": "corrupt-wheel",
+      "passed": true,
+      "observed": "wheel digest/size mismatch: annotated_doc-0.0.5-py3-none-any.whl"
+    },
+    {
+      "case": "missing-wheel",
+      "passed": true,
+      "observed": "missing wheel: annotated_doc-0.0.5-py3-none-any.whl"
+    },
+    {
+      "case": "corrupt-owner",
+      "passed": true,
+      "observed": "owner wheel missing or corrupt"
+    },
+    {
+      "case": "undeclared-wheel",
+      "passed": true,
+      "observed": "undeclared wheel in wheelhouse"
+    },
+    {
+      "case": "unsupported-interpreter",
+      "passed": true,
+      "observed": "Windows x64 CPython 3.13 is required"
+    }
+  ]
+}
