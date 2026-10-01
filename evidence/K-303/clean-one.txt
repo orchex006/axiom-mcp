@@ -1,0 +1,4 @@
+cwd=axiom-mcp
+command=python release/build_windows_wheel.py --source-revision 78f991622b52db86499c3031ed98c07a4d9d408e --out-dir <isolated-output>
+exit=0
+{"packaged_source_files": 50, "sha256": "36848a68ad4aa66932fbfd3773c020fab6267aa2e705ef624797745664409b56", "source_revision": "78f991622b52db86499c3031ed98c07a4d9d408e", "wheel": "axiom_mcp-0.1.1-py3-none-any.whl"}

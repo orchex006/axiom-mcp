@@ -1,0 +1,15 @@
+cwd=<isolated-windows-consumer>
+command=clean-entrypoint
+exit=0
+usage: axiom-mcp [-h] COMMAND ...
+
+axiom-mcp: processed-JSON query gateway over the official MCP SDK.
+
+positional arguments:
+  COMMAND
+    version   Report component identity and versions.
+    doctor    Diagnose runtime pins, SDK surface, scope and readiness.
+    update    Check for updates and delegate one approved plan.
+
+options:
+  -h, --help  show this help message and exit

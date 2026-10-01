@@ -50,6 +50,14 @@ K-407 local Linux x64 container candidate ใช้ `capture_native_matrix.py` �
 
 ## Required checks
 
+K-303 Windows x64 owner input uses Python 3.13 and a wheel built from this
+repository, plus a hash-pinned, offline Windows wheelhouse. Verify the owner
+wheel and every dependency byte with `release/verify_windows_inputs.py` before
+K-304 provisioning. This artifact proof does not establish installed query or
+release provenance.
+Use `release/build_windows_wheel.py` against an immutable source revision so
+tracked `build/lib` and egg-info from older builds cannot enter the owner wheel.
+
 C-001 established this repository's required checks (stack: Python 3.13 + official MCP SDK `mcp==1.28.1` + FastAPI):
 
 ```text

@@ -1,0 +1,4 @@
+cwd=axiom-mcp
+command=python release/verify_windows_inputs.py --input-dir <isolated-inputs>
+exit=0
+{"dependencies": 32, "ok": true, "owner_wheel_sha256": "36848a68ad4aa66932fbfd3773c020fab6267aa2e705ef624797745664409b56", "platform": "windows-x64", "python": "3.13", "source_revision": "78f991622b52db86499c3031ed98c07a4d9d408e"}

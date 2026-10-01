@@ -1,0 +1,10 @@
+{
+  "task_id": "K-303",
+  "owner": "axiom-mcp",
+  "branch": "feature/k-303-windows-wheel",
+  "source_revision": "78f991622b52db86499c3031ed98c07a4d9d408e",
+  "bundle_sha256": "82e9ca2920f91f6b41d953d2b53a6d8f359c2958be7f0c7e781a5e6e76143190",
+  "wheel_sha256": "36848a68ad4aa66932fbfd3773c020fab6267aa2e705ef624797745664409b56",
+  "handoff": "evidence/K-303/handoff.json",
+  "certified": false
+}

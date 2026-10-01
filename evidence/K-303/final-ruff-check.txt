@@ -1,0 +1,4 @@
+cwd=axiom-mcp
+command=python -m ruff check .
+exit=0
+All checks passed!

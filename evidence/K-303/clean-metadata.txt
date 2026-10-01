@@ -1,0 +1,4 @@
+cwd=<isolated-windows-consumer>
+command=clean-metadata
+exit=0
+0.1.1 2.13.4 1.28.1
