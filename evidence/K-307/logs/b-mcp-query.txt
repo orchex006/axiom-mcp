@@ -1,3 +1,2 @@
 exit=0
 {"catalog_generation_id": "06cb039219761b5d1f234d9e0a9b6d58b157ff705cd3c94a198be507fccdd533", "catalog_manifest_sha256": "5f284c90259bab2045eb736be83ee293ff8408b837c4ef743d47d88666750736", "catalog_pointer_sha256": "2014a862119994a512b0bb67c07ec68c765cbca5cd8bc278b0ef313673c8ee6f", "coverage": "complete_for_profile", "node_count": 1, "query_symbol": "K307After", "status": "passed", "verification": {"mode": "none"}, "version_mismatch": {"actual_runtime_pin_reasons": [], "missing_protocol": ["protocol_revision_missing:2025-11-25"], "wrong_python": ["python_version_unsupported:3.12.9"], "wrong_sdk": ["sdk_version_unsupported:1.28.0"]}, "wheel_import_below_venv": true}
-

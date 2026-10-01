@@ -80,13 +80,13 @@
       "id": "register-apply",
       "exit_code": 0,
       "path": "evidence/K-307/logs/register-apply.txt",
-      "sha256": "9274b4ab97b6b3dfa5fe2a6b171b89d868d20d5a70b465eeceed7f1f7a440438"
+      "sha256": "51f7b7c681ac37e1374aa4d84cbb7c202061ea5de34e79e927d3c4b0fc2ec116"
     },
     {
       "id": "graphd-query",
       "exit_code": 0,
       "path": "evidence/K-307/logs/graphd-query.txt",
-      "sha256": "b87878096491b09a8c735d0b716adc3bf7c66d4facecaabf961f1387a1039bb6"
+      "sha256": "62602a2ac99be4c230adc920879c06a66eb38c88e13cb4b73757ce985b16330f"
     },
     {
       "id": "matrix-run",
@@ -122,13 +122,13 @@
       "id": "b-mcp-query",
       "exit_code": 0,
       "path": "evidence/K-307/logs/b-mcp-query.txt",
-      "sha256": "b0c1090efbf95d7fb5e2effe6165d5087d63802dd6fbff8f385440ba696a20c6"
+      "sha256": "64d40b9b0b14bb5d2ecaeecf6b59de1dfbbf92c5756ae31513ee8adc0b298cb7"
     },
     {
       "id": "a-restored-mcp-query",
       "exit_code": 0,
       "path": "evidence/K-307/logs/a-restored-mcp-query.txt",
-      "sha256": "0f1d031b6c2c7cf0eaabfcd63b6b62ab91abdc88e929218e0d689c7e58217820"
+      "sha256": "ca14173c1bd67d968acea5f707923c5646b0c5d4ef0c727a1772e8a6767a7a56"
     },
     {
       "id": "b-apply-refusal",
@@ -140,19 +140,19 @@
       "id": "b-apply-retry",
       "exit_code": 0,
       "path": "evidence/K-307/logs/b-apply-retry.txt",
-      "sha256": "fa745cbe640d5c5a8c40bb208b543d43eaff1baf2058c6be7ecc670dc8185e3a"
+      "sha256": "3586555f10e03a5f50dd14a96f44b9d1695bffff1d11afc903388659d85e91e5"
     },
     {
       "id": "b-rollback",
       "exit_code": 0,
       "path": "evidence/K-307/logs/b-rollback.txt",
-      "sha256": "fae0a6ec17d7322aa3930aad645cc63dd5a5eaa968313e9a7db1e11500964836"
+      "sha256": "0e282ff2bc37120564c384b749726cdb73bb532f5aa876d7e8243c11c4fa967a"
     },
     {
       "id": "pytest-global",
       "exit_code": 1,
       "path": "evidence/K-307/logs/pytest-global.txt",
-      "sha256": "fdae6d356a44701fb69fbb5bdc2cfe5aaa69b4afd556084ab89f71eda6936f2b"
+      "sha256": "aa0335fd33a1d107aaf0196b1a4b5e80a6330ac3d4c1114cd5ad8ee9543a8a56"
     },
     {
       "id": "pytest-isolated",
@@ -176,7 +176,7 @@
       "id": "spec-pin",
       "exit_code": 0,
       "path": "evidence/K-307/logs/spec-pin.txt",
-      "sha256": "a6bf4d9e8a370eec23de6e3e60700736efddfe7319834cc49193cdd39b6d6c9a"
+      "sha256": "f738a7b7136f7d9bad292b9e9b6521a06d3ce979a037a9166d17db706a0c94d7"
     }
   ],
   "limitations": [

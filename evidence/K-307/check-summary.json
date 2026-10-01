@@ -23,7 +23,7 @@
       "id": "spec-pin",
       "exit_code": 0,
       "path": "evidence/K-307/logs/spec-pin.txt",
-      "sha256": "a6bf4d9e8a370eec23de6e3e60700736efddfe7319834cc49193cdd39b6d6c9a"
+      "sha256": "f738a7b7136f7d9bad292b9e9b6521a06d3ce979a037a9166d17db706a0c94d7"
     }
   ],
   "diagnostic": [
@@ -31,7 +31,7 @@
       "id": "pytest-global",
       "exit_code": 1,
       "path": "evidence/K-307/logs/pytest-global.txt",
-      "sha256": "fdae6d356a44701fb69fbb5bdc2cfe5aaa69b4afd556084ab89f71eda6936f2b"
+      "sha256": "aa0335fd33a1d107aaf0196b1a4b5e80a6330ac3d4c1114cd5ad8ee9543a8a56"
     }
   ]
 }

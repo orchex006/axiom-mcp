@@ -8,4 +8,3 @@ exit=0
   "release": false,
   "reasons": []
 }
-
