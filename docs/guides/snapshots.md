@@ -255,6 +255,10 @@ consistency.
   ABI-conformant holder, and the local Windows cross-language run used a non-Python
   (`LockFileEx`) holder rather than the `axiom-graphd` daemon. The POSIX holder target is
   likewise unverified on this host.
+  K-307 later exercised an exact K-308 `graph-core` Rust holder against the
+  installed MCP wheel on native Windows x64; its separate local candidate
+  evidence is under `evidence/K-307/`, without changing the historical C-011
+  result or claiming release certification.
 - **The POSIX guard tests skip where `fcntl` is unavailable**, so this revision's Windows test
   run does not exercise the POSIX `flock` primitive. The POSIX backend exists as code
   (`locks_posix.py`) but is not executed on this host; only the Windows backend is certified

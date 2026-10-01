@@ -1,5 +1,19 @@
 # V2-031 - native query and host process matrix
 
+## K-307 Windows x64 installed candidate
+
+Run `capture_native_matrix.py --target windows-x64 --task-id K-307` with the
+installed CPython executable, `--installed-repo`, `--installed-axiom-home` and
+`--installed-symbol K307WatcherB`. The K-306 B kit supplies exact CLI/core
+0.1.2 bytes while the installed MCP wheel remains 0.1.1. The seven native
+query, stdio and HTTP legs passed against a graphd-generated C# catalog.
+`installed_guard_windows_probe.py` verifies installed-wheel Windows process
+exclusion on the graphd guard directory. `capture_windows_cross_guard.py`
+uses the pinned K-308 graph-core Rust lock as a foreign exclusive holder; the
+installed MCP reader times out while it holds and acquires after it exits.
+MCP queries also passed before update, after B restart and after rollback to A.
+This is local candidate evidence only; released-fixture certification is open.
+
 ## K-407 container Linux x64 installed candidate
 
 The K-407 run uses the exact K-406 A/B kit and owned Debian 12 x86_64 volume.

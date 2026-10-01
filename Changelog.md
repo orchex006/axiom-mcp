@@ -4,6 +4,17 @@ Owner-authorized publication of current code; see release/v0.1.1-notes.md.
 
 # Changelog
 
+## Unreleased — K-307 Windows installed MCP candidate
+
+- Exercise the K-303 wheel inside the K-306 Windows 0.1.2 installed runtime
+  against a graphd-generated C# catalog. Capture installed query, stdio
+  handshake/tool call/timeout/interrupt/noise, HTTP security and version
+  mismatch results on native Windows x64.
+- Add installed-wheel Windows guard probes, including exclusion by the exact
+  K-308 `graph-core` Rust source. Verify MCP query after daemon restart,
+  A-to-B update and rollback, and preserve user data through owner uninstall.
+  This remains an unsigned local candidate, separate from released fixtures.
+
 ## K-407 container Linux x64 installed MCP candidate
 
 - Run the installed wheel against K-406's real-source graph catalog on Debian 12

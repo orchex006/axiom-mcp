@@ -1,12 +1,12 @@
 {
   "spec_version": "2.0.0-draft.1",
   "spec_repository": "axiom-specs",
-  "spec_revision": "6584470ffede0926029147efa40732f3d3a8bf16",
-  "spec_content_sha256": "a5f3ec2d108acc59d56d3481372ec23b3fd685647bbb6eb829039b03a98584de",
+  "spec_revision": "71fc697c4bf75dcd9f6185d70e56e2751eac6c44",
+  "spec_content_sha256": "f62390bf32e757a09b007627a819f3b0d68c98861a9e23fb90b14c504d9c900b",
   "owner_repository": "axiom-mcp",
   "workspace_layout": 2,
   "graph_payload_schema": 1,
-  "verification": "K-303: exact immutable specs revision 6584470ffede0926029147efa40732f3d3a8bf16 with ADR-0020, verified against Git blobs; draft candidate, no release certification.",
+  "verification": "K-307: exact delivered K-306 Windows B candidate and registered installed MCP task; immutable draft contract bytes, local candidate only.",
   "contract_digests": {
     "Development.md": "731fef8f80f99b0656877a3742a117163e8b6b1d446e5e9ff1a8a99bc4ff14de",
     "adrs/ADR-0019.md": "aae92d700b3019a535ab0a57cf91bf4e01771f02890ebb043ff8aaecd3e44fbd",
@@ -22,9 +22,10 @@
     "contracts/schemas/query-request.schema.json": "57395f25fa99498f42d5591c70c202d4685258635852f7cd50e1437884dc1cff",
     "contracts/schemas/query-response.schema.json": "fe444ce8319c0413b2ce5d4a208a40e9af5eb5323cad99493d2c1d25703a04b5",
     "contracts/version-dimensions.json": "7717d17d48a8a6dc697c5e78c9f699744bef2c32edf03d7a4b5afeea40b12345",
-    "specs/v2/K-release-readiness.md": "a83da7e2f0a000d9165aa0d664ab690fa2756f2b61e7255dbf72c52acb2288e9",
+    "specs/v2/K-release-readiness.md": "ab0c872d8c2d74f5f3efe25f6844ba22d1fbdccd9b0b9a0879dea9439193a5d9",
+    "tasks/K/K-307.md": "842971bcf3fe8be986ae780ae17b154944540bba774e9b04c7b932d33c26dcde",
     "tasks/K/scope-map.json": "60a8b5f4e6813083c51e2d6992327af7fbf10865bc3c1aee5dc2f7dfed35edc1",
-    "tasks/tasks.json": "1b958edb00e25b2b53dc621410bd5d9b2db8ae945c0783b0f38d0c7aa8de605f",
+    "tasks/tasks.json": "2c05b708f2528488bad9720d2aec14675ef3920f1cca9194184c973b077c4fbf",
     "tools/specctl.py": "2353a4ca139b5d52f0904fb98a2cacfb14ffb08acee9a828d4d299e812db099f"
   }
 }

@@ -28,6 +28,16 @@ K-407 local Linux x64 container candidate ใช้ `capture_native_matrix.py` �
 ใน versioned environment; native identity และผล process/security อยู่ใน
 `evidence/K-407/`. Released-fixture certification ยังคงเป็น release-phase gate.
 
+K-307 native Windows x64 candidate uses the exact K-306 0.1.2 kit with the
+independently versioned K-303 MCP 0.1.1 wheel in the installed CPython 3.13.15
+runtime. `capture_native_matrix.py --target windows-x64 --task-id K-307`
+uses installed repo/home/symbol arguments for the real-source query and
+versioned wheel process legs. `installed_guard_windows_probe.py` checks native
+multi-process exclusion, and `capture_windows_cross_guard.py` builds a temporary
+Rust holder against exact K-308 graph-core source to check exclusion across
+languages. The candidate evidence is under `evidence/K-307/`; released core,
+signing and three-lane certification remain separate gates.
+
 ## Preflight — ก่อนเริ่มทุก task
 
 1. อ่าน workspace `AGENTS.md`, `Development.md` ของ repository นี้ และ task card/spec ที่เกี่ยวข้อง;
