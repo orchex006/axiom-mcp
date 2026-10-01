@@ -1,0 +1,37 @@
+{
+  "task_id": "K-307",
+  "checks": [
+    {
+      "id": "pytest-isolated",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/pytest-isolated.txt",
+      "sha256": "c2e56b52edc40257211f47d6242a9e4dc04d0efe8636daa2a809ae88dffdcffd"
+    },
+    {
+      "id": "ruff-check",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/ruff-check.txt",
+      "sha256": "b2dc2dcfe597968d234f658f97329199a2775387a9357f014784202cdbbec192"
+    },
+    {
+      "id": "ruff-format",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/ruff-format.txt",
+      "sha256": "4822ad3b5d3fce4ca114c8ce3beb59da51ccb8c5ab273ec650376f0cbd680734"
+    },
+    {
+      "id": "spec-pin",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/spec-pin.txt",
+      "sha256": "a6bf4d9e8a370eec23de6e3e60700736efddfe7319834cc49193cdd39b6d6c9a"
+    }
+  ],
+  "diagnostic": [
+    {
+      "id": "pytest-global",
+      "exit_code": 1,
+      "path": "evidence/K-307/logs/pytest-global.txt",
+      "sha256": "fdae6d356a44701fb69fbb5bdc2cfe5aaa69b4afd556084ab89f71eda6936f2b"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "task_id": "K-307",
+  "lane": "windows-x64",
+  "kind": "local_runtime",
+  "candidate": true,
+  "certified": false,
+  "publication": "not_published",
+  "owner_source_revision": "d45854cc04c2277681f953a64571e527c8ab5341",
+  "spec_revision": "71fc697c4bf75dcd9f6185d70e56e2751eac6c44",
+  "installed_wheel_source_revision": "78f991622b52db86499c3031ed98c07a4d9d408e",
+  "installed_wheel_sha256": "36848a68ad4aa66932fbfd3773c020fab6267aa2e705ef624797745664409b56",
+  "core_source_revision": "d548bdfcd34975abf08d6a88de335f9ae432f55c",
+  "cli_b_source_revision": "c4cfb4ba21f6c95211fc1ceec2909e25b3f0f711",
+  "k306_b_kit_sha256": "a4bbcb65d2f9aa9b599c1b587f8a4271e8db8fcea195ba99c75a180dbd699a79",
+  "k306_scope_sha256": "368c28cb020ed4581426e1cac9ad470f5d4896274d1b65e15725d1a228678063",
+  "matrix": {
+    "path": "evidence/K-307/matrix-summary.json",
+    "sha256": "8b77910031f1f5cf7d0beae119bc2bb83ced55c22e8001ca5f6fd9cc803067c6",
+    "leg_status": {
+      "http-security": "passed",
+      "python-query": "passed",
+      "stdio-handshake": "passed",
+      "stdio-interrupt": "passed",
+      "stdio-noise": "passed",
+      "stdio-silence-deadline": "passed",
+      "stdio-tool-call": "passed"
+    }
+  },
+  "native_report": {
+    "path": "evidence/K-307/native-report.json",
+    "sha256": "b782cbf5d7c809f226dbfc06ff814845f549f98e87f6ce9bbbb7ef1cc82060c7"
+  },
+  "cross_language_guard": {
+    "path": "evidence/K-307/cross-language-guard-report.json",
+    "sha256": "cfe74ed5d37dab767552358e8d433c4f83ea9cc8eb5f0b6fa6c671e80bdae8e6"
+  },
+  "update_query": {
+    "path": "evidence/K-307/update-report.json",
+    "sha256": "1118374d49d296e916288ce945a4a9fb6f180dbd53aa04474841b8c300e18109"
+  },
+  "consumer": "K-502",
+  "limitations": [
+    "unsigned installed candidate, no released core fixture",
+    "one transient Windows staging file lock refused the first secondary update attempt; A was unchanged and same approved plan succeeded on retry",
+    "global Python had stale ambient pydantic; required pytest and ruff checks passed in pinned isolated venv"
+  ]
+}

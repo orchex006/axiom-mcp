@@ -1,0 +1,5 @@
+exit=0
+stdout:
+164 files already formatted
+
+stderr:

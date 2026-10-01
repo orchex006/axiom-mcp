@@ -1,0 +1,60 @@
+{
+  "task_id": "K-307",
+  "candidate": true,
+  "certified": false,
+  "wheel_sha256": "36848a68ad4aa66932fbfd3773c020fab6267aa2e705ef624797745664409b56",
+  "b_catalog": "5f284c90259bab2045eb736be83ee293ff8408b837c4ef743d47d88666750736",
+  "restored_catalog": "1039381869a25cfc2a6e67a57188b26571bd58e4990d40ccdb1bdc8e489f79c8",
+  "b_query": {
+    "catalog_generation_id": "06cb039219761b5d1f234d9e0a9b6d58b157ff705cd3c94a198be507fccdd533",
+    "catalog_manifest_sha256": "5f284c90259bab2045eb736be83ee293ff8408b837c4ef743d47d88666750736",
+    "catalog_pointer_sha256": "2014a862119994a512b0bb67c07ec68c765cbca5cd8bc278b0ef313673c8ee6f",
+    "coverage": "complete_for_profile",
+    "node_count": 1,
+    "query_symbol": "K307After",
+    "status": "passed",
+    "verification": {
+      "mode": "none"
+    },
+    "version_mismatch": {
+      "actual_runtime_pin_reasons": [],
+      "missing_protocol": [
+        "protocol_revision_missing:2025-11-25"
+      ],
+      "wrong_python": [
+        "python_version_unsupported:3.12.9"
+      ],
+      "wrong_sdk": [
+        "sdk_version_unsupported:1.28.0"
+      ]
+    },
+    "wheel_import_below_venv": true
+  },
+  "restored_query": {
+    "catalog_generation_id": "d8e01b426559c73d07787b1962d3b10e6b93629c215fa50d8c10b3498a32fedd",
+    "catalog_manifest_sha256": "1039381869a25cfc2a6e67a57188b26571bd58e4990d40ccdb1bdc8e489f79c8",
+    "catalog_pointer_sha256": "a773cdada8a569856d04f4b1e1ca684787960fabfacf3739ffceee519832fbd8",
+    "coverage": "complete_for_profile",
+    "node_count": 1,
+    "query_symbol": "K307Restored",
+    "status": "passed",
+    "verification": {
+      "mode": "none"
+    },
+    "version_mismatch": {
+      "actual_runtime_pin_reasons": [],
+      "missing_protocol": [
+        "protocol_revision_missing:2025-11-25"
+      ],
+      "wrong_python": [
+        "python_version_unsupported:3.12.9"
+      ],
+      "wrong_sdk": [
+        "sdk_version_unsupported:1.28.0"
+      ]
+    },
+    "wheel_import_below_venv": true
+  },
+  "user_data_preserved": true,
+  "staging_lock_retry": true
+}

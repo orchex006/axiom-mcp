@@ -1,0 +1,5 @@
+exit=2
+stdout:
+{"certified": false, "reason": "axiom-cli.exe exited 8: {\"code\": 8, \"details\": {\"engine_owner\": \"axiom-graphd\", \"reason\": \"the install plan digest is 267c361e42159eb2b58296a5ca50746e7ff59f7335679516d0cc6d594e561203; D:\\\\SP-Billy\\\\axiom\\\\goals\\\\run-logs\\\\K-307\\\\update-run\\\\user-install\\\\staging\\\\engine-bundle: The process cannot access the file because it is being used by another process. (os error 32)\", \"reason_code\": \"bundle_staging_unwritable\"}, \"message\": \"the install plan digest is 267c361e42159eb2b58296a5ca50746e7ff59f7335679516d0cc6d594e561203; D:\\\\SP-Billy\\\\axiom\\\\goals\\\\run-logs\\\\K-307\\\\update-run\\\\user-install\\\\staging\\\\engine-bundle: The process cannot access the file because it is being used by another process. (os error 32)\", \"request_id\": \"axiom-cli-update-2dc8-18da6cc7836eecf4\", \"retryable\": true, \"status\": \"io_error\"}", "status": "refused"}
+
+stderr:

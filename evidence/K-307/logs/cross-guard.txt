@@ -1,0 +1,5 @@
+exit=0
+stdout:
+{"backend": "windows", "holder": {"backend": "graph-core", "event": "acquired"}, "installed_python": "<isolated-run>\\user-install\\mcp-runtime\\versions\\d0f0fc8644e8e88e91cadb78\\venv\\Scripts\\python.exe", "refused": {"event": "failed", "lock": "data.lock", "message": "lock_timeout:data.lock: bounded wait of 300 ms elapsed without acquiring the guard; every acquired guard was released in reverse acquisition order", "pid": 35740, "platform": "win32", "reason": "lock_timeout"}, "refused_exit_code": 3, "released": [{"backend": "windows", "event": "acquired", "locks": ["data.lock"], "mode": "shared", "pid": 29872, "platform": "win32"}, {"event": "released", "locks": ["data.lock"], "pid": 29872, "platform": "win32"}], "released_exit_code": 0, "rust_core_revision": "d548bdfcd34975abf08d6a88de335f9ae432f55c", "rust_holder_sha256": "1751e19e46f3d1e9aca2342d5c3aa5298d987edc8619cbb840ac84ff1199942c", "status": "passed"}
+
+stderr:

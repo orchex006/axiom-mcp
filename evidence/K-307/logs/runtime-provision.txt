@@ -1,0 +1,5 @@
+exit=0
+stdout:
+{"bundle_sha256": "82e9ca2920f91f6b41d953d2b53a6d8f359c2958be7f0c7e781a5e6e76143190", "certified": false, "executable_sha256": "a949c53c51e05752d4022943ee6d57475f79553848246bac5da76f292fcc353c", "generation": "d0f0fc8644e8e88e91cadb78", "python_sha256": "85b71d8c6ec1905935f74be0c9869aae198d00e98f39df699ec66f9c5a84cecd", "runtime_bin": "<isolated-run>\\user-install\\mcp-runtime\\versions\\d0f0fc8644e8e88e91cadb78\\venv\\Scripts", "runtime_sha256": "d1f04d990aee1253d8569e8e5104e30fa9f5fa830899f14843448872d936a2cf", "source_revision": "78f991622b52db86499c3031ed98c07a4d9d408e", "status": "provisioned", "version": "0.1.1"}
+
+stderr:

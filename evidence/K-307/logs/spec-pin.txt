@@ -1,0 +1,11 @@
+cwd=axiom-mcp
+command=python <axiom-specs>/tools/spec-lock-check.py --lock spec.lock.json --spec-root <clean-pinned-specs> --json
+exit=0
+{
+  "ok": true,
+  "lock": "spec.lock.json",
+  "spec_root": "D:\\SP-Billy\\axiom\\goals\\run-logs\\K-308-spec-pin",
+  "release": false,
+  "reasons": []
+}
+

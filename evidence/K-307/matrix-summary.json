@@ -1,0 +1,438 @@
+{
+  "task_id": "K-307",
+  "target": "windows-x64",
+  "passed": true,
+  "leg_status": {
+    "http-security": "passed",
+    "python-query": "passed",
+    "stdio-handshake": "passed",
+    "stdio-interrupt": "passed",
+    "stdio-noise": "passed",
+    "stdio-silence-deadline": "passed",
+    "stdio-tool-call": "passed"
+  },
+  "released_core_fixture": {
+    "fixture_self_label": "synthetic-fixture-v2-not-runtime",
+    "fixture_used": "real-source-installed-candidate",
+    "reason": "Installed real-source candidate was tested locally; no released fixture certification was performed.",
+    "status": "not_run"
+  },
+  "identity": {
+    "os_name": "nt",
+    "sys_platform": "win32",
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "machine": "AMD64",
+    "pointer_bits": 64,
+    "python_version": "3.13.15",
+    "guard_backend": "windows",
+    "protocol_minimum": "2025-11-25",
+    "runtime_pins": {
+      "anyio": "4.14.2",
+      "fastapi": "0.139.2",
+      "httpx": "0.28.1",
+      "mcp": "1.28.1",
+      "pydantic": "2.13.4",
+      "starlette": "1.3.1",
+      "uvicorn": "0.51.0"
+    }
+  },
+  "legs": [
+    {
+      "leg": "python-query",
+      "status": "passed",
+      "checks": [
+        {
+          "check": "installed_wheel.real_source_query",
+          "kind": "positive",
+          "observed": {
+            "catalog_generation_id": "13b15c1337ced6d573a0d590e28e2d80068be94e5fd527f6beb1cf2f6bef67aa",
+            "catalog_manifest_sha256": "de8830eef827512bfcd9888953cbd919a0b0ac7e1a0832eb9635e4f6a18166d4",
+            "catalog_pointer_sha256": "1edba032e226d5ff259f890c40b4411d373ed704a4c2ca8d41bfb94042ddf722",
+            "coverage": "complete_for_profile",
+            "node_count": 1,
+            "query_symbol": "K307WatcherB",
+            "status": "passed",
+            "verification": {
+              "mode": "none"
+            },
+            "version_mismatch": {
+              "actual_runtime_pin_reasons": [],
+              "missing_protocol": [
+                "protocol_revision_missing:2025-11-25"
+              ],
+              "wrong_python": [
+                "python_version_unsupported:3.12.9"
+              ],
+              "wrong_sdk": [
+                "sdk_version_unsupported:1.28.0"
+              ]
+            },
+            "wheel_import_below_venv": true
+          },
+          "outcome": "pass"
+        }
+      ],
+      "exit_code": 0
+    },
+    {
+      "leg": "stdio-handshake",
+      "status": "passed",
+      "checks": [
+        {
+          "check": "stdio-handshake.stdout_protocol_only",
+          "kind": "positive",
+          "observed": {
+            "first_non_protocol_line": null,
+            "jsonrpc_frames": 2,
+            "non_protocol_lines": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-handshake.initialize",
+          "kind": "positive",
+          "observed": {
+            "protocol_version": "2025-11-25",
+            "server_name": "v2-031-native-stdio",
+            "server_version": "1.28.1"
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-handshake.tools_list_answer",
+          "kind": "positive",
+          "observed": {
+            "tools": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-handshake.exit_code",
+          "kind": "positive",
+          "observed": {
+            "exit_code": 0,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-handshake.stderr_diagnostics",
+          "kind": "positive",
+          "observed": {
+            "banner_present": true,
+            "diverted_writes": 0,
+            "stdio_stop": "axiom-mcp: stdio_stop protocol_bytes=328 protocol_writes=2 violations=0"
+          },
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "leg": "stdio-noise",
+      "status": "passed",
+      "checks": [
+        {
+          "check": "stdio-noise.stdout_protocol_only",
+          "kind": "positive",
+          "observed": {
+            "first_non_protocol_line": null,
+            "jsonrpc_frames": 2,
+            "non_protocol_lines": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.initialize",
+          "kind": "positive",
+          "observed": {
+            "protocol_version": "2025-11-25",
+            "server_name": "v2-031-native-noise",
+            "server_version": "1.28.1"
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.tools_list_answer",
+          "kind": "positive",
+          "observed": {
+            "tools": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.exit_code",
+          "kind": "positive",
+          "observed": {
+            "exit_code": 0,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.stderr_diagnostics",
+          "kind": "positive",
+          "observed": {
+            "banner_present": true,
+            "diverted_writes": 3,
+            "stdio_stop": "axiom-mcp: stdio_stop protocol_bytes=328 protocol_writes=2 violations=3"
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio-noise.stdout_noise_diverted",
+          "kind": "failure",
+          "observed": {
+            "diverted_writes": 3,
+            "injected_lines": 3,
+            "leaked_to_stdout": 0
+          },
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "leg": "stdio-silence-deadline",
+      "status": "passed",
+      "checks": [
+        {
+          "check": "stdio.silence.read_deadline",
+          "kind": "boundary",
+          "observed": {
+            "deadline_expired_without_data": true,
+            "read_deadline_seconds": 2.0,
+            "unsolicited_bytes": 0
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio.silence.exit_code",
+          "kind": "boundary",
+          "observed": {
+            "exit_code": 0,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "leg": "stdio-interrupt",
+      "status": "passed",
+      "checks": [
+        {
+          "check": "stdio.interrupt.ctrl_break_event",
+          "kind": "failure",
+          "observed": {
+            "delivered": "CTRL_BREAK_EVENT",
+            "exit_code": 3221225786,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "stdio.interrupt.ctrl_break_event.hard_stop",
+          "kind": "failure",
+          "observed": {
+            "exit_code": 3221225786,
+            "stderr_tail": "axiom-mcp: stdout=protocol-only stderr=diagnostics",
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "leg": "stdio-tool-call",
+      "status": "passed",
+      "checks": [
+        {
+          "check": "installed_stdio.graph_query",
+          "kind": "positive",
+          "observed": {
+            "call_response": {
+              "id": 3,
+              "jsonrpc": "2.0",
+              "result": {
+                "content": [
+                  {
+                    "text": "{\n  \"schema_version\": 1,\n  \"solution_id\": \"demo-solution\",\n  \"catalog_generation_id\": \"13b15c1337ced6d573a0d590e28e2d80068be94e5fd527f6beb1cf2f6bef67aa\",\n  \"project_generations\": [\n    {\n      \"project_id\": \"demo-project\",\n      \"generation_id\": \"e4b0123a23947ce65ad216d997afeb40d666810d57ee3d95c9e3b26ea3adb6cb\"\n    }\n  ],\n  \"freshness\": \"unknown\",\n  \"coverage\": \"complete_for_profile\",\n  \"verification\": {\n    \"mode\": \"none\"\n  },\n  \"nodes\": [\n    {\n      \"id\": \"734be31d4a23782ad143d51055d7e64efe92c805c3a5f551a1c36b4fdde0de2c\",\n      \"project_id\": \"demo-project\",\n      \"kind\": \"Class\",\n      \"name\": \"K307WatcherB\",\n      \"qualified_name\": \"Demo.K307WatcherB\",\n      \"language\": \"csharp\",\n      \"source\": {\n        \"file\": \"TokenSource.cs\",\n        \"start_line\": 4,\n        \"end_line\": 4\n      },\n      \"identity_quality\": \"semantic_key\",\n      \"attributes\": {}\n    }\n  ],\n  \"edges\": [],\n  \"truncated\": false,\n  \"warnings\": [\n    \"freshness was not reported, so it is unknown rather than fresh\"\n  ]\n}",
+                    "type": "text"
+                  }
+                ],
+                "isError": false
+              }
+            },
+            "exit_code": 0,
+            "failure": null,
+            "protocol_junk": [],
+            "tool_names": [
+              "graph_query"
+            ]
+          },
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "leg": "http-security",
+      "status": "passed",
+      "checks": [
+        {
+          "check": "http.launcher_ready",
+          "kind": "positive",
+          "observed": {
+            "line": "READY http://127.0.0.1:56777",
+            "ready": true
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.probes.allowed_host_without_credential",
+          "kind": "positive",
+          "observed": {
+            "any_refused_by_policy": false,
+            "readyz_reported_readiness": "{\"ready\":false,\"query\":{\"available\":false,\"detail\":\"query data plane not wired\"},\"control\":{\"available\":false,\"detail\":\"graphd control client not wired\"},\"error\":\"NOT_READY\"}",
+            "statuses": {
+              "/healthz": 200,
+              "/readyz": 503
+            }
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.sdk_client.handshake",
+          "kind": "positive",
+          "observed": {
+            "capabilities": [
+              "experimental",
+              "prompts",
+              "resources",
+              "tools"
+            ],
+            "elapsed_seconds": 0.536,
+            "negotiated_is_pinned_minimum": true,
+            "protocol_version": "2025-11-25",
+            "server_name": "v2-031-native-http",
+            "server_version": "1.28.1"
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.lookalike_host.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"FORBIDDEN\", \"message\": \"the Host header is not on the transport allowlist\", \"retryable\": false, \"details\": {}, \"request_id\": \"b2ec503a6e674cba89f1fcb9ff58eda1\"}",
+            "body_sha256": "66a8bfd431471b874c68f00e0c8b931f57e2a852e569def2168eae8a08c027f7",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.473,
+            "error_code": "FORBIDDEN",
+            "status_code": 403
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.lookalike_origin.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"FORBIDDEN\", \"message\": \"the Origin header is not on the transport allowlist\", \"retryable\": false, \"details\": {}, \"request_id\": \"242ec00a15fb4aee975c89e8bd713362\"}",
+            "body_sha256": "037f5b7966c8c6ab2eadddcdb91e6bc4b96512f99ba3f45c7e3d189d5fe80e9a",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.388,
+            "error_code": "FORBIDDEN",
+            "status_code": 403
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.missing_credential.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"UNAUTHENTICATED\", \"message\": \"a bearer token is required\", \"retryable\": false, \"details\": {}, \"request_id\": \"da9f0feed53544fe90366c5c578c2dd0\"}",
+            "body_sha256": "16f26be721a6c2955629e8297ec195c5c6af6a0e29d9e662d83e5d2bdf492e17",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.621,
+            "error_code": "UNAUTHENTICATED",
+            "status_code": 401
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.control_audience_credential.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"UNAUTHENTICATED\", \"message\": \"the presented bearer token is not recognised\", \"retryable\": false, \"details\": {}, \"request_id\": \"de27ee11f7e440b78eec7441f57208ed\"}",
+            "body_sha256": "7e4ccaee211070dcee21aca78c4c46a97168c118f348aa66e17d597045651023",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.411,
+            "error_code": "UNAUTHENTICATED",
+            "status_code": 401
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.read_token_mutating_tool.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"FORBIDDEN\", \"message\": \"the bearer token lacks the required capability\", \"retryable\": false, \"details\": {}, \"request_id\": \"bb154f863734441184de0918f1874e30\"}",
+            "body_sha256": "8e29eb3fb68c54729b0b4434c8dfe59cbaff0178e59fe29965c15e73318cafac",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.413,
+            "error_code": "FORBIDDEN",
+            "status_code": 403
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.read_token_unscoped_solution.refused",
+          "kind": "negative",
+          "observed": {
+            "body_excerpt": "{\"code\": \"FORBIDDEN\", \"message\": \"the bearer token is not scoped to this solution\", \"retryable\": false, \"details\": {}, \"request_id\": \"2b864f8afbaf4afea9191a520076f4dd\"}",
+            "body_sha256": "73074ea8beca03e1ff96c9f1553e1cb8444f9158ddb0dc48fc99ec9e26d5da72",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.418,
+            "error_code": "FORBIDDEN",
+            "status_code": 403
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.oversized_body.refused",
+          "kind": "boundary",
+          "observed": {
+            "body_excerpt": "{\"code\": \"VALIDATION_ERROR\", \"message\": \"request body exceeds the configured bound\", \"retryable\": false, \"details\": {}, \"request_id\": \"9ff9356defe84c05b8fa0c80155ffe70\"}",
+            "body_sha256": "063f5b19c52dca50aebedc2918f9ad0d23f7fdd8ef8e99f00fdeafe3e774886e",
+            "content_type": "application/json",
+            "elapsed_seconds": 0.454,
+            "error_code": "VALIDATION_ERROR",
+            "status_code": 400
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.stalled_body.client_timeout",
+          "kind": "failure",
+          "observed": {
+            "bytes_received": 0,
+            "client_deadline_seconds": 6.0,
+            "client_timed_out": true,
+            "elapsed_seconds": 6.04
+          },
+          "outcome": "pass"
+        },
+        {
+          "check": "http.launcher_teardown",
+          "kind": "boundary",
+          "observed": {
+            "exit_code": 1,
+            "terminated_by_harness": false
+          },
+          "outcome": "pass"
+        }
+      ]
+    }
+  ],
+  "raw_matrix_sha256": "ffa333425038810dd425dfa01d775d5758f1f5326e5d3d6dd5a8890b7e5e2403",
+  "raw_sha256sums_sha256": "e91ad995e71fbafad454e6f2adfea6a571c2c817bdcba52c441ed97e71834f96"
+}

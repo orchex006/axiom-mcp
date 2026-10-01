@@ -1,0 +1,15 @@
+{
+  "task_id": "K-307",
+  "core_version": "0.1.2",
+  "first_catalog_generation": "206d5f5de49b87b3ec3b6da61b2ed5baed5ef63321660e913016adf9672a7d99",
+  "watcher_generation": "57314c108e371b02c977798bd6425b426ffcaf57775aa07757bb9b8357a09d59",
+  "restart_generation": "de8830eef827512bfcd9888953cbd919a0b0ac7e1a0832eb9635e4f6a18166d4",
+  "daemon_exit_codes": [
+    0,
+    0
+  ],
+  "query_exit_code": 0,
+  "query_sha256": "b63c60db6e8e8df263845186edf5d13452efcbc1000221cc00ae7feeb1248024",
+  "source_sha256": "cdab5ba1531fb91731c354bae21158ae77d27e6589b5c2b936b876b1e29dbf2e",
+  "installed_daemon_sha256": "433c1c030953164dc2b5dcde81cb0650cae708c31cabbb00055283a9f50beb24"
+}

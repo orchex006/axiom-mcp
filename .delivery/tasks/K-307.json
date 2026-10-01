@@ -1,0 +1,12 @@
+{
+  "task_id": "K-307",
+  "owner": "axiom-mcp",
+  "branch": "feature/k-307-windows-installed-mcp",
+  "source_revision": "d45854cc04c2277681f953a64571e527c8ab5341",
+  "lane": "windows-x64",
+  "kind": "local_runtime",
+  "certified": false,
+  "installed_wheel_sha256": "36848a68ad4aa66932fbfd3773c020fab6267aa2e705ef624797745664409b56",
+  "matrix_sha256": "8b77910031f1f5cf7d0beae119bc2bb83ced55c22e8001ca5f6fd9cc803067c6",
+  "handoff": "evidence/K-307/handoff.json"
+}

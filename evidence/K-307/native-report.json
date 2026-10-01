@@ -1,0 +1,187 @@
+{
+  "task_id": "K-307",
+  "kind": "local_runtime",
+  "lane": "windows-x64",
+  "status": "local_verified",
+  "certified": false,
+  "provenance": "candidate",
+  "owner_source_revision": "d45854cc04c2277681f953a64571e527c8ab5341",
+  "installed_wheel_source_revision": "78f991622b52db86499c3031ed98c07a4d9d408e",
+  "installed_wheel_sha256": "36848a68ad4aa66932fbfd3773c020fab6267aa2e705ef624797745664409b56",
+  "cli_b_source_revision": "c4cfb4ba21f6c95211fc1ceec2909e25b3f0f711",
+  "core_b_source_revision": "d548bdfcd34975abf08d6a88de335f9ae432f55c",
+  "k306_kit_sha256": "a4bbcb65d2f9aa9b599c1b587f8a4271e8db8fcea195ba99c75a180dbd699a79",
+  "matrix_leg_status": {
+    "http-security": "passed",
+    "python-query": "passed",
+    "stdio-handshake": "passed",
+    "stdio-interrupt": "passed",
+    "stdio-noise": "passed",
+    "stdio-silence-deadline": "passed",
+    "stdio-tool-call": "passed"
+  },
+  "matrix_passed": true,
+  "installed_wheel_query": true,
+  "version_mismatch_refused": {
+    "actual_runtime_pin_reasons": [],
+    "missing_protocol": [
+      "protocol_revision_missing:2025-11-25"
+    ],
+    "wrong_python": [
+      "python_version_unsupported:3.12.9"
+    ],
+    "wrong_sdk": [
+      "sdk_version_unsupported:1.28.0"
+    ]
+  },
+  "cross_language_guard_passed": true,
+  "native_windows_guard_passed": true,
+  "update_rollback_query_passed": true,
+  "cleanup": {
+    "task_id": "K-307",
+    "path_exact_restored": true,
+    "path_kind": 2,
+    "user_data_preserved": true,
+    "entrypoints_removed": true,
+    "source_repos_preserved": true
+  },
+  "commands": [
+    {
+      "id": "install-plan",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/install-plan.txt",
+      "sha256": "18ec7371f9a58b9d6d12e12e9c9d4cf8a9392258b13cd4d8637c4a26727dbd29"
+    },
+    {
+      "id": "install-apply",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/install-apply.txt",
+      "sha256": "489ca62699e52ebb7d552607943addbec5e5792630a760d9fc8351c87f626306"
+    },
+    {
+      "id": "runtime-provision",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/runtime-provision.txt",
+      "sha256": "369b332b8ce241357e7feeeefce4f3d6a1632b4d309983b7c517cfba1099fb48"
+    },
+    {
+      "id": "engine-plan",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/engine-plan.txt",
+      "sha256": "f83e018a2f2b4b8ea70b3fd6a420366e734be9216f039a68c0ff56aef7931046"
+    },
+    {
+      "id": "engine-apply",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/engine-apply.txt",
+      "sha256": "4f5923a67e470727a739475d77051233625d152295190854ddda214f0c9e1c31"
+    },
+    {
+      "id": "register-apply",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/register-apply.txt",
+      "sha256": "9274b4ab97b6b3dfa5fe2a6b171b89d868d20d5a70b465eeceed7f1f7a440438"
+    },
+    {
+      "id": "graphd-query",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/graphd-query.txt",
+      "sha256": "b87878096491b09a8c735d0b716adc3bf7c66d4facecaabf961f1387a1039bb6"
+    },
+    {
+      "id": "matrix-run",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/matrix-run.txt",
+      "sha256": "339066ab749261e0eb71f6064c9b7a77d045945bd9060505e0c4e8352795ed85"
+    },
+    {
+      "id": "guard-probe",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/guard-probe.txt",
+      "sha256": "49c56d39614828a45d466216f876c3e895f1ec1124acc53a494df0f72346624b"
+    },
+    {
+      "id": "cross-guard",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/cross-guard.txt",
+      "sha256": "03890a8bd294b5e3b14e7be246eb6ac8be50313d24196b6f34fc9a8c83034119"
+    },
+    {
+      "id": "rust-guard-build",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/rust-guard-build.txt",
+      "sha256": "628cd4c2a39bda29ab346edfa72cc383ebc8b9200c562c24ab3e2f4d9313338a"
+    },
+    {
+      "id": "a-mcp-query",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/a-mcp-query.txt",
+      "sha256": "11b019c097dd656cf89d7cac7f6ac68ba066ab2dc8455d8ccf4a2cbef96e91ad"
+    },
+    {
+      "id": "b-mcp-query",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/b-mcp-query.txt",
+      "sha256": "b0c1090efbf95d7fb5e2effe6165d5087d63802dd6fbff8f385440ba696a20c6"
+    },
+    {
+      "id": "a-restored-mcp-query",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/a-restored-mcp-query.txt",
+      "sha256": "0f1d031b6c2c7cf0eaabfcd63b6b62ab91abdc88e929218e0d689c7e58217820"
+    },
+    {
+      "id": "b-apply-refusal",
+      "exit_code": 2,
+      "path": "evidence/K-307/logs/b-apply-refusal.txt",
+      "sha256": "19eec71fe57aef11ae04a33a14c8dd72b0c62b646c27c3d746bc08ed5ac1e386"
+    },
+    {
+      "id": "b-apply-retry",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/b-apply-retry.txt",
+      "sha256": "fa745cbe640d5c5a8c40bb208b543d43eaff1baf2058c6be7ecc670dc8185e3a"
+    },
+    {
+      "id": "b-rollback",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/b-rollback.txt",
+      "sha256": "fae0a6ec17d7322aa3930aad645cc63dd5a5eaa968313e9a7db1e11500964836"
+    },
+    {
+      "id": "pytest-global",
+      "exit_code": 1,
+      "path": "evidence/K-307/logs/pytest-global.txt",
+      "sha256": "fdae6d356a44701fb69fbb5bdc2cfe5aaa69b4afd556084ab89f71eda6936f2b"
+    },
+    {
+      "id": "pytest-isolated",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/pytest-isolated.txt",
+      "sha256": "c2e56b52edc40257211f47d6242a9e4dc04d0efe8636daa2a809ae88dffdcffd"
+    },
+    {
+      "id": "ruff-check",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/ruff-check.txt",
+      "sha256": "b2dc2dcfe597968d234f658f97329199a2775387a9357f014784202cdbbec192"
+    },
+    {
+      "id": "ruff-format",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/ruff-format.txt",
+      "sha256": "4822ad3b5d3fce4ca114c8ce3beb59da51ccb8c5ab273ec650376f0cbd680734"
+    },
+    {
+      "id": "spec-pin",
+      "exit_code": 0,
+      "path": "evidence/K-307/logs/spec-pin.txt",
+      "sha256": "a6bf4d9e8a370eec23de6e3e60700736efddfe7319834cc49193cdd39b6d6c9a"
+    }
+  ],
+  "limitations": [
+    "unsigned installed local candidate only; no released core fixture provenance",
+    "first update apply in secondary root refused a transient Windows staging file lock; installed A stayed intact and retry with identical plan/digest succeeded",
+    "global Python pytest saw stale ambient pydantic 2.12.5; all required checks passed in K-303 pinned isolated test venv"
+  ]
+}

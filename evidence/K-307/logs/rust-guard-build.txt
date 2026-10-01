@@ -1,0 +1,31 @@
+exit=0
+stdout:
+
+stderr:
+     Locking 33 packages to latest compatible versions
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling typenum v1.20.1
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling serde_core v1.0.229
+   Compiling windows_x86_64_msvc v0.53.1
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.3
+   Compiling cpufeatures v0.2.17
+   Compiling generic-array v0.14.7
+   Compiling windows-targets v0.53.5
+   Compiling windows-sys v0.60.2
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling syn v3.0.6
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling serde_derive v1.0.229
+   Compiling graph-core v0.1.2 (<axiom-graphd>\crates\graph-core)
+   Compiling k307-rust-holder v0.0.0 (<isolated-run>\k307-rust-holder)
+    Finished `release` profile [optimized] target(s) in 24.56s

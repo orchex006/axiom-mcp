@@ -1,0 +1,3 @@
+exit=0
+{"id":"demo-solution","profile":"default","config_hash":"4f0dd27e35048f3fa3c376f2fa2b5bd590831bc5492100f80bc89456b6837341","projects":1}
+

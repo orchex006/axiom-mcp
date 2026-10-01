@@ -1,0 +1,5 @@
+exit=0
+stdout:
+{"backend": "windows", "holder": {"backend": "windows", "event": "acquired", "locks": ["data.lock"], "mode": "exclusive", "pid": 47000, "platform": "win32"}, "holder_exit_code": 1, "refused_exit_code": 3, "refused_output": "{\"event\": \"failed\", \"lock\": \"data.lock\", \"message\": \"lock_timeout:data.lock: bounded wait of 300 ms elapsed without acquiring the guard; every acquired guard was released in reverse acquisition order\", \"pid\": 10040, \"platform\": \"win32\", \"reason\": \"lock_timeout\"}", "released_exit_code": 0, "released_output": "{\"backend\": \"windows\", \"event\": \"acquired\", \"locks\": [\"data.lock\"], \"mode\": \"shared\", \"pid\": 41868, \"platform\": \"win32\"}\n{\"event\": \"released\", \"locks\": [\"data.lock\"], \"pid\": 41868, \"platform\": \"win32\"}", "status": "passed", "wheel_import_below_venv": true}
+
+stderr:
