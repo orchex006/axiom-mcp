@@ -46,6 +46,7 @@ Owner-authorized publication of current code; see release/v0.1.1-notes.md.
 Build and verify the portable 0.1.1 MCP wheel with a native Windows Python
 3.13 dependency wheelhouse and exact hashes. Record metadata, entrypoints and
 corrupt/missing/unsupported input refusals for the K-304 consumer.
+Stage the wheel from exact committed source bytes to exclude stale build output.
 
 - **fix** (V2-031) `graph_query` now reads the solution catalog once and opens
   only its exact pinned member generations. A project `current.json` that advances
