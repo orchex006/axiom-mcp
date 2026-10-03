@@ -1,0 +1,40 @@
+{
+  "task_id": "K-409",
+  "status": "done",
+  "verification_status": "local_verified",
+  "lane": "wsl2-linux-x64",
+  "certified": false,
+  "branch": "feature/k-409-wsl-installed-mcp",
+  "source_revision": "d1395d6d1bb0801be05e01ba5760004143bd1781",
+  "local_commit_sha": "d1395d6d1bb0801be05e01ba5760004143bd1781",
+  "push_remote": "https://github.com/orchex006/axiom-mcp.git",
+  "verified_remote_branch_sha": "d1395d6d1bb0801be05e01ba5760004143bd1781",
+  "delivery_state": "pushed",
+  "preflight_checks": [
+    "P1",
+    "P2",
+    "P3",
+    "P4",
+    "P5",
+    "P6"
+  ],
+  "completion_checks": [
+    "D1",
+    "D2",
+    "D3",
+    "D4",
+    "D5",
+    "D6",
+    "D7",
+    "D8"
+  ],
+  "evidence": [
+    "evidence/K-409/native/native-report.json",
+    "evidence/K-409/native/matrix/raw/matrix.json",
+    "evidence/K-409/owner-checks.json",
+    "evidence/K-409/review.md"
+  ],
+  "integration_state": "blocked",
+  "integration_blocker": "Workspace AGENTS section 12 forbids merge without explicit current-task authorization. Preserve main checkout K-307 branch; no main integration claimed.",
+  "next_action": "Owner may authorize reviewed task-feature integration separately; specs closure is delivered on its dedicated feature."
+}

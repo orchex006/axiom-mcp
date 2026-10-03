@@ -41,6 +41,8 @@ Owner-authorized publication of current code; see release/v0.1.1-notes.md.
 
 ## Unreleased
 
+- K-409: add non-root WSL2 installed MCP query/process/security capture with exact K-408 inputs, isolated test home, restart/update/rollback queries and data preservation.
+
 ### K-303 Windows MCP wheel input
 
 Build and verify the portable 0.1.1 MCP wheel with a native Windows Python

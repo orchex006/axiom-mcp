@@ -28,6 +28,14 @@ K-407 local Linux x64 container candidate ใช้ `capture_native_matrix.py` �
 ใน versioned environment; native identity และผล process/security อยู่ใน
 `evidence/K-407/`. Released-fixture certification ยังคงเป็น release-phase gate.
 
+K-409 WSL2 installed MCP candidate uses `tests/native/capture_wsl_k409.py` on an
+existing non-root WSL2 x64 user with a fresh task-owned home and exact K-408
+A/B kit, runtime, wheelhouse and wheel inputs. Installed-wheel queries run after
+A, restart, B update and rollback; `capture_native_matrix.py` records actual WSL2
+process/security and `installed_guard_probe.py` records POSIX exclusion/recovery.
+Evidence stays in `evidence/K-409/`; container proof, publication and certification
+remain separate. Resolve current Git checkouts instead of historical host paths.
+
 ## Preflight — ก่อนเริ่มทุก task
 
 1. อ่าน workspace `AGENTS.md`, `Development.md` ของ repository นี้ และ task card/spec ที่เกี่ยวข้อง;
