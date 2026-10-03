@@ -1,0 +1,7 @@
+{
+  "source_revision": "b1486c310f177897f99c3a985dbd3a61399948c4",
+  "verified_git_blob_digests": {
+    "tests/linux/k406_query_watch.py": "8a4aea2afca7a8cbae92c950efbb015cf9e5b091dae29459a47c7516f580d18a",
+    "packaging/linux/Provision-McpRuntime.py": "219e8ff6b8ca0e7dfbf58953215e4e2a0f4f5e4beabcc7c3deada324b71fa076"
+  }
+}

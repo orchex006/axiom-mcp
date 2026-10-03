@@ -1,0 +1,5 @@
+# K-409 native WSL2 candidate evidence
+
+Run `python3 tests/native/capture_wsl_k409.py --inputs <K-408-input-directory> --kits <K-408-A-B-kit-directory> --cli-owner <immutable-K-408-CLI-export> --spec-root <immutable-spec-checkout> --out <fresh-output-directory>` as a non-root x64 user on an existing WSL2 instance. Inputs are the exact K-408 wheel/runtime/kit bytes and source revisions; large assets remain retrievable from the upstream handoffs. The script creates its own isolated home and retains it outside Git for inspection.
+
+`native/native-report.json` and `native/commands.json` record real runtime, lifecycle, guard and preservation evidence. `native/matrix/` retains byte-exact raw process/security outputs. `owner-checks.json` records final owner verification; `cli-source-verify.json` records immutable source hash verification. Diagnostics describe initial harness/environment failures, and are not passing runtime evidence. All completion cases passed in the fresh final run; certified remains false.

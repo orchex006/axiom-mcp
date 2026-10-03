@@ -1,0 +1,29 @@
+[
+  {
+    "id": "pytest",
+    "command": "python -m pytest tests -q",
+    "exit_code": 1,
+    "artifact": {
+      "path": "evidence/K-409/pytest.txt",
+      "sha256": "c91bb5dc912db98b7cfe4e22c19944eefb620f95ba4ae5e3bd9be15edba19eec"
+    }
+  },
+  {
+    "id": "ruff",
+    "command": "python -m ruff check .",
+    "exit_code": 0,
+    "artifact": {
+      "path": "evidence/K-409/ruff.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  {
+    "id": "format",
+    "command": "python -m ruff format --check .",
+    "exit_code": 0,
+    "artifact": {
+      "path": "evidence/K-409/format.txt",
+      "sha256": "27b0eb549ee60b2db607fc774f8030ac1994dcb38c3fd6db8e5ef09861482a03"
+    }
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "pytest",
+    "command": "D:/SP-Billy/axiom/goals/run-logs/k-303/test-venv/Scripts/python.exe -m pytest tests -q (cwd owner feature worktree)",
+    "exit_code": 0,
+    "artifact": {
+      "path": "evidence/K-409/pytest.txt",
+      "sha256": "72b3d7bf4e0251f8dbc0199986f8504607df937fd2293f86ba69a916a4ef76d1"
+    }
+  },
+  {
+    "id": "ruff",
+    "command": "D:/SP-Billy/axiom/goals/run-logs/k-303/test-venv/Scripts/python.exe -m ruff check . (cwd owner feature worktree)",
+    "exit_code": 0,
+    "artifact": {
+      "path": "evidence/K-409/ruff.txt",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+    }
+  },
+  {
+    "id": "format",
+    "command": "D:/SP-Billy/axiom/goals/run-logs/k-303/test-venv/Scripts/python.exe -m ruff format --check . (cwd owner feature worktree)",
+    "exit_code": 0,
+    "artifact": {
+      "path": "evidence/K-409/format.txt",
+      "sha256": "27b0eb549ee60b2db607fc774f8030ac1994dcb38c3fd6db8e5ef09861482a03"
+    }
+  }
+]

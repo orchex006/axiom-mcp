@@ -1,0 +1,172 @@
+[
+  {
+    "id": "runtime-provision",
+    "argv": [
+      "/usr/bin/python3",
+      "<wsl-user-home>/axiom-k408/owner/packaging/linux/Provision-McpRuntime.py",
+      "provision",
+      "--root",
+      "<test-home>/.local/share/axiom/mcp-runtime",
+      "--version",
+      "0.1.0",
+      "--source-revision",
+      "4ccd3df6eed29a280adb6424d0e595c304cd26e6",
+      "--runtime",
+      "<wsl-user-home>/axiom-k408/inputs/cpython-3.13.15-linux-x64-candidate.tar.gz",
+      "--runtime-sha256",
+      "64f1f07d2f05ab6f7e670eb5e5d297f1429aa42c667a4360c33845471b7b55ea",
+      "--wheelhouse",
+      "<wsl-user-home>/axiom-k408/inputs/wheelhouse-linux-x64-py313.tar.gz",
+      "--wheelhouse-sha256",
+      "ca1a141f19000f16cec4fa1ed485e13ca0beee7f90183a4504bc9d31532cb1e4",
+      "--wheel",
+      "<wsl-user-home>/axiom-k408/inputs/axiom_mcp-0.1.0-py3-none-any.whl",
+      "--wheel-sha256",
+      "ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b",
+      "--lock",
+      "<wsl-user-home>/axiom-k408/inputs/container-linux-x64-py313-requirements.txt",
+      "--lock-sha256",
+      "ce2e686592de779dd980a20474ed8a317cb05487b8e4388cebfea9a73e000cb6"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"executable\": \"<test-home>/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/axiom-mcp\", \"executable_sha256\": \"0a469805ab921006c5dc6c1b214a67f17f791e1e144887ccae2a6d2373a6a94b\", \"generation\": \"f4182e34bb2ac50bb5a766ec\", \"lock_sha256\": \"ce2e686592de779dd980a20474ed8a317cb05487b8e4388cebfea9a73e000cb6\", \"python\": \"<test-home>/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python\", \"python_sha256\": \"93a93f4c8af5ae6f127fb0310f923d5fab89eb7257a0b801eec2e44b3f199840\", \"runtime_sha256\": \"64f1f07d2f05ab6f7e670eb5e5d297f1429aa42c667a4360c33845471b7b55ea\", \"status\": \"provisioned\", \"version\": \"0.1.0\", \"wheel_sha256\": \"ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b\", \"wheelhouse_sha256\": \"ca1a141f19000f16cec4fa1ed485e13ca0beee7f90183a4504bc9d31532cb1e4\"}\n",
+    "stderr": ""
+  },
+  {
+    "id": "engine-install-plan",
+    "argv": [
+      "<wsl-user-home>/axiom-k408/kits/0.1.0/release/axiom-cli",
+      "install",
+      "--from",
+      "<wsl-user-home>/axiom-k408/kits/0.1.0/release",
+      "--dry-run",
+      "--json"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"code\":0,\"details\":{\"channel\":\"stable\",\"engine_owner\":\"axiom-graphd\",\"generated_at\":\"2026-10-03T07:11:25Z\",\"install_root\":\"<test-home>/.local/share/axiom\",\"manifest_sha256\":\"b73159f25b31749ad12807c639279faf3d76906404fccb03dc37da419905feca\",\"manifest_source\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/release/channel.json\",\"mode\":\"dry-run\",\"plan\":{\"approval\":{\"approve_digest\":null,\"state\":\"unapproved\"},\"channel\":\"stable\",\"components\":[{\"artifact\":{\"class\":\"per-user-installer\",\"platform\":\"linux-x64\",\"sha256\":\"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\",\"size_bytes\":4512896,\"url\":\"https://candidate.invalid/axiom-graphd\"},\"component\":\"axiom-graphd\",\"declared\":true,\"needs_restart\":true,\"revision\":\"e5a30e2ee6807ab36cecbc881be3ffb4259cba83\",\"version\":\"0.1.0\"},{\"artifact\":{\"class\":\"per-user-installer\",\"platform\":\"linux-x64\",\"sha256\":\"ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b\",\"size_bytes\":214242,\"url\":\"https://candidate.invalid/axiom_mcp-0.1.0-py3-none-any.whl\"},\"component\":\"axiom-mcp\",\"declared\":true,\"needs_restart\":true,\"revision\":\"d92e71b25623132966b602b15ef5112c7eef7c96\",\"version\":\"0.1.0\"},{\"artifact\":null,\"component\":\"skills\",\"declared\":true,\"needs_restart\":false,\"revision\":\"eade281614677f96fd86260dc28e1fe0cbdeac0a\",\"version\":\"0.1.0\"}],\"host\":\"linux-x64\",\"install_root\":\"<test-home>/.local/share/axiom\",\"manifest\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/release/channel.json\",\"manifest_sha256\":\"b73159f25b31749ad12807c639279faf3d76906404fccb03dc37da419905feca\",\"plan_digest\":\"2884fb1eefdbf2a4246d9420aa25ca332c697f8ee1ef2a048607b11ac43398e5\",\"plan_version\":1,\"published\":false,\"verb\":\"install\"},\"plan_digest\":\"2884fb1eefdbf2a4246d9420aa25ca332c697f8ee1ef2a048607b11ac43398e5\",\"published\":false,\"target\":\"linux-x64\",\"verified_artifacts\":[{\"component\":\"axiom-graphd\",\"resolved\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/release/axiom-graphd\",\"sha256\":\"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\",\"size_bytes\":4512896,\"url\":\"https://candidate.invalid/axiom-graphd\",\"verified\":true},{\"component\":\"axiom-mcp\",\"resolved\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/release/axiom_mcp-0.1.0-py3-none-any.whl\",\"sha256\":\"ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b\",\"size_bytes\":214242,\"url\":\"https://candidate.invalid/axiom_mcp-0.1.0-py3-none-any.whl\",\"verified\":true}]},\"message\":\"install plan reported; nothing was changed\",\"request_id\":\"axiom-cli-update-1bd-18daf374dd3c86a7\",\"retryable\":false,\"status\":\"ok\"}\n",
+    "stderr": ""
+  },
+  {
+    "id": "engine-install-apply",
+    "argv": [
+      "<wsl-user-home>/axiom-k408/kits/0.1.0/release/axiom-cli",
+      "install",
+      "--from",
+      "<wsl-user-home>/axiom-k408/kits/0.1.0/release",
+      "--apply",
+      "--approve-digest",
+      "2884fb1eefdbf2a4246d9420aa25ca332c697f8ee1ef2a048607b11ac43398e5",
+      "--json"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"code\":0,\"details\":{\"channel\":\"stable\",\"components\":[{\"component\":\"axiom-graphd\",\"destination\":\"<test-home>/.local/share/axiom/installs/ecosystem/versions/0.1.0/bin/axiom-graphd\",\"position\":1,\"sha256\":\"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\",\"status\":\"installed\",\"version\":\"0.1.0\"},{\"component\":\"axiom-mcp\",\"destination\":\"<test-home>/.local/share/axiom/installs/ecosystem/versions/0.1.0/python/axiom_mcp-0.1.0-py3-none-any.whl\",\"position\":2,\"sha256\":\"ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b\",\"status\":\"installed\",\"version\":\"0.1.0\"},{\"component\":\"axiom-skills\",\"destination\":\"skills/0.1.0\",\"position\":3,\"sha256\":\"0766ae82048e745914581e9dc93f6babe719f71791577e6aeb34852cba204080\",\"status\":\"installed\",\"version\":\"0.1.0\"}],\"engine\":{\"bundle_components\":[{\"artifact\":\"bin/axiom-graphd\",\"component\":\"axiom-graphd\",\"host\":\"linux-x64\",\"kind\":\"binary\",\"network_access\":[],\"permissions\":[\"read\",\"execute\"],\"service\":null,\"sha256\":\"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\",\"size_bytes\":4512896,\"version\":\"0.1.0\"},{\"artifact\":\"python/axiom_mcp-0.1.0-py3-none-any.whl\",\"component\":\"axiom-mcp\",\"host\":\"linux-x64\",\"kind\":\"python\",\"network_access\":[],\"permissions\":[\"read\"],\"service\":null,\"sha256\":\"ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b\",\"size_bytes\":214242,\"version\":\"0.1.0\"}],\"bundle_manifest_bytes\":679,\"bundle_manifest_sha256\":\"d9464841b078cc15380450eed7250de8cdb6c3d9ca9a45e6af833ff383e2de59\",\"bundle_root\":\"<test-home>/.local/share/axiom/staging/engine-bundle\",\"host\":\"linux-x64\",\"install_root\":\"<test-home>/.local/share/axiom\",\"not_carried\":[],\"skills\":{\"component\":\"axiom-skills\",\"entries\":41,\"manifest_sha256\":\"0766ae82048e745914581e9dc93f6babe719f71791577e6aeb34852cba204080\",\"revision\":\"eade281614677f96fd86260dc28e1fe0cbdeac0a\",\"source\":\"skills_manifest_converted\",\"spec_revision\":\"39759ac2311206059b00c44179a998f502e4e777\",\"version\":\"0.1.0\"},\"steps\":[{\"code\":null,\"exit_code\":0,\"status\":\"planned\",\"stderr\":\"\",\"stdout\":\"{\\\"plan_digest\\\":\\\"b6821aec1e6f4513bc8aec0897c22793253cf20c2d05aa99a471d5b34a4c8706\\\",\\\"plan_file\\\":\\\"<test-home>/.local/share/axiom/staging/engine-bundle/engine-plan.json\\\",\\\"plan_id\\\":\\\"install-1791011485-f5b98bf9bd212613\\\",\\\"status\\\":\\\"planned\\\"}\",\"step\":\"plan\"},{\"code\":null,\"exit_code\":0,\"status\":\"installed\",\"stderr\":\"\",\"stdout\":\"{\\\"schema_version\\\":1,\\\"plan_id\\\":\\\"install-1791011485-f5b98bf9bd212613\\\",\\\"plan_digest\\\":\\\"b6821aec1e6f4513bc8aec0897c22793253cf20c2d05aa99a471d5b34a4c8706\\\",\\\"transaction_id\\\":\\\"ecosystem-1791011485-7d8f73a82a8fe6e5\\\",\\\"applied_at\\\":\\\"2026-10-03T07:11:25Z\\\",\\\"status\\\":\\\"installed\\\",\\\"components\\\":[{\\\"position\\\":1,\\\"component\\\":\\\"axiom-graphd\\\",\\\"version\\\":\\\"0.1.0\\\",\\\"status\\\":\\\"installed\\\",\\\"sha256\\\":\\\"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\\\",\\\"destination\\\":\\\"<test-home>/.local/share/axiom/installs/ecosystem/versions/0.1.0/bin/axiom-graphd\\\"},{\\\"position\\\":2,\\\"component\\\":\\\"axiom-mcp\\\",\\\"version\\\":\\\"0.1.0\\\",\\\"status\\\":\\\"installed\\\",\\\"sha256\\\":\\\"ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b\\\",\\\"destination\\\":\\\"<test-home>/.local/share/axiom/installs/ecosystem/versions/0.1.0/python/axiom_mcp-0.1.0-py3-none-any.whl\\\"},{\\\"position\\\":3,\\\"component\\\":\\\"axiom-skills\\\",\\\"version\\\":\\\"0.1.0\\\",\\\"status\\\":\\\"installed\\\",\\\"sha256\\\":\\\"0766ae82048e745914581e9dc93f6babe719f71791577e6aeb34852cba204080\\\",\\\"destination\\\":\\\"skills/0.1.0\\\"}],\\\"core_pointer\\\":\\\"<test-home>/.local/share/axiom/installs/ecosystem/current\\\",\\\"skills_pointer\\\":\\\"skills/current\\\",\\\"keeps_previous_versions\\\":1}\",\"step\":\"apply\"}]},\"engine_owner\":\"axiom-graphd\",\"engine_plan_digest\":\"b6821aec1e6f4513bc8aec0897c22793253cf20c2d05aa99a471d5b34a4c8706\",\"engine_plan_id\":\"install-1791011485-f5b98bf9bd212613\",\"engine_program\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/release/axiom\",\"engine_source\":\"sibling\",\"engine_status\":\"installed\",\"engine_status_reported\":true,\"generated_at\":\"2026-10-03T07:11:25Z\",\"install_root\":\"<test-home>/.local/share/axiom\",\"manifest_sha256\":\"b73159f25b31749ad12807c639279faf3d76906404fccb03dc37da419905feca\",\"manifest_source\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/release/channel.json\",\"mcp_runtime_bin\":\"<test-home>/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin\",\"mode\":\"apply\",\"plan\":{\"approval\":{\"approve_digest\":null,\"state\":\"unapproved\"},\"channel\":\"stable\",\"components\":[{\"artifact\":{\"class\":\"per-user-installer\",\"platform\":\"linux-x64\",\"sha256\":\"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\",\"size_bytes\":4512896,\"url\":\"https://candidate.invalid/axiom-graphd\"},\"component\":\"axiom-graphd\",\"declared\":true,\"needs_restart\":true,\"revision\":\"e5a30e2ee6807ab36cecbc881be3ffb4259cba83\",\"version\":\"0.1.0\"},{\"artifact\":{\"class\":\"per-user-installer\",\"platform\":\"linux-x64\",\"sha256\":\"ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b\",\"size_bytes\":214242,\"url\":\"https://candidate.invalid/axiom_mcp-0.1.0-py3-none-any.whl\"},\"component\":\"axiom-mcp\",\"declared\":true,\"needs_restart\":true,\"revision\":\"d92e71b25623132966b602b15ef5112c7eef7c96\",\"version\":\"0.1.0\"},{\"artifact\":null,\"component\":\"skills\",\"declared\":true,\"needs_restart\":false,\"revision\":\"eade281614677f96fd86260dc28e1fe0cbdeac0a\",\"version\":\"0.1.0\"}],\"host\":\"linux-x64\",\"install_root\":\"<test-home>/.local/share/axiom\",\"manifest\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/release/channel.json\",\"manifest_sha256\":\"b73159f25b31749ad12807c639279faf3d76906404fccb03dc37da419905feca\",\"plan_digest\":\"2884fb1eefdbf2a4246d9420aa25ca332c697f8ee1ef2a048607b11ac43398e5\",\"plan_version\":1,\"published\":false,\"verb\":\"install\"},\"plan_digest\":\"2884fb1eefdbf2a4246d9420aa25ca332c697f8ee1ef2a048607b11ac43398e5\",\"published\":false,\"staging_root\":\"<test-home>/.local/share/axiom/staging/engine-bundle\",\"target\":\"linux-x64\",\"verified_artifacts\":[{\"component\":\"axiom-graphd\",\"resolved\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/release/axiom-graphd\",\"sha256\":\"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\",\"size_bytes\":4512896,\"url\":\"https://candidate.invalid/axiom-graphd\",\"verified\":true},{\"component\":\"axiom-mcp\",\"resolved\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/release/axiom_mcp-0.1.0-py3-none-any.whl\",\"sha256\":\"ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b\",\"size_bytes\":214242,\"url\":\"https://candidate.invalid/axiom_mcp-0.1.0-py3-none-any.whl\",\"verified\":true}]},\"message\":\"the engine (`<wsl-user-home>/axiom-k408/kits/0.1.0/release/axiom` sibling) placed the approved bundle: status `installed`\",\"request_id\":\"axiom-cli-update-1be-18daf374e817df20\",\"retryable\":false,\"status\":\"ok\"}\n",
+    "stderr": ""
+  },
+  {
+    "id": "cli-install-plan",
+    "argv": [
+      "/bin/sh",
+      "<wsl-user-home>/axiom-k408/kits/0.1.0/Install-AxiomCli.sh",
+      "--release-set",
+      "<wsl-user-home>/axiom-k408/kits/0.1.0/cli-release/release-set.json",
+      "--plan",
+      "--json"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"schema_version\":1,\"spec_version\":\"2.0.0-draft.1\",\"envelope_kind\":\"install-result\",\"operation\":\"install\",\"outcome\":\"planned\",\"exit_code\":0,\"status\":\"ok\",\"message\":\"install plan computed; nothing was created, copied or registered\",\"retryable\":false,\"platform\":\"linux-x64\",\"host\":{\"os\":\"linux\",\"arch\":\"x86_64\",\"kernel\":\"Linux 6.18.40.1-microsoft-standard-WSL2 x86_64 GNU/Linux\",\"distro_id\":\"ubuntu\",\"distro_version\":\"24.04\",\"libc\":\"glibc 2.39\",\"wsl\":true,\"wsl_distro_name\":\"Axiom-K408-Ubuntu2404\",\"session_uid\":1001,\"session_elevated\":false,\"systemd_user_available\":true},\"install_root\":\"<test-home>/.local/share/axiom-cli\",\"bin_dir\":\"<test-home>/.local/bin\",\"dry_run\":true,\"mutated\":false,\"plan_digest\":\"c3866f2706fbb53285f53d073e8b3d4dd7218a707d914e7434dc80dba9e3abbb\",\"approved_digest\":null,\"transaction_id\":null,\"interrupted_install_recovered\":false,\"release_set\":{\"path\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/cli-release/release-set.json\",\"sha256\":\"6bc74285305281ebdcf1402c51647f380df47e6589189fdc291219a3acb26196\",\"release_version\":\"0.1.0\"},\"artifacts\":[{\"name\":\"axiom-cli\",\"component\":\"axiom-cli\",\"version\":\"0.1.0\",\"arch\":\"x86_64\",\"sha256\":\"02d7c19861f5ef21b5a329298ca6c6080c8922f5cdca8e4cb2d86c4e3430dd6b\",\"size_bytes\":1194392,\"verified\":true,\"installed_path\":null,\"source\":\"axiom-cli\"}],\"unverified_artifacts\":[{\"name\":\"axiom-graphd\",\"component\":\"axiom-graphd\",\"reason\":\"the distribution contract requires this component in a complete installation, but this release set carries no pinned artifact for it, so it was not installed and nothing about its state is claimed\"},{\"name\":\"axiom-mcp\",\"component\":\"axiom-mcp\",\"reason\":\"the distribution contract requires this component in a complete installation, but this release set carries no pinned artifact for it, so it was not installed and nothing about its state is claimed\"},{\"name\":\"skills\",\"component\":\"skills\",\"reason\":\"the distribution contract requires this component in a complete installation, but this release set carries no pinned artifact for it, so it was not installed and nothing about its state is claimed\"}],\"components\":[{\"component\":\"axiom-cli\",\"installed_version\":\"0.1.0\",\"artifact_sha256\":\"02d7c19861f5ef21b5a329298ca6c6080c8922f5cdca8e4cb2d86c4e3430dd6b\",\"version_source\":\"release-set.json (declared by this release set)\"}],\"refusals\":[],\"path_rule\":{\"scope\":\"none\",\"file\":null,\"entry\":\"<test-home>/.local/bin\",\"applied\":false,\"machine_wide_change\":false,\"previous_present\":false},\"service_registration\":{\"kind\":\"none\",\"unit_name\":null,\"unit_path\":null,\"owner\":null,\"registered\":false,\"removed\":false,\"daemon_reloaded\":false,\"reason\":\"no service registration was attempted\"},\"preserved\":[],\"removed\":[],\"elevation_required\":false,\"shell\":\"linux-posix-sh\",\"limitations\":[\"entrypoint directory <test-home>/.local/bin is reported but never added to PATH by this installer (no hidden PATH mutation); add it yourself if it is not already on PATH\"],\"generated_at\":\"2026-10-03T07:11:25Z\",\"request_id\":\"axiom-cli-450-1791011485\"}\n",
+    "stderr": "axiom-cli: plan digest c3866f2706fbb53285f53d073e8b3d4dd7218a707d914e7434dc80dba9e3abbb\n"
+  },
+  {
+    "id": "cli-install-apply",
+    "argv": [
+      "/bin/sh",
+      "<wsl-user-home>/axiom-k408/kits/0.1.0/Install-AxiomCli.sh",
+      "--release-set",
+      "<wsl-user-home>/axiom-k408/kits/0.1.0/cli-release/release-set.json",
+      "--apply",
+      "--approve-digest",
+      "c3866f2706fbb53285f53d073e8b3d4dd7218a707d914e7434dc80dba9e3abbb",
+      "--json"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"schema_version\":1,\"spec_version\":\"2.0.0-draft.1\",\"envelope_kind\":\"install-result\",\"operation\":\"install\",\"outcome\":\"installed\",\"exit_code\":0,\"status\":\"ok\",\"message\":\"installed release 0.1.0 into <test-home>/.local/share/axiom-cli/generations/0.1.0-c3866f2706fb; entrypoint at <test-home>/.local/bin/axiom-cli\",\"retryable\":false,\"platform\":\"linux-x64\",\"host\":{\"os\":\"linux\",\"arch\":\"x86_64\",\"kernel\":\"Linux 6.18.40.1-microsoft-standard-WSL2 x86_64 GNU/Linux\",\"distro_id\":\"ubuntu\",\"distro_version\":\"24.04\",\"libc\":\"glibc 2.39\",\"wsl\":true,\"wsl_distro_name\":\"Axiom-K408-Ubuntu2404\",\"session_uid\":1001,\"session_elevated\":false,\"systemd_user_available\":true},\"install_root\":\"<test-home>/.local/share/axiom-cli\",\"bin_dir\":\"<test-home>/.local/bin\",\"dry_run\":false,\"mutated\":true,\"plan_digest\":\"c3866f2706fbb53285f53d073e8b3d4dd7218a707d914e7434dc80dba9e3abbb\",\"approved_digest\":\"c3866f2706fbb53285f53d073e8b3d4dd7218a707d914e7434dc80dba9e3abbb\",\"transaction_id\":\"txn-1791011485-810\",\"interrupted_install_recovered\":false,\"release_set\":{\"path\":\"<wsl-user-home>/axiom-k408/kits/0.1.0/cli-release/release-set.json\",\"sha256\":\"6bc74285305281ebdcf1402c51647f380df47e6589189fdc291219a3acb26196\",\"release_version\":\"0.1.0\"},\"artifacts\":[{\"name\":\"axiom-cli\",\"component\":\"axiom-cli\",\"version\":\"0.1.0\",\"arch\":\"x86_64\",\"sha256\":\"02d7c19861f5ef21b5a329298ca6c6080c8922f5cdca8e4cb2d86c4e3430dd6b\",\"size_bytes\":1194392,\"verified\":true,\"installed_path\":\"<test-home>/.local/share/axiom-cli/generations/0.1.0-c3866f2706fb/axiom-cli\",\"source\":\"axiom-cli\"}],\"unverified_artifacts\":[{\"name\":\"axiom-graphd\",\"component\":\"axiom-graphd\",\"reason\":\"the distribution contract requires this component in a complete installation, but this release set carries no pinned artifact for it, so it was not installed and nothing about its state is claimed\"},{\"name\":\"axiom-mcp\",\"component\":\"axiom-mcp\",\"reason\":\"the distribution contract requires this component in a complete installation, but this release set carries no pinned artifact for it, so it was not installed and nothing about its state is claimed\"},{\"name\":\"skills\",\"component\":\"skills\",\"reason\":\"the distribution contract requires this component in a complete installation, but this release set carries no pinned artifact for it, so it was not installed and nothing about its state is claimed\"}],\"components\":[{\"component\":\"axiom-cli\",\"installed_version\":\"0.1.0\",\"artifact_sha256\":\"02d7c19861f5ef21b5a329298ca6c6080c8922f5cdca8e4cb2d86c4e3430dd6b\",\"version_source\":\"release-set.json (declared by this release set)\"}],\"refusals\":[],\"path_rule\":{\"scope\":\"none\",\"file\":null,\"entry\":\"<test-home>/.local/bin\",\"applied\":false,\"machine_wide_change\":false,\"previous_present\":false},\"service_registration\":{\"kind\":\"none\",\"unit_name\":null,\"unit_path\":null,\"owner\":null,\"registered\":false,\"removed\":false,\"daemon_reloaded\":false,\"reason\":\"this release set declares no user service, so none was registered\"},\"preserved\":[{\"path\":\"<test-home>/.local/state/axiom-cli\",\"reason\":\"per-user state is never modified by install and is preserved for uninstall\"}],\"removed\":[],\"elevation_required\":false,\"shell\":\"linux-posix-sh\",\"limitations\":[\"entrypoint directory <test-home>/.local/bin is reported but never added to PATH by this installer (no hidden PATH mutation); add it yourself if it is not already on PATH\"],\"generated_at\":\"2026-10-03T07:11:25Z\",\"request_id\":\"axiom-cli-810-1791011485\"}\n",
+    "stderr": "axiom-cli: installed release 0.1.0 into <test-home>/.local/share/axiom-cli/generations/0.1.0-c3866f2706fb; entrypoint at <test-home>/.local/bin/axiom-cli\n"
+  },
+  {
+    "id": "watcher-a",
+    "argv": [
+      "/usr/bin/python3",
+      "<wsl-user-home>/axiom-k408/owner/tests/linux/k406_query_watch.py",
+      "--home",
+      "<test-home>",
+      "--symbol",
+      "K409WatcherA",
+      "--setup"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"bindings_sha256\": \"d98e3fdba99c42fd861117b88e61b2ccf4fcd037b8dd84d2cfd07920b021ed2d\", \"catalog_after\": \"61d3f170ce98f4e68c24fd821f6ec5590387b341ed5379166beace88361e6d37\", \"catalog_before\": \"fe718f96722834bec2fed56458df2099423f2e2160e5940432883779f73ce7b0\", \"daemon\": \"<test-home>/.local/share/axiom/installs/ecosystem/versions/0.1.0/bin/axiom-graphd\", \"daemon_exit_code\": 0, \"daemon_sha256\": \"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\", \"source_sha256_after\": \"3fae2d696ed2ea0c2ee28451889cfc6b2cf1cfbf85bc217f760bb156d0200cb9\", \"source_sha256_before\": \"54eb10fd18b5f4ab659bf85c5f1d6c8b966eccad28de017b53f175cd72da3e9f\", \"status\": \"passed\", \"stderr_tail\": \"{\\\"level\\\":\\\"info\\\",\\\"message\\\":\\\"instance lock acquired; running persistent foreground reconcile loop\\\",\\\"target\\\":\\\"daemon\\\"}\\n\", \"stdout_tail\": \"{\\\"instance_id\\\":\\\"default\\\",\\\"solutions\\\":1,\\\"projects\\\":1,\\\"dirty_before\\\":0,\\\"dirty_after\\\":0,\\\"published_generations\\\":1,\\\"recoveries\\\":[],\\\"outcomes\\\":[{\\\"solution_id\\\":\\\"demo-solution\\\",\\\"project_id\\\":\\\"demo-project\\\",\\\"project_root\\\":\\\"<test-home>/demo-repo/src\\\",\\\"lane_root\\\":\\\"<test-home>/demo-repo/.axiom/graph/demo-solution/demo-project/live\\\",\\\"inventory_generation\\\":2,\\\"inventory_added\\\":0,\\\"inventory_changed\\\":1,\\\"inventory_deleted\\\":0,\\\"analyzed_files\\\":1,\\\"nodes\\\":3,\\\"edges\\\":2,\\\"published\\\":true,\\\"generation_id\\\":\\\"b82fbd7180da9b4e576a40a9b2576928f5a46ec86ecc9944959d3677c95de50d\\\",\\\"manifest_hash\\\":\\\"b82fbd7180da9b4e576a40a9b2576928f5a46ec86ecc9944959d3677c95de50d\\\",\\\"current_generation\\\":\\\"b82fbd7180da9b4e576a40a9b2576928f5a46ec86ecc9944959d3677c95de50d\\\"}],\\\"shutdown\\\":\\\"Drained\\\"}\\n\", \"symbol\": \"K409WatcherA\", \"user_data_sha256\": \"a1ceb2ff193db1430b03053663a573f12b77cc8370f776f6df41b1a95810e0c8\"}\n",
+    "stderr": ""
+  },
+  {
+    "id": "mcp-query-a",
+    "argv": [
+      "<test-home>/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python",
+      "/mnt/d/SP-Billy/axiom/.worktrees/axiom-mcp-k409/tests/native/installed_query_probe.py",
+      "--axiom-home",
+      "<test-home>/.local/share/axiom",
+      "--repo",
+      "<test-home>/demo-repo",
+      "--symbol",
+      "K409WatcherA"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"catalog_generation_id\": \"ad5f3b67acb0c99154768b93636e3fa49026bca066eab9e4be8a1c67df5fbe73\", \"catalog_manifest_sha256\": \"61d3f170ce98f4e68c24fd821f6ec5590387b341ed5379166beace88361e6d37\", \"catalog_pointer_sha256\": \"2405ff9382469ad8a22b874460caf8b512a20acc12a10ad74217b0d8f4e83ee2\", \"coverage\": \"complete_for_profile\", \"node_count\": 1, \"query_symbol\": \"K409WatcherA\", \"status\": \"passed\", \"verification\": {\"mode\": \"none\"}, \"version_mismatch\": {\"actual_runtime_pin_reasons\": [], \"missing_protocol\": [\"protocol_revision_missing:2025-11-25\"], \"wrong_python\": [\"python_version_unsupported:3.12.9\"], \"wrong_sdk\": [\"sdk_version_unsupported:1.28.0\"]}, \"wheel_import_below_venv\": true}\n",
+    "stderr": ""
+  },
+  {
+    "id": "watcher-restart",
+    "argv": [
+      "/usr/bin/python3",
+      "<wsl-user-home>/axiom-k408/owner/tests/linux/k406_query_watch.py",
+      "--home",
+      "<test-home>",
+      "--symbol",
+      "K409WatcherRestart"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"bindings_sha256\": \"d98e3fdba99c42fd861117b88e61b2ccf4fcd037b8dd84d2cfd07920b021ed2d\", \"catalog_after\": \"9b1865eae6574cb744af15d14628d40217e305ab419a375305fe92aa1e788ec1\", \"catalog_before\": \"61d3f170ce98f4e68c24fd821f6ec5590387b341ed5379166beace88361e6d37\", \"daemon\": \"<test-home>/.local/share/axiom/installs/ecosystem/versions/0.1.0/bin/axiom-graphd\", \"daemon_exit_code\": 0, \"daemon_sha256\": \"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\", \"source_sha256_after\": \"3ca6575dce19096fb7db15901ab92098b05003ca386e4a402571e2a7096f47f9\", \"source_sha256_before\": \"3fae2d696ed2ea0c2ee28451889cfc6b2cf1cfbf85bc217f760bb156d0200cb9\", \"status\": \"passed\", \"stderr_tail\": \"{\\\"level\\\":\\\"info\\\",\\\"message\\\":\\\"instance lock acquired; running persistent foreground reconcile loop\\\",\\\"target\\\":\\\"daemon\\\"}\\n\", \"stdout_tail\": \"{\\\"instance_id\\\":\\\"default\\\",\\\"solutions\\\":1,\\\"projects\\\":1,\\\"dirty_before\\\":0,\\\"dirty_after\\\":0,\\\"published_generations\\\":1,\\\"recoveries\\\":[],\\\"outcomes\\\":[{\\\"solution_id\\\":\\\"demo-solution\\\",\\\"project_id\\\":\\\"demo-project\\\",\\\"project_root\\\":\\\"<test-home>/demo-repo/src\\\",\\\"lane_root\\\":\\\"<test-home>/demo-repo/.axiom/graph/demo-solution/demo-project/live\\\",\\\"inventory_generation\\\":3,\\\"inventory_added\\\":0,\\\"inventory_changed\\\":1,\\\"inventory_deleted\\\":0,\\\"analyzed_files\\\":1,\\\"nodes\\\":4,\\\"edges\\\":3,\\\"published\\\":true,\\\"generation_id\\\":\\\"ec8740469ffe086ce5bdf440a507c111638686ea51b04d56fa0593da560d45f6\\\",\\\"manifest_hash\\\":\\\"ec8740469ffe086ce5bdf440a507c111638686ea51b04d56fa0593da560d45f6\\\",\\\"current_generation\\\":\\\"ec8740469ffe086ce5bdf440a507c111638686ea51b04d56fa0593da560d45f6\\\"}],\\\"shutdown\\\":\\\"Drained\\\"}\\n\", \"symbol\": \"K409WatcherRestart\", \"user_data_sha256\": \"a1ceb2ff193db1430b03053663a573f12b77cc8370f776f6df41b1a95810e0c8\"}\n",
+    "stderr": ""
+  },
+  {
+    "id": "mcp-query-restart",
+    "argv": [
+      "<test-home>/.local/share/axiom/mcp-runtime/versions/f4182e34bb2ac50bb5a766ec/venv/bin/python",
+      "/mnt/d/SP-Billy/axiom/.worktrees/axiom-mcp-k409/tests/native/installed_query_probe.py",
+      "--axiom-home",
+      "<test-home>/.local/share/axiom",
+      "--repo",
+      "<test-home>/demo-repo",
+      "--symbol",
+      "K409WatcherRestart"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"catalog_generation_id\": \"cbeee6f16dde35997a6f242226e1ba23c9179770a3ccdf83380fb8da71f024b2\", \"catalog_manifest_sha256\": \"9b1865eae6574cb744af15d14628d40217e305ab419a375305fe92aa1e788ec1\", \"catalog_pointer_sha256\": \"b56bda1afa6c8e4ae531e7e94e683a7223f4faffa2d142720460b9c8c23e454a\", \"coverage\": \"complete_for_profile\", \"node_count\": 1, \"query_symbol\": \"K409WatcherRestart\", \"status\": \"passed\", \"verification\": {\"mode\": \"none\"}, \"version_mismatch\": {\"actual_runtime_pin_reasons\": [], \"missing_protocol\": [\"protocol_revision_missing:2025-11-25\"], \"wrong_python\": [\"python_version_unsupported:3.12.9\"], \"wrong_sdk\": [\"sdk_version_unsupported:1.28.0\"]}, \"wheel_import_below_venv\": true}\n",
+    "stderr": ""
+  },
+  {
+    "id": "update-plan",
+    "argv": [
+      "<wsl-user-home>/axiom-k408/kits/0.1.1/release/axiom-cli",
+      "update",
+      "plan",
+      "--to",
+      "0.1.1",
+      "--out",
+      "<test-home>/plan-b.json",
+      "--json"
+    ],
+    "exit_code": 0,
+    "stdout": "{\"before\": {\"cli_generation\": \"<test-home>/.local/share/axiom-cli/generations/0.1.0-c3866f2706fb\", \"cli_marker_sha256\": \"6d40501d3acfd273a1c0d39f139946a564e71f93254e9811f3b686660bac03bf\", \"cli_sha256\": \"02d7c19861f5ef21b5a329298ca6c6080c8922f5cdca8e4cb2d86c4e3430dd6b\", \"cli_version\": \"0.1.0\", \"core_revision\": null, \"core_sha256\": \"c34f9bcee0b45a9e6d3a661669943627bee1047b365ab6282250eba3c0b39bea\", \"core_version\": \"0.1.0\", \"engine_pointer_sha256\": \"077e94746cab75fce89a46929e6a55a6ffd617fefe2772426edd951fcecaea80\", \"mcp_wheel_sha256\": \"ccb2166c414d36b16ca8316dc93e34d13a77f4db31ed9117895d8063161be20b\", \"runtime_pointer_sha256\": \"6b128e0f0d30a84fc4dc013bba04cdcc1416f9cdcd8b5d4224852c2a73312834\", \"skills_pointer_sha256\": \"bc283271207975218fe91341f0d0cd5b92a4d1e887214b6b5c2c726e86a25488\"}, \"candidate\": {\"channel_sha256\": \"2401bf9d3d63e3ebcdd8a658a714e26c493721815c0e94598f363961aac70531\", \"cli_sha256\": \"488ddfa41ea757a1e5e645e7764320d2547d654889fe1fcfa90f7970893f7d6d\", \"core_revision\": \"dc6b7190260f879043354b991e0a4ced76da0ddd\", \"core_sha256\": \"87b6146ba9133b5cbdce2d42a4842b29b1eceb3fb3375201621ecb0a105c4f07\", \"core_version\": \"0.1.1\", \"files_sha256\": \"cdc9b208b479fd2cb42046698c9e76f995a0c6c2f52f5787a8c8bd3d9efbe527\", \"release_set_sha256\": \"b6942e958f2597d3c1e68028ecd4b2c8c05286970b8f6445eba9aeeefd7ed3d9\", \"runtime_input_sha256\": \"bbd8ea260dcd3f6486009baf299564f25a2d37a4ff6e59b5f8e69b93230d0113\"}, \"certified\": false, \"kit_manifest_sha256\": \"cbd789b8ef17ce219ea1b7c058b664b1e8c6d3920a17faf4aa12a415f2ce340b\", \"plan_digest\": \"76276eadd60f33f2698eda66d4d3a985ba2f681c3e9008d12c9a83668df46b95\", \"status\": \"planned\"}\n",
+    "stderr": ""
+  }
+]

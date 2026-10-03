@@ -1,0 +1,638 @@
+................................................ [  6%]
+.....................................EE.EEEEE.......................... [ 15%]
+.....E..E.EE..E......................................................s. [ 25%]
+................................................................................. [ 35%]
+...................................................................... [ 44%]
+........................................................................ [ 54%]
+........................................................ [ 61%]
+........................................................................ [ 71%]
+..........................................sss........................... [ 80%]
+........................................................................ [ 90%]
+..........................................................................                    [100%]
+=================================== ERRORS ====================================
+____ ERROR at setup of test_the_locked_runtime_is_the_version_environment _____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+_ ERROR at setup of test_the_real_shared_environment_declares_that_it_shares_base_packages _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+___ ERROR at setup of test_python_no_user_site_hides_an_ambient_user_module ___
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+_ ERROR at setup of test_the_stdio_plan_is_an_argv_array_with_an_absolute_interpreter _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+____ ERROR at setup of test_the_host_document_never_offers_a_shell_string _____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+_ ERROR at setup of test_the_plan_environment_is_sorted_so_the_digest_can_be_written_down _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+_ ERROR at setup of test_the_locked_stdio_plan_starts_and_answers_without_an_activation_script _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+_ ERROR at setup of test_a_recorded_lock_describes_the_plans_until_something_moves _
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+__________ ERROR at setup of test_two_plans_for_one_mode_are_refused __________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+______ ERROR at setup of test_the_module_cli_prints_one_launch_document _______
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+__ ERROR at setup of test_the_module_cli_records_and_then_verifies_the_lock ___
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+___ ERROR at setup of test_the_module_entrypoint_is_reachable_as_a_process ____
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x000002661E92B230>, _basetemp=WindowsPath('C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def locked(tmp_path_factory: pytest.TempPathFactory) -> dict[str, pathlib.Path]:
+        """A real install root whose own path holds spaces, an ampersand and Thai text."""
+        root = tmp_path_factory.mktemp("locked") / AWKWARD_DIR
+>       return build_version_environment(
+            root, version_name=LOCKED_VERSION, share_system_site=True, link_source=True
+        )
+
+tests\test_entrypoints.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_entrypoints.py:173: in build_version_environment
+    seed_runtime_dependencies(site)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+destination = WindowsPath("C:/Users/006006/AppData/Local/Temp/pytest-of-006006/pytest-0/locked0/axiom mcp (locked) & 'v2' ·´ÊÍº/versions/9.9.9/venv/Lib/site-packages")
+
+    def seed_runtime_dependencies(destination: pathlib.Path) -> None:
+        """Copy only the pinned runtime distributions and their active dependencies."""
+        venv_root = next(
+            parent for parent in destination.parents if parent.name == entrypoints.VENV_DIRNAME
+        )
+        available = {
+            _distribution_key(item.metadata["Name"]): item for item in metadata.distributions()
+        }
+        pending: list[tuple[str, Requirement | None]] = [(name, None) for name in version.RUNTIME_PINS]
+        copied: set[str] = set()
+        while pending:
+            name, required = pending.pop()
+            key = _distribution_key(name)
+            if key in copied:
+                continue
+            distribution = available.get(key)
+            assert distribution is not None, f"active runtime misses {name}"
+            if required is not None:
+                assert required.specifier.contains(distribution.version), (
+                    f"{required} selected {distribution.version}"
+                )
+            expected = version.RUNTIME_PINS.get(name)
+            if expected is not None:
+>               assert distribution.version == expected, f"{name}={distribution.version}!={expected}"
+E               AssertionError: pydantic=2.12.5!=2.13.4
+E               assert '2.12.5' == '2.13.4'
+E                 
+E                 - 2.13.4
+E                 + 2.12.5
+
+tests\test_entrypoints.py:127: AssertionError
+=========================== short test summary info ===========================
+ERROR tests/test_entrypoints.py::test_the_locked_runtime_is_the_version_environment
+ERROR tests/test_entrypoints.py::test_the_real_shared_environment_declares_that_it_shares_base_packages
+ERROR tests/test_entrypoints.py::test_python_no_user_site_hides_an_ambient_user_module
+ERROR tests/test_entrypoints.py::test_the_stdio_plan_is_an_argv_array_with_an_absolute_interpreter
+ERROR tests/test_entrypoints.py::test_the_host_document_never_offers_a_shell_string
+ERROR tests/test_entrypoints.py::test_the_plan_environment_is_sorted_so_the_digest_can_be_written_down
+ERROR tests/test_entrypoints.py::test_the_locked_stdio_plan_starts_and_answers_without_an_activation_script
+ERROR tests/test_entrypoints.py::test_a_recorded_lock_describes_the_plans_until_something_moves
+ERROR tests/test_entrypoints.py::test_two_plans_for_one_mode_are_refused - As...
+ERROR tests/test_entrypoints.py::test_the_module_cli_prints_one_launch_document
+ERROR tests/test_entrypoints.py::test_the_module_cli_records_and_then_verifies_the_lock
+ERROR tests/test_entrypoints.py::test_the_module_entrypoint_is_reachable_as_a_process
+743 passed, 5 skipped, 12 errors, 230 subtests passed in 101.05s (0:01:41)
