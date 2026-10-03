@@ -9,7 +9,7 @@
   "local_commit_sha": "d1395d6d1bb0801be05e01ba5760004143bd1781",
   "push_remote": "https://github.com/orchex006/axiom-mcp.git",
   "verified_remote_branch_sha": "d1395d6d1bb0801be05e01ba5760004143bd1781",
-  "delivery_state": "pushed",
+  "delivery_state": "integrated",
   "preflight_checks": [
     "P1",
     "P2",
@@ -34,7 +34,10 @@
     "evidence/K-409/owner-checks.json",
     "evidence/K-409/review.md"
   ],
-  "integration_state": "blocked",
-  "integration_blocker": "Workspace AGENTS section 12 forbids merge without explicit current-task authorization. Preserve main checkout K-307 branch; no main integration claimed.",
-  "next_action": "Owner may authorize reviewed task-feature integration separately; specs closure is delivered on its dedicated feature."
+  "integration_state": "integrated",
+  "merge_commit_sha": "93f33824dc0fbc3d9c1a6e5332fb387d5caf1c9f",
+  "verified_main_remote_sha": "93f33824dc0fbc3d9c1a6e5332fb387d5caf1c9f",
+  "primary_checkout": "axiom-mcp",
+  "primary_checkout_updated": true,
+  "integration_authority": "User explicitly requested merge to finish K-409 in current turn."
 }
