@@ -72,7 +72,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: orchex006/axiom-graphd
-          ref: 846ce6fda31f8589c97f882286590efa3320f277
+          ref: 6fb6e9b9e78dccdcae2261b4656a849639ed5b1b
           path: _ci/core
       - name: Isolate the verified CLI source dependency
         shell: python
@@ -91,12 +91,12 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             ${{ runner.temp }}/verified-core/target
-          key: mcp-core-${{ matrix.platform }}-846ce6f-rust185
+          key: mcp-core-${{ matrix.platform }}-6fb6e9b-rust185
       - name: Build the existing verified core CLI dependency
         shell: bash
         working-directory: ${{ runner.temp }}/verified-core
         env:
-          AXIOM_BUILD_REVISION: 846ce6fda31f8589c97f882286590efa3320f277
+          AXIOM_BUILD_REVISION: 6fb6e9b9e78dccdcae2261b4656a849639ed5b1b
         run: |
           rustup toolchain install 1.85.0 --profile minimal
           cargo +1.85.0 build --locked --release -p axiom-cli
@@ -115,6 +115,7 @@ jobs:
           python = environment / '${{ matrix.python }}'
           subprocess.run([str(python), '-m', 'pip', 'install', '--require-hashes', '-r', 'release/${{ matrix.lock }}-py313-requirements.txt'], check=True)
           subprocess.run([str(python), '-m', 'pip', 'install', '--no-deps', str(wheel)], check=True)
+          subprocess.run([sys.executable, 'release/build_runtime_inputs.py', '--wheel', str(wheel), '--lock', 'release/${{ matrix.lock }}-py313-requirements.txt', '--lane', '${{ matrix.platform }}', '--source-revision', os.environ['GITHUB_SHA'], '--out', str(temporary / 'runtime-inputs')], check=True)
           holder = temporary / ('rust-guard-holder.exe' if os.name == 'nt' else 'rust-guard-holder')
           subprocess.run([sys.executable, 'tests/native/build_rust_holder.py', '--core', str(temporary / 'verified-core'), '--out', str(holder)], check=True)
           env = dict(os.environ, AXIOM_GUARD_HOLDER_ARGV=json.dumps([str(holder)]))
@@ -132,4 +133,5 @@ jobs:
             ${{ runner.temp }}/native-report.json
             ${{ runner.temp }}/guard-proof.json
             ${{ runner.temp }}/foreign-guard.txt
+            ${{ runner.temp }}/runtime-inputs/*
           if-no-files-found: error

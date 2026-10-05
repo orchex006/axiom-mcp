@@ -47,11 +47,36 @@ def collect(root: Path, source: str, output: Path):
         reports[lane] = path
     if set(reports) != LANES:
         raise ValueError("three native lanes required")
+    inputs = {}
+    for path in root.rglob("*-runtime-inputs.json"):
+        item = json.loads(path.read_bytes())
+        lane = item.get("platform")
+        if lane not in LANES or lane in inputs or item.get("source_revision") != source:
+            raise ValueError("runtime input source/lane mismatch")
+        if item.get("owner_wheel_sha256") != proof["sha256"]:
+            raise ValueError("runtime inputs use another owner wheel")
+        files = [path]
+        for key in ("inputs", "wheelhouse", "dependency_lock"):
+            row = item[key]
+            if Path(row["name"]).name != row["name"]:
+                raise ValueError("unsafe runtime asset path")
+            file = path.parent / row["name"]
+            if sha(file) != row["sha256"]:
+                raise ValueError("runtime asset hash mismatch")
+            files.append(file)
+        inputs[lane] = files
+    if proof.get("runtime_inputs_required") and set(inputs) != LANES:
+        raise ValueError("native dependency inputs required for distribution")
     output.mkdir(parents=True)
     shutil.copyfile(wheel, output / name)
     shutil.copyfile(proofs[0], output / "wheel-provenance.json")
     for lane, path in reports.items():
         shutil.copyfile(path, output / (lane + "-native-report.json"))
+    for files in inputs.values():
+        for file in files:
+            if (output / file.name).exists():
+                raise ValueError("duplicate runtime output name")
+            shutil.copyfile(file, output / file.name)
     (output / "SOURCE-REVISION.txt").write_text(source + "\n", encoding="utf-8", newline="\n")
     (output / "RELEASE-NOTES.md").write_text(
         "# Axiom MCP\n\nOne portable Python 3.13 wheel; native Windows x64, Linux x64 and Mac "

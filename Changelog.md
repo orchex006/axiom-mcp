@@ -1,3 +1,7 @@
+## 0.1.2 — K-614
+
+- Publish one portable MCP wheel with current core 0.1.2 native proofs and hash-pinned offline dependency inputs for the distribution; no certification or Mac ARM gate.
+
 ## Unreleased — K-610
 
 - Compose six authenticated graph tools on public stdio/HTTP entrypoints with registered native guard selection and per-request HTTP scopes.
