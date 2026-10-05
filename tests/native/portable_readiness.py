@@ -53,6 +53,7 @@ def run(python: Path, wheel: Path, core: Path, source: str, out: Path) -> None:
                 "outcome_basis": "RPC isError or asserted process proof",
             }
         )
+        print("PASS: " + name, flush=True)
 
     with tempfile.TemporaryDirectory(prefix="axiom mcp native ") as temporary:
         root = Path(temporary)
@@ -120,17 +121,18 @@ def run(python: Path, wheel: Path, core: Path, source: str, out: Path) -> None:
             )
             assert query.structuredContent["nodes"], query
             record(transport + " registered query", query)
-            record(
-                "scope refusal" if transport == "stdio" else "http scope refusal",
-                await session.call_tool(
-                    "graph_query",
-                    {"solution_id": "invisible", "operation": "search", "query": "login"},
-                ),
-                1,
-            )
-            assert (
-                await session.call_tool("graph_reconcile", {"solution_id": "demo-solution"})
-            ).isError
+            if transport == "stdio":
+                record(
+                    "scope refusal",
+                    await session.call_tool(
+                        "graph_query",
+                        {"solution_id": "invisible", "operation": "search", "query": "login"},
+                    ),
+                    1,
+                )
+                assert (
+                    await session.call_tool("graph_reconcile", {"solution_id": "demo-solution"})
+                ).isError
             assert not (await session.call_tool("graph_version", {})).isError
 
         async def stdio_probe():
@@ -183,6 +185,27 @@ def run(python: Path, wheel: Path, core: Path, source: str, out: Path) -> None:
                 time.sleep(0.1)
             assert httpx.post(url + "/mcp", json={}, timeout=5).status_code == 401
             record("http auth refusal", {"status": 401})
+            for name, tool, arguments in [
+                (
+                    "http scope refusal",
+                    "graph_query",
+                    {"solution_id": "invisible", "operation": "search"},
+                ),
+                ("http mutation refusal", "graph_reconcile", {"solution_id": "demo-solution"}),
+            ]:
+                response = httpx.post(
+                    url + "/mcp",
+                    headers={"Authorization": "Bearer native-fixture-token"},
+                    json={
+                        "jsonrpc": "2.0",
+                        "id": 1,
+                        "method": "tools/call",
+                        "params": {"name": tool, "arguments": arguments},
+                    },
+                    timeout=5,
+                )
+                assert response.status_code == 403
+                record(name, {"status": response.status_code})
 
             async def http_probe():
                 with anyio.fail_after(40):
@@ -315,7 +338,9 @@ def run(python: Path, wheel: Path, core: Path, source: str, out: Path) -> None:
         "platform": lane,
         "execution": "native",
         "source_revision": source,
-        "public_forms": sorted({c["id"] for c in cases} - {"http scope refusal"}),
+        "public_forms": sorted(
+            {c["id"] for c in cases} - {"http scope refusal", "http mutation refusal"}
+        ),
         "cases": cases,
         "installed_wheel_verified": True,
         "wheel_sha256": hashlib.sha256(wheel.read_bytes()).hexdigest(),
