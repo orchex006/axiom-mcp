@@ -1,0 +1,127 @@
+{
+  "platform": "windows-x64",
+  "execution": "native",
+  "arch": "AMD64",
+  "source_revision": "39f163a6bb8bb8101e0186af00045d1e20486f28",
+  "public_forms": [
+    "approved update delegation",
+    "http auth refusal",
+    "http registered query",
+    "http six tools",
+    "native guard exclusion",
+    "native guard recovery",
+    "scope refusal",
+    "stale update refusal",
+    "stdio registered query",
+    "stdio shutdown",
+    "stdio six tools",
+    "wheel provenance"
+  ],
+  "cases": [
+    {
+      "id": "wheel provenance",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "c395bfaba2a014c67d08efbb904a2ccce0fad3fde8f87ac21d5cb5083f8a74ba",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "stdio six tools",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "ad32ca71b32eb9bbae88129733332e8a82275252d5a523b7727b5efe3f13811e",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "stdio registered query",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "1e368a8641d792f14df1047a44a2b18b9c6ea64e94ca5250d7e7b9cb3b746ded",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "scope refusal",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "stdout_sha256": "9f61abee07e20a66c4d65ea08e943797a6575fd5df8b130df615296aacd4b90c",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "stdio shutdown",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "80158b8fd02be9e929cfc5efb7834297c9ce356083a586fd748a142d193d741a",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "http auth refusal",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "b49b7002b7a0da7b658d6d1a4be643cab50d4a86d809638e63c143dcbf14e595",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "http scope refusal",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "979398c6e33b43a85e951bb7af2e2a119f40a56acf5011f66c9410908d7df55b",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "http mutation refusal",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "979398c6e33b43a85e951bb7af2e2a119f40a56acf5011f66c9410908d7df55b",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "http six tools",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "ad32ca71b32eb9bbae88129733332e8a82275252d5a523b7727b5efe3f13811e",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "http registered query",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "1e368a8641d792f14df1047a44a2b18b9c6ea64e94ca5250d7e7b9cb3b746ded",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "native guard exclusion",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "d7820e4c104214bf19ae2de5fd7ca62e0142a5c5068996783216b5caac9de3aa",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "native guard recovery",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "stale update refusal",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "b385c36781058ee20b29e970f6c42edaecc809868c34ea7fa077ac798fb631c5",
+      "outcome_basis": "RPC isError or asserted process proof"
+    },
+    {
+      "id": "approved update delegation",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "stdout_sha256": "f33c42c96cc34499d7b4d9ea645c4982ceb6452b53bf88c715198de341439ea3",
+      "outcome_basis": "RPC isError or asserted process proof"
+    }
+  ],
+  "installed_wheel_verified": true,
+  "wheel_sha256": "7e2a07407df946e7b6158f9283fa795f295d30a011f469ad3f21472cb0cab304",
+  "negative_cases_verified": true,
+  "rust_guard_verified": true,
+  "rust_guard_proof_sha256": "366d7d058e2a35c2e858141c8c8177b7898a3cca2032603917e959a1ae2575e6",
+  "fixture_scope": "canonical processed snapshot; no licensed AI host",
+  "background": "host-owned stdio child; foreground HTTP; CLI owns supervision"
+}

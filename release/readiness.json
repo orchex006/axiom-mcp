@@ -1,0 +1,24 @@
+{
+  "state": "READY",
+  "ready": true,
+  "certification_required": false,
+  "wheel_sha256": "7e2a07407df946e7b6158f9283fa795f295d30a011f469ad3f21472cb0cab304",
+  "source_revision": "39f163a6bb8bb8101e0186af00045d1e20486f28",
+  "github_actions": "https://github.com/orchex006/axiom-mcp/actions/runs/37267724441",
+  "native_lanes": [
+    {
+      "platform": "linux-x64",
+      "report_sha256": "a493910c4a6dbdbf7b95fd10abf50b3be1b046707ac24f4840c0e6bd1a495d21"
+    },
+    {
+      "platform": "macos-x64",
+      "report_sha256": "08f2f7e42143c7dfddf26b5ec8d8541d3307ff7e24f2914b9934bddb3229866c"
+    },
+    {
+      "platform": "windows-x64",
+      "report_sha256": "cccfe8d4ffb93e800b3f4a2c8450cfecfec3d56e21176345a970a15fe1320799"
+    }
+  ],
+  "macos_arm64": "deferred",
+  "published": false
+}
