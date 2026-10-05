@@ -1,0 +1,4 @@
+{
+  "purpose": "rejection sample: POSIX absolute path",
+  "path": "/home/example/project/src/main.rs"
+}

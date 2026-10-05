@@ -34,9 +34,12 @@ TOOLS = {
 }
 
 
-def run(python: Path, wheel: Path, core: Path, source: str, out: Path) -> None:
+def run(python: Path, wheel: Path, core: Path, source: str, out: Path, guard_proof: Path) -> None:
     assert len(source) == 40 and wheel.name.endswith("-py3-none-any.whl")
+    assert platform.machine().lower() in {"amd64", "x86_64"}, "x64 proof requires native x64"
     cases = []
+    foreign = json.loads(guard_proof.read_bytes())
+    assert foreign["exit_code"] == 0 and foreign["source_revision"] == source
 
     def record(name, result, expected=0):
         observed = int(result.isError) if hasattr(result, "isError") else 0
@@ -56,7 +59,9 @@ def run(python: Path, wheel: Path, core: Path, source: str, out: Path) -> None:
         print("PASS: " + name, flush=True)
 
     with tempfile.TemporaryDirectory(prefix="axiom mcp native ") as temporary:
-        root = Path(temporary)
+        # macOS's standard temp directory may use the system /var -> /private/var alias.
+        # Fixtures use the physical root; product path/link refusal remains unchanged.
+        root = Path(temporary).resolve()
         repo = install_bundle(root)
         home = root / "home"
         write_registry(home, repo)
@@ -321,7 +326,7 @@ def run(python: Path, wheel: Path, core: Path, source: str, out: Path) -> None:
             capture_output=True,
             timeout=10,
         )
-        assert approved.returncode == 2
+        assert approved.returncode == 2, (approved.returncode, approved.stderr.decode())
         record(
             "approved update delegation",
             {
@@ -337,6 +342,7 @@ def run(python: Path, wheel: Path, core: Path, source: str, out: Path) -> None:
     report = {
         "platform": lane,
         "execution": "native",
+        "arch": platform.machine(),
         "source_revision": source,
         "public_forms": sorted(
             {c["id"] for c in cases} - {"http scope refusal", "http mutation refusal"}
@@ -345,6 +351,8 @@ def run(python: Path, wheel: Path, core: Path, source: str, out: Path) -> None:
         "installed_wheel_verified": True,
         "wheel_sha256": hashlib.sha256(wheel.read_bytes()).hexdigest(),
         "negative_cases_verified": True,
+        "rust_guard_verified": True,
+        "rust_guard_proof_sha256": hashlib.sha256(guard_proof.read_bytes()).hexdigest(),
         "fixture_scope": "canonical processed snapshot; no licensed AI host",
         "background": "host-owned stdio child; foreground HTTP; CLI owns supervision",
     }
@@ -359,6 +367,7 @@ if __name__ == "__main__":
     parser.add_argument("--core", type=Path, required=True)
     parser.add_argument("--source-revision", required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--guard-proof", type=Path, required=True)
     args = parser.parse_args()
     run(
         args.python.absolute(),
@@ -366,4 +375,5 @@ if __name__ == "__main__":
         args.core.resolve(),
         args.source_revision,
         args.out.resolve(),
+        args.guard_proof.resolve(),
     )

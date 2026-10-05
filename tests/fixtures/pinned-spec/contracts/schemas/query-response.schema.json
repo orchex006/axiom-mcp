@@ -1,0 +1,440 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:axiom:graph:query-response:1",
+  "title": "query-response",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "solution_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,62}$"
+    },
+    "catalog_generation_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "project_generations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,62}$"
+          },
+          "generation_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "project_id",
+          "generation_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "freshness": {
+      "enum": [
+        "fresh",
+        "stale",
+        "updating",
+        "unknown",
+        "invalid"
+      ]
+    },
+    "coverage": {
+      "enum": [
+        "complete_for_profile",
+        "partial",
+        "unsupported"
+      ]
+    },
+    "verification": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "enum": [
+            "inventory_hash",
+            "watcher_hint",
+            "none"
+          ]
+        },
+        "verified_at": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "mode"
+      ],
+      "additionalProperties": false
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "project_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,62}$"
+          },
+          "kind": {
+            "enum": [
+              "Solution",
+              "Project",
+              "File",
+              "Namespace",
+              "Class",
+              "Interface",
+              "Function",
+              "Method",
+              "Property",
+              "ApiEndpoint",
+              "DataStore",
+              "Table",
+              "StoredProcedure",
+              "QueueTopic",
+              "ExternalService",
+              "TestCase",
+              "UnresolvedTarget"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "qualified_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "language": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$))(?![A-Za-z]:).+$"
+              },
+              "start_line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "end_line": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "file",
+              "start_line",
+              "end_line"
+            ],
+            "additionalProperties": false
+          },
+          "identity_quality": {
+            "enum": [
+              "semantic_key",
+              "syntax_key",
+              "annotation_key"
+            ]
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "string",
+                "integer",
+                "boolean",
+                "array",
+                "object"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "project_id",
+          "kind",
+          "name",
+          "qualified_name",
+          "language",
+          "source",
+          "identity_quality",
+          "attributes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "target_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "unresolved_target": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_project_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,62}$"
+          },
+          "kind": {
+            "enum": [
+              "CONTAINS",
+              "IMPORTS",
+              "REFERENCES",
+              "CALLS",
+              "INHERITS",
+              "IMPLEMENTS",
+              "EXPOSES",
+              "CALLS_ENDPOINT",
+              "READS",
+              "WRITES",
+              "EXECUTES_PROCEDURE",
+              "DEPENDS_ON",
+              "PUBLISHES",
+              "SUBSCRIBES",
+              "TESTS"
+            ]
+          },
+          "resolution": {
+            "enum": [
+              "exact_static",
+              "inferred_static",
+              "annotated",
+              "unresolved"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "object",
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^(?!/)(?!.*\\\\)(?!.*(?:^|/)\\.\\.(?:/|$))(?![A-Za-z]:).+$"
+                    },
+                    "start_line": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "end_line": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "start_line",
+                    "end_line"
+                  ],
+                  "additionalProperties": false
+                },
+                "rule_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "source",
+                "rule_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "analyzer_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "source_id",
+          "target_project_id",
+          "kind",
+          "resolution",
+          "evidence",
+          "analyzer_id"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": [
+              "target_id"
+            ],
+            "not": {
+              "required": [
+                "unresolved_target"
+              ]
+            }
+          },
+          {
+            "required": [
+              "unresolved_target"
+            ],
+            "not": {
+              "required": [
+                "target_id"
+              ]
+            }
+          }
+        ],
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "resolution": {
+                  "const": "unresolved"
+                }
+              },
+              "required": [
+                "resolution"
+              ]
+            },
+            "then": {
+              "required": [
+                "unresolved_target"
+              ]
+            },
+            "else": {
+              "required": [
+                "target_id"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "next_cursor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "error": {
+      "$ref": "#/$defs/queryError"
+    }
+  },
+  "$defs": {
+    "queryError": {
+      "description": "Structured failure envelope. A failed query never carries a partial result envelope.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "enum": [
+            "UNSUPPORTED_OPERATION",
+            "LIMIT_EXCEEDED",
+            "VALIDATION_ERROR",
+            "UNAUTHENTICATED",
+            "FORBIDDEN",
+            "NOT_FOUND",
+            "CONFLICT",
+            "INCOMPATIBLE_INPUT",
+            "RATE_LIMITED",
+            "SNAPSHOT_EXPIRED",
+            "DAEMON_UNAVAILABLE",
+            "NOT_READY",
+            "INTERNAL_ERROR"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "details": {
+          "type": "object"
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "error"
+        ]
+      },
+      "then": {
+        "required": [
+          "schema_version",
+          "solution_id",
+          "error"
+        ],
+        "not": {
+          "required": [
+            "nodes"
+          ]
+        }
+      },
+      "else": {
+        "required": [
+          "schema_version",
+          "solution_id",
+          "catalog_generation_id",
+          "project_generations",
+          "freshness",
+          "coverage",
+          "verification",
+          "nodes",
+          "edges",
+          "truncated",
+          "warnings"
+        ]
+      }
+    }
+  ]
+}

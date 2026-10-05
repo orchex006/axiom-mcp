@@ -1,0 +1,4 @@
+{
+  "path": "src/main.rs",
+  "content": "fn main() { println!(\"hello\"); }"
+}

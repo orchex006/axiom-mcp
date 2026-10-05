@@ -51,6 +51,7 @@ jobs:
       GIT_CONFIG_COUNT: '1'
       GIT_CONFIG_KEY_0: core.autocrlf
       GIT_CONFIG_VALUE_0: 'false'
+      AXIOM_SPECS_ROOT: ${{ github.workspace }}/tests/fixtures/pinned-spec
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -114,9 +115,21 @@ jobs:
           python = environment / '${{ matrix.python }}'
           subprocess.run([str(python), '-m', 'pip', 'install', '--require-hashes', '-r', 'release/${{ matrix.lock }}-py313-requirements.txt'], check=True)
           subprocess.run([str(python), '-m', 'pip', 'install', '--no-deps', str(wheel)], check=True)
-          subprocess.run([sys.executable, 'tests/native/portable_readiness.py', '--python', str(python), '--wheel', str(wheel), '--core', str(temporary / 'verified-core/target/release/${{ matrix.core }}'), '--source-revision', os.environ['GITHUB_SHA'], '--out', str(temporary / 'native-report.json')], check=True)
+          holder = temporary / ('rust-guard-holder.exe' if os.name == 'nt' else 'rust-guard-holder')
+          subprocess.run([sys.executable, 'tests/native/build_rust_holder.py', '--core', str(temporary / 'verified-core'), '--out', str(holder)], check=True)
+          env = dict(os.environ, AXIOM_GUARD_HOLDER_ARGV=json.dumps([str(holder)]))
+          guard = subprocess.run([sys.executable, '-m', 'pytest', 'tests/test_guard_cross_language.py', 'tests/test_guard_protocol.py', 'tests/test_errors.py', '-q'], env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+          print(guard.stdout.decode('utf-8'))
+          assert guard.returncode == 0 and b'skipped' not in guard.stdout
+          (temporary / 'foreign-guard.txt').write_bytes(guard.stdout)
+          proof = {'exit_code': guard.returncode, 'rust_holder_sha256': hashlib.sha256(holder.read_bytes()).hexdigest(), 'stdout_sha256': hashlib.sha256(guard.stdout).hexdigest(), 'source_revision': os.environ['GITHUB_SHA']}
+          (temporary / 'guard-proof.json').write_text(json.dumps(proof))
+          subprocess.run([sys.executable, 'tests/native/portable_readiness.py', '--python', str(python), '--wheel', str(wheel), '--core', str(temporary / 'verified-core/target/release/${{ matrix.core }}'), '--guard-proof', str(temporary / 'guard-proof.json'), '--source-revision', os.environ['GITHUB_SHA'], '--out', str(temporary / 'native-report.json')], check=True)
       - uses: actions/upload-artifact@v4
         with:
           name: native-${{ matrix.platform }}-${{ github.sha }}
-          path: ${{ runner.temp }}/native-report.json
+          path: |
+            ${{ runner.temp }}/native-report.json
+            ${{ runner.temp }}/guard-proof.json
+            ${{ runner.temp }}/foreign-guard.txt
           if-no-files-found: error

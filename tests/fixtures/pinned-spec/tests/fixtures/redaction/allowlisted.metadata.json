@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "solution_id": "demo-solution",
+  "project_id": "auth-api",
+  "repo": "auth-api",
+  "path": "src/auth/session.rs",
+  "language": "rust",
+  "symbol_kind": "function",
+  "symbol_name": "refresh_session",
+  "line_start": 120,
+  "line_end": 168,
+  "content_sha256": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+  "source_fingerprint": "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2",
+  "generation_id": "c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+  "bytes": 2048,
+  "nodes_count": 42,
+  "edges_count": 96,
+  "coverage": "complete_for_profile",
+  "analysis_profile": "default",
+  "timestamp_utc": "2026-09-18T00:00:00Z",
+  "redaction_notice": "no secrets or absolute local paths are stored"
+}

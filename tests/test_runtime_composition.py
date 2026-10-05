@@ -107,6 +107,9 @@ def test_generated_evaluator_bytes_are_the_provenance_not_a_policy_fork():
             hashlib.sha256((fixtures / "canonical-update-plan" / name).read_bytes()).hexdigest()
             == digest
         )
+    provenance = json.loads((fixtures / "pinned-spec-provenance.json").read_bytes())
+    for name, digest in provenance["files"].items():
+        assert hashlib.sha256((fixtures / "pinned-spec" / name).read_bytes()).hexdigest() == digest
 
 
 def test_cli_core_plan_needs_explicit_exact_approval(monkeypatch):
