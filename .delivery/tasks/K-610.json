@@ -16,5 +16,8 @@
   "mac_arm": "deferred",
   "certification_required": false,
   "published": false,
-  "delivery_state": "pushed"
+  "delivery_state": "integrated",
+  "integration_source_merge": "33385681d4a3565efeb44a67fa84844b921d1dff",
+  "canonical_main_remote_verified": true,
+  "primary_checkout_updated": true
 }
