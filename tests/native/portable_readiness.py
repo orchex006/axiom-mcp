@@ -361,7 +361,7 @@ if __name__ == "__main__":
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     run(
-        args.python.resolve(),
+        args.python.absolute(),
         args.wheel.resolve(),
         args.core.resolve(),
         args.source_revision,
