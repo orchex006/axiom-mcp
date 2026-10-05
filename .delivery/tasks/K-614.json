@@ -1,0 +1,12 @@
+{
+  "task_id": "K-614",
+  "status": "done",
+  "branch": "feature/k-614-release-012",
+  "delivery_state": "integrated",
+  "published": true,
+  "tag": "v0.1.2",
+  "release_source_revision": "3c9f847addee0e8232e402474d455be3b92656bc",
+  "github_release": "https://github.com/orchex006/axiom-mcp/releases/tag/v0.1.2",
+  "publication_ci": "https://github.com/orchex006/axiom-mcp/actions/runs/37276545215",
+  "certification_required": false
+}

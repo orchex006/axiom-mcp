@@ -1,0 +1,121 @@
+{
+  "repository": "orchex006/axiom-mcp",
+  "version": "0.1.2",
+  "tag": "v0.1.2",
+  "published": true,
+  "release_url": "https://github.com/orchex006/axiom-mcp/releases/tag/v0.1.2",
+  "published_at": "2026-10-05T07:22:33Z",
+  "source_revision": "3c9f847addee0e8232e402474d455be3b92656bc",
+  "github_actions": "https://github.com/orchex006/axiom-mcp/actions/runs/37276545215",
+  "assets": [
+    {
+      "name": "RELEASE-NOTES.md",
+      "sha256": "7b1f326bd1e91521dc4a7fcd5b0bd4a145466db22c38d62f1956fc56131f0b38",
+      "bytes": 331
+    },
+    {
+      "name": "SOURCE-REVISION.txt",
+      "sha256": "b5a503488444d6f6621541928b79954c7d6968bb2cb0c5d6a7e0fd7288a59e61",
+      "bytes": 41
+    },
+    {
+      "name": "axiom-mcp-0.1.2-linux-x64-wheelhouse.tar.gz",
+      "sha256": "1586bffd04987e65bc3302c9c6776a89a0991be1b990a8e6b73834d73ef648ce",
+      "bytes": 9419938
+    },
+    {
+      "name": "axiom-mcp-0.1.2-macos-x64-wheelhouse.tar.gz",
+      "sha256": "957560c91bdbcd4fe2b1fc918b8db2e2a5ecd920a22402f9b294619443ae1270",
+      "bytes": 12633267
+    },
+    {
+      "name": "axiom-mcp-0.1.2-windows-x64-wheelhouse.tar.gz",
+      "sha256": "daf4f729f3002b1a9560fdd99a71073ebc5f634eb65724d292cb4b6e8edba101",
+      "bytes": 15180709
+    },
+    {
+      "name": "axiom_mcp-0.1.2-py3-none-any.whl",
+      "sha256": "364a13ce07d3f79dc59cfe74e1192dd08f29ecac08ddbcde233e8a57013a1849",
+      "bytes": 228712
+    },
+    {
+      "name": "linux-x64-native-report.json",
+      "sha256": "2957a3052ab1a57123c21fedf3ac6dbfb7d97667cdbf640fc627b3b9d7bb61a9",
+      "bytes": 4500
+    },
+    {
+      "name": "linux-x64-py313-inputs.tar",
+      "sha256": "667728648b9940351c99769a467e703be78da77e6ba21ea96b6ac91ead888ade",
+      "bytes": 10096640
+    },
+    {
+      "name": "linux-x64-py313-requirements.txt",
+      "sha256": "ce2e686592de779dd980a20474ed8a317cb05487b8e4388cebfea9a73e000cb6",
+      "bytes": 37634
+    },
+    {
+      "name": "linux-x64-runtime-inputs.json",
+      "sha256": "1f684c3f40869136d2102215e4d759f6e0be1faf782560e7cb5cf17c2545e0ec",
+      "bytes": 671
+    },
+    {
+      "name": "macos-x64-native-report.json",
+      "sha256": "92c260dc428095496b2ef81b9c3d21b4441467c5926ccb1090a1da1fec40dcb1",
+      "bytes": 4500
+    },
+    {
+      "name": "macos-x64-py313-inputs.tar",
+      "sha256": "e787ba2d75a5e5ba2c91d72e0cf058f39b105ca3d091fb2bb6d8fc9d48e9492d",
+      "bytes": 13312000
+    },
+    {
+      "name": "macos-x64-py313-requirements.txt",
+      "sha256": "4db70be8d9acb83b9309d64a21e3fd316e0b19450685d1ba1e538ae6153ea43a",
+      "bytes": 39388
+    },
+    {
+      "name": "macos-x64-runtime-inputs.json",
+      "sha256": "dd3ead021c787228c2d5acbdff030fec7e55f4a0919f83c1f2242cd5b6dfa319",
+      "bytes": 671
+    },
+    {
+      "name": "wheel-provenance.json",
+      "sha256": "5aa7c68dbfc9bec61123874b99e709e45c0ebdde80ca5bb9c396910bc43946a4",
+      "bytes": 261
+    },
+    {
+      "name": "windows-x64-native-report.json",
+      "sha256": "285054d5b148ac982f39da2eab7f1cf7c266029b6d6a6fe1ee47596320e83280",
+      "bytes": 4501
+    },
+    {
+      "name": "windows-x64-py313-inputs.tar",
+      "sha256": "054f2d18834336c15afa6caca45b160397ab6c110989b6ebb5ab375223116914",
+      "bytes": 15851520
+    },
+    {
+      "name": "windows-x64-py313-requirements.txt",
+      "sha256": "a24ce21137e780baca68a3a0e1695efe11959634a6a5cdc61a3792c48afa61a6",
+      "bytes": 3298
+    },
+    {
+      "name": "windows-x64-runtime-inputs.json",
+      "sha256": "f3c4b4c5ac6b4318a3b3832be7ad427af28d5a9e0a46661d015aff53840b9c0e",
+      "bytes": 679
+    }
+  ],
+  "certification_required": false,
+  "verified_environments": [
+    "windows-x64",
+    "macos-x64",
+    "linux-x64",
+    "wsl2-linux-x64"
+  ],
+  "limitations": [
+    "Mac ARM excluded.",
+    "Licensed AI host applications are not claimed exercised.",
+    "Mac Intel native package/entrypoint/install-plan and installed MCP/core CI passed; full desktop service registration/apply is not inferred from this runner.",
+    "Use the extracted Windows/Linux CLI for management; optional user-PATH entrypoint installers are explicit actions. Embedded local channels are offline verified descriptions; signed automatic update feeds remain separate.",
+    "Default static-analysis profile remains bounded; a single-line C# namespace-plus-class test fixture was not resolved as a class. Multiline real-source watcher/query passed."
+  ]
+}
