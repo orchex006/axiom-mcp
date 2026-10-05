@@ -1,5 +1,7 @@
 # axiom-mcp
 
+One portable Python 3.13 wheel and the same MCP commands on Windows, Linux and macOS. OS installation and service selection belong to the Axiom CLI. GitHub Actions verifies installed-wheel Windows x64, Linux x64 and Mac Intel execution; Mac ARM is deferred. GitHub Releases distributes the checked wheel and checksums without certification/signing prerequisites. Current evidence is recorded in `release/readiness.json` when all native checks pass.
+
 Python query gateway for the Axiom Graph Ecosystem: a FastAPI + official MCP SDK service that
 answers graph operations over processed JSON without touching the graph runtime.
 
@@ -49,6 +51,10 @@ stdio is the default and carries protocol only on stdout, with every diagnostic 
 python -m axiom_mcp.stdio --name axiom-mcp
 ```
 
+Both public transports register all six existing graph tools. Configure `AXIOM_HOME` with the trusted registry and `AXIOM_MCP_TOKEN_REGISTRY` with scoped credential references. `AXIOM_MCP_TOKEN_REFERENCE` is a JSON reference such as `{"kind":"file","path":"<PRIVATE-CREDENTIAL-FILE>"}` for the stdio caller; the token value never belongs in project config. Without credentials, stdio discovery works but tool calls refuse `UNAUTHENTICATED`. HTTP authenticates each incoming bearer token and preserves its scope. Optional `AXIOM_CONTROL_URL` (loopback only) and `AXIOM_CONTROL_TOKEN_REFERENCE` configure the daemon control client; reads can work from valid snapshots while control is offline.
+
+Stdio runs as the AI host's child process until its pipes close. HTTP runs in foreground with one worker and graceful shutdown; use the CLI's OS supervisor if background operation is needed. MCP does not install a service or require `.ps1`/`.sh` wrappers. Locked launch documents carry reviewed configuration and credential references, never copy the caller's token values. Use a private credential-file reference for locked launches.
+
 Streamable HTTP is an explicit opt-in that requires a `Host` and `Origin` allowlist; it binds
 loopback by default and refuses a non-loopback bind without an explicit acknowledgement:
 
@@ -74,6 +80,8 @@ A running process is never pip-upgraded in place. `axiom-mcp update check` repor
 installed and what is available — and never renders an unknown answer as up to date —
 and `axiom-mcp update apply --plan <plan.json>` validates an approved plan and delegates it to the
 external updater. See [update-plan-delegation](docs/update-plan-delegation.md).
+
+For the current core, use an `axiom update plan` document and pass its exact reviewed digest to `axiom-mcp update apply --plan <plan.json> --approve-digest <digest>`. The approval covers the entire CLI-owned ecosystem plan. MCP calls the installed native `axiom` program directly (optional absolute `AXIOM_CORE_COMMAND`), and propagates its actual outcome. The core re-verifies schema, inputs, installation ownership and approval before activation. Historical general-plan inputs are still validated and forwarded; a core that does not support their schema refuses them rather than reporting a fictitious successful update. Canonical general-plan evaluator bytes are shipped as generated immutable assets with spec revision/SHA provenance, so an installed wheel does not need a private specs checkout.
 
 ## Documentation
 
@@ -133,7 +141,4 @@ transports, and the `version`/`doctor`/`update` CLI with the locked launch entry
 skills (`axiom-skills`): public commands, schema and layout versions, the control API, guard
 semantics and migration decisions change in `axiom-specs` first.
 
-The native target set and its certification status are owned by `axiom-specs`
-(`compatibility/platform-matrix.json`). Support is never inferred from compilation or from a
-passing test run alone, and where a leg could not be executed on this host it is recorded as
-`not_run` in the pages under `docs/` rather than as passing.
+Current scope follows `axiom-specs` ADR-0031: Windows x64, Linux x64 and Mac Intel installed-wheel proof; Mac ARM is deferred and certification does not block delivery. One owner wheel is shared by all lanes; native dependency wheels are resolved by pip for the host. Older `not_run` and certification records remain historical evidence. Native MCP protocol tests do not claim licensed AI host applications were exercised.

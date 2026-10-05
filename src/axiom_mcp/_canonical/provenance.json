@@ -1,0 +1,11 @@
+{
+  "spec_revision": "2e2de80be4d22091612e12017b8f8d4fd3ea91b9",
+  "path": "tools/update_plan_contract.py",
+  "sha256": "9d81795ef68225c9827dc98f4fb3136b07487844685e4f82059ffb40191d8577",
+  "assets": {
+    "query-request.schema.json": {
+      "path": "contracts/schemas/query-request.schema.json",
+      "sha256": "57395f25fa99498f42d5591c70c202d4685258635852f7cd50e1437884dc1cff"
+    }
+  }
+}

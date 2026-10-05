@@ -1,0 +1,11 @@
+{
+  "case": "update.invalid.plan-not-object",
+  "expected_ok": false,
+  "expected_reasons": [
+    "plan_not_object"
+  ],
+  "expected_plan_digest": null,
+  "document": {
+    "plan": "not-an-object"
+  }
+}

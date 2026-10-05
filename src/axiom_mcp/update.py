@@ -26,11 +26,14 @@ conformance test instead of a silent divergence.
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import os
 import pathlib
 import shutil
+import stat
+import subprocess
 import sys
 import sysconfig
 import types
@@ -344,12 +347,17 @@ def find_specs_root(start: pathlib.Path | None = None) -> pathlib.Path | None:
 
 def load_canonical_evaluator(specs_root: pathlib.Path | None = None) -> types.ModuleType:
     """Load the specification's own plan evaluator. Absence is an error, never a pass."""
-    root = specs_root or find_specs_root()
-    if root is None:
-        raise UpdateUnavailable("canonical_update_plan_evaluator_not_found")
-    path = root / EVALUATOR_RELATIVE
+    canonical = pathlib.Path(__file__).with_name("_canonical")
+    provenance = json.loads((canonical / "provenance.json").read_bytes())
+    path = (
+        specs_root / EVALUATOR_RELATIVE
+        if specs_root is not None
+        else canonical / "update_plan_contract.py"
+    )
     if not path.is_file():
         raise UpdateUnavailable(f"canonical_update_plan_evaluator_missing:{path}")
+    if hashlib.sha256(path.read_bytes()).hexdigest() != provenance["sha256"]:
+        raise UpdateUnavailable("canonical_update_plan_evaluator_hash_mismatch")
     spec = importlib.util.spec_from_file_location("axiom_canonical_update_plan", path)
     if spec is None or spec.loader is None:
         raise UpdateUnavailable("canonical_update_plan_evaluator_unloadable")
@@ -554,3 +562,72 @@ def apply_exit_code(error: PlanRejected) -> int:
 def orchestrator_available(orchestrator: str = ORCHESTRATOR) -> bool:
     """Whether the external updater this process delegates to is on PATH."""
     return shutil.which(orchestrator) is not None
+
+
+def _regular_input(path: pathlib.Path) -> pathlib.Path:
+    for candidate in (path, *path.parents):
+        info = candidate.lstat()
+        if candidate.is_symlink() or getattr(info, "st_file_attributes", 0) & getattr(
+            stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0
+        ):
+            raise UpdateUnavailable("unsafe_core_or_plan_path")
+    if not path.is_file():
+        raise UpdateUnavailable("core_or_plan_not_regular")
+    return path.resolve(strict=True)
+
+
+def core_program() -> pathlib.Path:
+    configured = os.environ.get("AXIOM_CORE_COMMAND")
+    located = configured or shutil.which(ORCHESTRATOR)
+    if not located:
+        raise UpdateUnavailable("installed_core_cli_not_found")
+    program = pathlib.Path(located).absolute()
+    try:
+        program = _regular_input(program)
+        probe = subprocess.run(
+            [str(program), "version", "--json"],
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            timeout=10,
+            check=False,
+        )
+        identity = json.loads(probe.stdout)
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        raise UpdateUnavailable("installed_core_identity_unavailable") from exc
+    if probe.returncode or identity.get("component") != "axiom" or identity.get("control_api") != 1:
+        raise UpdateUnavailable("installed_core_identity_mismatch")
+    return program
+
+
+def run_core(argv: Sequence[str]) -> int:
+    """Launch the installed updater directly, with its own final integrity verifier."""
+    program = core_program()
+    args = list(argv[1:])
+    try:
+        path = _regular_input(pathlib.Path(args[args.index("--plan") + 1]).absolute())
+        if path.stat().st_size > 16 * 1024 * 1024:
+            raise UpdateUnavailable("update_plan_too_large")
+        if "--approve-digest" not in args:
+            raise UpdateUnavailable("explicit_core_approval_required")
+        completed = subprocess.run([str(program), *args], stdin=subprocess.DEVNULL, timeout=120)
+        return completed.returncode if completed.returncode >= 0 else 8
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        raise UpdateUnavailable("core_update_failed_or_timed_out_state_unknown") from exc
+
+
+def execute_core_plan(
+    document: Mapping[str, Any], path: str, approved: str | None, *, as_json: bool
+) -> int:
+    """Forward an explicitly approved CLI-owned ecosystem plan, without translating it."""
+    if not approved or approved != document.get("plan_digest"):
+        raise PlanRejected(["plan_not_approved"])
+    body = dict(document)
+    body.pop("plan_digest", None)
+    canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    if hashlib.sha256(canonical).hexdigest() != approved:
+        raise PlanRejected(["plan_digest_mismatch"])
+    # Approval covers the whole ecosystem plan; only the core owns its schema/activation.
+    argv = [ORCHESTRATOR, *ORCHESTRATOR_SUBCOMMAND, path, "--approve-digest", approved]
+    if as_json:
+        argv.append("--json")
+    return run_core(argv)

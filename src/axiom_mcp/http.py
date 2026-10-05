@@ -185,7 +185,9 @@ def build_gateway(
 
     @app.get(settings.ready_path)
     async def readyz() -> JSONResponse:
-        report = probe()
+        import anyio
+
+        report = await anyio.to_thread.run_sync(probe)
         return JSONResponse(report.as_dict(), status_code=200 if report.ready else 503)
 
     mounted = sdk_compat.mount_streamable_http(app, server, path=settings.path)
@@ -405,8 +407,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     server = sdk_compat.build_server(
         args.name, allowed_hosts=args.allow_host, allowed_origins=args.allow_origin
     )
-    gateway = build_gateway(server, settings=settings)
-    serve(gateway.app, settings)
+    from axiom_mcp import security
+    from axiom_mcp.runtime import Runtime, compose
+
+    runtime = Runtime.configured()
+    compose(server, runtime, transport="http")
+    gateway = build_gateway(
+        server,
+        settings=settings,
+        readiness=runtime.readiness,
+        security=security.SecurityPolicy.build(
+            allowed_hosts=args.allow_host, allowed_origins=args.allow_origin
+        ),
+        authenticator=runtime.tokens,
+    )
+    try:
+        serve(gateway.app, settings)
+    finally:
+        runtime.close()
     return 0
 
 

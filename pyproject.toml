@@ -44,6 +44,7 @@ where = ["src"]
 # copy of the repository README and `tests/test_package_readme.py` fails when the two diverge.
 [tool.setuptools.package-data]
 axiom_mcp = ["README.md"]
+"axiom_mcp._canonical" = ["*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -52,6 +53,8 @@ pythonpath = ["src"]
 [tool.ruff]
 target-version = "py313"
 line-length = 100
+# Immutable canonical bytes are verified by SHA-256, never reformatted here.
+extend-exclude = ["src/axiom_mcp/_canonical/update_plan_contract.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B"]

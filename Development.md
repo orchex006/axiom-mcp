@@ -1,5 +1,9 @@
 # Development — axiom-mcp
 
+## Portable MCP delivery — K-610 / ADR-0031
+
+Ship one `py3-none-any` wheel and the same commands across native OS targets. CLI owns platform installation/service supervision; MCP uses internal native guard adapters. Stdio is a host-owned child; HTTP runs in foreground. Current READY requires installed-wheel Windows/Linux/Mac Intel GitHub Actions checks and immutable wheel/source hashes. Mac ARM, certification, signing and attestation are not gates. Earlier local candidate/certification statements below are historical scope records. Publication remains separately authorized.
+
 ## Repository identity
 
 | Field | Value |

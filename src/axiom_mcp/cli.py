@@ -212,6 +212,12 @@ def resolve_build_revision(
     explicit = (source.get(BUILD_REVISION_ENV) or "").strip()
     if explicit:
         return explicit
+    try:
+        from axiom_mcp._build_revision import BUILD_REVISION
+
+        return BUILD_REVISION
+    except ImportError:
+        pass  # Source checkout; the immutable wheel builder supplies this generated record.
     return _git_revision(repo_root) or UNKNOWN_BUILD_REVISION
 
 
@@ -620,6 +626,9 @@ def build_parser() -> argparse.ArgumentParser:
     apply_parser.add_argument(
         "--json", action="store_true", help="Emit a single JSON object on stdout."
     )
+    apply_parser.add_argument(
+        "--approve-digest", default=None, help="Exact reviewed CLI plan digest."
+    )
     return parser
 
 
@@ -683,7 +692,7 @@ def _run_update_check(
     return update.check_exit_code(check)
 
 
-def _run_update_apply(*, as_json: bool, plan_path: str) -> int:
+def _run_update_apply(*, as_json: bool, plan_path: str, approve_digest: str | None = None) -> int:
     try:
         document = json.loads(pathlib.Path(plan_path).read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
@@ -691,7 +700,17 @@ def _run_update_apply(*, as_json: bool, plan_path: str) -> int:
         print(problem, file=sys.stderr)
         return EXIT_VALIDATION
     try:
-        decision = update.apply_plan(document, plan_path=plan_path)
+        if document.get("kind") == "ecosystem-update-plan":
+            return update.execute_core_plan(document, plan_path, approve_digest, as_json=as_json)
+        decision = update.apply_plan(
+            document,
+            plan_path=plan_path,
+            approved_digest=approve_digest,
+            runner=lambda argv: update.run_core(
+                [*argv, "--approve-digest", document["plan"]["plan_digest"]]
+                + (["--json"] if as_json else [])
+            ),
+        )
     except update.UpdateUnavailable as exc:
         print(f"{version.COMPONENT}: {exc}", file=sys.stderr)
         return EXIT_NOT_FOUND
@@ -699,6 +718,8 @@ def _run_update_apply(*, as_json: bool, plan_path: str) -> int:
         for reason in exc.reasons:
             print(f"  {reason}", file=sys.stderr)
         return update.apply_exit_code(exc)
+    if decision.executed:
+        return int(decision.outcome.rsplit(":", 1)[1]) if "failed:" in decision.outcome else 0
     if as_json:
         print(json.dumps(decision.as_report(), ensure_ascii=False))
     else:
@@ -706,6 +727,8 @@ def _run_update_apply(*, as_json: bool, plan_path: str) -> int:
         print(f"target: {decision.target_component} -> {decision.install_root}")
         print(f"outcome: {decision.outcome}")
         print("delegate: " + " ".join(decision.argv))
+    if decision.outcome.startswith("delegated_failed:"):
+        return int(decision.outcome.rsplit(":", 1)[1])
     return EXIT_SUCCESS
 
 
@@ -729,7 +752,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 as_json=args.json, offline=args.offline, metadata_path=args.metadata
             )
         if args.update_command == "apply":
-            return _run_update_apply(as_json=args.json, plan_path=args.plan)
+            return _run_update_apply(
+                as_json=args.json, plan_path=args.plan, approve_digest=args.approve_digest
+            )
         print("usage: axiom-mcp update {check,apply}", file=sys.stderr)
         return EXIT_VALIDATION
     parser.print_help(sys.stderr)

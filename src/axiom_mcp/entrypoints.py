@@ -406,6 +406,17 @@ def scoped_environment(
             environment["SYSTEMROOT"] = system_root
             environment["WINDIR"] = system_root
     environment["PATH"] = os.pathsep.join(entries)
+    source = os.environ if parent is None else parent
+    # Only reviewed configuration/reference names, never token values or PYTHONPATH.
+    for key in (
+        "AXIOM_HOME",
+        "AXIOM_MCP_TOKEN_REGISTRY",
+        "AXIOM_MCP_TOKEN_REFERENCE",
+        "AXIOM_CONTROL_URL",
+        "AXIOM_CONTROL_TOKEN_REFERENCE",
+    ):
+        if source.get(key):
+            environment[key] = source[key]
     return environment
 
 

@@ -1,0 +1,11 @@
+{
+  "case": "update.invalid.document-not-object",
+  "expected_ok": false,
+  "expected_reasons": [
+    "document_not_object"
+  ],
+  "expected_plan_digest": null,
+  "document": [
+    "not-an-object"
+  ]
+}

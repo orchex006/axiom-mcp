@@ -1,5 +1,7 @@
 # Streamable HTTP transport
 
+Public HTTP launch composes the same six tools and authenticates the actual request token. Host/Origin policy remains explicit; blocking guard/query work runs off the event loop. HTTP stays foreground with one worker; CLI supervision owns background lifecycle. Historical transport-only records below remain unchanged.
+
 Owner: `axiom-mcp`. Contract: `repo-seeds/axiom-mcp/docs/17-FASTAPI-MCP.md` sections 2, 6 and 9, at the pinned
 `axiom-specs` revision. This document records implementation, not policy.
 Companion document: `docs/query-transports.md` compares HTTP with the stdio transport and

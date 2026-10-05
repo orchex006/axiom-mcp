@@ -19,7 +19,7 @@ def git(*args: str) -> bytes:
     return subprocess.check_output(["git", *args], cwd=ROOT)
 
 
-def build(output: Path, revision: str) -> dict:
+def build(output: Path, revision: str, *, stamp_revision: bool = False) -> dict:
     if revision != git("rev-parse", "HEAD").decode().strip():
         raise ValueError("source revision differs from checked-out commit")
     if git("status", "--porcelain=v1", "--untracked-files=normal").strip():
@@ -38,6 +38,10 @@ def build(output: Path, revision: str) -> dict:
             target = stage / name
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(git("show", f"{revision}:{name}"))
+        if stamp_revision:
+            (stage / "src/axiom_mcp/_build_revision.py").write_text(
+                f'BUILD_REVISION = "{revision}"\n', encoding="utf-8", newline="\n"
+            )
         env = dict(os.environ, SOURCE_DATE_EPOCH=epoch)
         command = [
             sys.executable,
@@ -68,6 +72,10 @@ def build(output: Path, revision: str) -> dict:
                 name.removeprefix("src/")
             ) != git("show", f"{revision}:{name}"):
                 raise ValueError(f"wheel differs from committed source: {name}")
+        if stamp_revision and artifact.read("axiom_mcp/_build_revision.py") != (
+            f'BUILD_REVISION = "{revision}"\n'.encode()
+        ):
+            raise ValueError("wheel build revision differs from immutable source")
     return {
         "wheel": wheel.name,
         "sha256": hashlib.sha256(wheel.read_bytes()).hexdigest(),

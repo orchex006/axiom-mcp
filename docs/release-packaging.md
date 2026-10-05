@@ -1,5 +1,7 @@
 # Release packaging into versioned environments
 
+K-610 GitHub CI builds one immutable py3-none-any owner wheel once and installs the identical wheel on native Windows/Linux/Mac Intel. Pip resolves native dependencies for each OS. The current Release workflow verifies source/wheel/native report hashes and refuses existing Release replacement. Mac ARM and certification are nonblocking; actual publication remains separately authorized.
+
 `release/package.py` is the release-side packager for `axiom-mcp`. It is the other
 half of the update contract in `docs/update-plan-delegation.md`: the update surface
 checks versions and delegates an approved plan, and the packager turns an
