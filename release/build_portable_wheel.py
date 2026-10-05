@@ -12,6 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("--source-revision", required=True)
     args = parser.parse_args()
     proof = build(args.out_dir.resolve(), args.source_revision, stamp_revision=True)
+    proof["runtime_inputs_required"] = True
     if not proof["wheel"].endswith("-py3-none-any.whl"):
         raise ValueError("MCP owner wheel must be portable")
     (args.out_dir / "wheel-provenance.json").write_text(
