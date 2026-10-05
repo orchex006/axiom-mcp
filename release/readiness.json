@@ -1,24 +1,25 @@
 {
-  "state": "READY",
+  "state": "PUBLISHED",
   "ready": true,
+  "version": "0.1.2",
+  "published": true,
+  "source_revision": "3c9f847addee0e8232e402474d455be3b92656bc",
+  "release_url": "https://github.com/orchex006/axiom-mcp/releases/tag/v0.1.2",
+  "github_actions": "https://github.com/orchex006/axiom-mcp/actions/runs/37276545215",
   "certification_required": false,
-  "wheel_sha256": "7e2a07407df946e7b6158f9283fa795f295d30a011f469ad3f21472cb0cab304",
-  "source_revision": "39f163a6bb8bb8101e0186af00045d1e20486f28",
-  "github_actions": "https://github.com/orchex006/axiom-mcp/actions/runs/37267724441",
-  "native_lanes": [
-    {
-      "platform": "linux-x64",
-      "report_sha256": "a493910c4a6dbdbf7b95fd10abf50b3be1b046707ac24f4840c0e6bd1a495d21"
-    },
-    {
-      "platform": "macos-x64",
-      "report_sha256": "08f2f7e42143c7dfddf26b5ec8d8541d3307ff7e24f2914b9934bddb3229866c"
-    },
-    {
-      "platform": "windows-x64",
-      "report_sha256": "cccfe8d4ffb93e800b3f4a2c8450cfecfec3d56e21176345a970a15fe1320799"
-    }
+  "verified_environments": [
+    "windows-x64",
+    "macos-x64",
+    "linux-x64",
+    "wsl2-linux-x64"
   ],
-  "macos_arm64": "deferred",
-  "published": false
+  "macos_arm64": "excluded",
+  "receipt": "release/v0.1.2-receipt.json",
+  "limitations": [
+    "Mac ARM excluded.",
+    "Licensed AI host applications are not claimed exercised.",
+    "Mac Intel native package/entrypoint/install-plan and installed MCP/core CI passed; full desktop service registration/apply is not inferred from this runner.",
+    "Use the extracted Windows/Linux CLI for management; optional user-PATH entrypoint installers are explicit actions. Embedded local channels are offline verified descriptions; signed automatic update feeds remain separate.",
+    "Default static-analysis profile remains bounded; a single-line C# namespace-plus-class test fixture was not resolved as a class. Multiline real-source watcher/query passed."
+  ]
 }
