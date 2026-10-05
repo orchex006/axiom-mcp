@@ -1,0 +1,22 @@
+{
+  "spec_revision": "2e2de80be4d22091612e12017b8f8d4fd3ea91b9",
+  "files": {
+    "contracts/native-reader-writer-guards.md": "ee7d224b194de99b56a0c31f8c48c6e823b116ef92bee4da5130940c7e84663e",
+    "contracts/redaction-policy.md": "f474a399d2308dba51ff9849d79b5598e69dd930387331b9b40fac681107dc5e",
+    "contracts/schemas/query-response.schema.json": "fe444ce8319c0413b2ce5d4a208a40e9af5eb5323cad99493d2c1d25703a04b5",
+    "tests/test_redaction_policy.py": "34f96bd1ebe1c6a351a40f72a8b5993df78ba18cbcbfa6ecebf33a8027624e3e",
+    "tests/fixtures/redaction/README.md": "8e88b041fd9e8c205a8f276e0e1b4377a2a1071b7f86a089dd79a91701b921a1",
+    "tests/fixtures/redaction/allowlisted.metadata.json": "942f9964ba1e8d5ac9908365df9a2740c54e8d2aa78fba0759cb509f5862a3c7",
+    "tests/fixtures/redaction/boundary.metadata-key-not-allowlisted.json": "98aebf28d8423f479e72e731c238aa07555a557ea21b8245a5941cca3b2af940",
+    "tests/fixtures/redaction/violating.bearer-token.json": "c67e956ec165f8004872cd6ab544b4b5701fe7b2b51db30c958b410ce3a8dd7d",
+    "tests/fixtures/redaction/violating.cloud-access-key.json": "81f76c4dd3ab0637b89490b2de7ebd0e3c6d8d480a31a602d4c777e516d02dc4",
+    "tests/fixtures/redaction/violating.connection-string.json": "a22e5962f68827fe805d3d7ad32b42da8b3156f5883f4f34a00015af160420e2",
+    "tests/fixtures/redaction/violating.credential-url.json": "fca2bd79c4b652f1737181d2f5c618b089d26ce3bc15bbb41cd5bbb74574b505",
+    "tests/fixtures/redaction/violating.password-assignment.json": "77c242ffad2ea80b8ca7607977cec37361f0297a31fb462ba6a22e28d790a4c3",
+    "tests/fixtures/redaction/violating.posix-path.json": "83bc2ce01fbf19f5e0daa1a347a5f2c824f65439928f118c43b61491f092b8b1",
+    "tests/fixtures/redaction/violating.private-key.json": "c496658e12c90070a00a43355d42ed2f2afa772e2010b5ff38390d96d0541b61",
+    "tests/fixtures/redaction/violating.provider-token.json": "91a166b12a6fb50f035f513bf8b3bccfa7c02dd2106d863493c66ecbd4f1030c",
+    "tests/fixtures/redaction/violating.unc-path.json": "ea1658b35cfde1ebb21532bb13f69d12ae9a5867b0bdca8ee7eaf5f1b7c10d2e",
+    "tests/fixtures/redaction/violating.windows-path.json": "14ff4a07b9d2e1fa3fdd09797a0deb6d067837917584aacd91f45bf661745007"
+  }
+}

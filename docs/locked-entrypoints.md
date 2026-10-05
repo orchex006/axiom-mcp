@@ -1,5 +1,7 @@
 # Locked native entrypoints
 
+K-610 carries only reviewed AXIOM_HOME, token registry/reference and optional control reference configuration. It never copies token values or caller PYTHONPATH. Private credential-file references work with the sanitized launch environment. The public Python module composes all six tools.
+
 `src/axiom_mcp/entrypoints.py` is the launch surface for a host that must start the
 gateway **without a shell**. A host does not activate a virtual environment, does not
 source a script and does not quote a command line: it launches one absolute

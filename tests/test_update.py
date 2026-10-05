@@ -32,6 +32,11 @@ ACCEPTED_DOCUMENT = FIXTURE_RELATIVE / "documents" / "accepted.document.json"
 VERSIONED_MCP_ROOT = str((pathlib.Path(sys.prefix).parent / "axiom-mcp-test" / "0.2.0").resolve())
 
 _SPECS_ROOT = update.find_specs_root()
+_FIXTURE_ROOT = (
+    _SPECS_ROOT / FIXTURE_RELATIVE
+    if _SPECS_ROOT
+    else REPO_ROOT / "tests/fixtures/canonical-update-plan"
+)
 
 
 class _SpecsCase(unittest.TestCase):
@@ -39,18 +44,14 @@ class _SpecsCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        if _SPECS_ROOT is None:
-            raise unittest.SkipTest(
-                "no pinned axiom-specs checkout with the plan contract is present"
-            )
         cls.evaluator = update.load_canonical_evaluator(_SPECS_ROOT)
 
     def accepted_document(self):
-        path = _SPECS_ROOT / ACCEPTED_DOCUMENT
+        path = _FIXTURE_ROOT / "documents/accepted.document.json"
         return json.loads(path.read_text(encoding="utf-8"))
 
     def fixture_documents(self):
-        for path in sorted((_SPECS_ROOT / FIXTURE_RELATIVE).glob("*.json")):
+        for path in sorted(_FIXTURE_ROOT.glob("*.json")):
             yield path, json.loads(path.read_text(encoding="utf-8"))
 
     def mcp_document(self, install_root: str = VERSIONED_MCP_ROOT):

@@ -1,3 +1,9 @@
+## Unreleased — K-610
+
+- Compose six authenticated graph tools on public stdio/HTTP entrypoints with registered native guard selection and per-request HTTP scopes.
+- Keep one portable wheel; CLI owns OS background/service lifecycle. Execute exact approved core-plan delegation and preserve real failures.
+- Ship immutable hash-verified canonical evaluator assets and add three native installed-wheel GitHub Actions lanes plus immutable GitHub Release delivery without certification.
+
 # 0.1.1 MacIntel test release
 
 Owner-authorized publication of current code; see release/v0.1.1-notes.md.

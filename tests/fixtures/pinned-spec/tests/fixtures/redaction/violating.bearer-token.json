@@ -1,0 +1,4 @@
+{
+  "purpose": "rejection sample: bearer token",
+  "header": "Authorization: Bearer exampletoken0123456789abcd"
+}

@@ -1,0 +1,4 @@
+{
+  "purpose": "rejection sample: private key block",
+  "body": "-----BEGIN RSA PRIVATE KEY-----\nMIIEnotarealkey\n-----END RSA PRIVATE KEY-----"
+}

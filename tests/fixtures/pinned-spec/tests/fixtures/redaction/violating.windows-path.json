@@ -1,0 +1,4 @@
+{
+  "purpose": "rejection sample: Windows drive absolute path",
+  "path": "C:\\Users\\example\\project\\src\\main.rs"
+}

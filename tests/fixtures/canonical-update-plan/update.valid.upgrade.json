@@ -1,0 +1,112 @@
+{
+  "case": "update.valid.upgrade",
+  "expected_ok": true,
+  "expected_reasons": [],
+  "expected_plan_digest": "b1938dd0652de5cd76d1a4934fd39d5a7d83012eb3a8e8c0c6139e1bc1d77b00",
+  "document": {
+    "plan": {
+      "schema_version": 1,
+      "spec_version": "2.0.0-draft.1",
+      "plan_id": "update-2026-09-18-graphd-0-2-0",
+      "created_at": "2026-09-18T02:00:00Z",
+      "expires_at": "2026-09-19T02:00:00Z",
+      "channel": "stable",
+      "target": {
+        "component": "axiom-graphd",
+        "host": "windows-x64",
+        "install_root": "C:/Users/demo/.axiom/components/axiom-graphd/0.2.0"
+      },
+      "components": [
+        {
+          "component": "axiom-graphd",
+          "installed_version": "0.1.0",
+          "installed_revision": "1111111111111111111111111111111111111111",
+          "target_version": "0.2.0",
+          "target_revision": "2222222222222222222222222222222222222222",
+          "artifact_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+          "action": "upgrade"
+        },
+        {
+          "component": "axiom",
+          "installed_version": "0.1.0",
+          "installed_revision": "1111111111111111111111111111111111111111",
+          "target_version": "0.2.0",
+          "target_revision": "2222222222222222222222222222222222222222",
+          "artifact_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+          "action": "upgrade"
+        }
+      ],
+      "downloads": [
+        {
+          "artifact": "axiom-graphd-0.2.0-windows-x64.zip",
+          "url": "https://github.com/orchex006/axiom-graphd/releases/download/v0.2.0/axiom-graphd-0.2.0-windows-x64.zip",
+          "sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+          "size_bytes": 41943040
+        }
+      ],
+      "migrations": [
+        {
+          "migration_id": "queue-schema-1-to-2",
+          "from_queue_schema": 1,
+          "to_queue_schema": 2,
+          "reversible": false,
+          "requires_backup": true
+        }
+      ],
+      "backup": {
+        "required": true,
+        "targets": [
+          ".axiom/state/queue.db",
+          ".axiom/state/queue.db-wal"
+        ]
+      },
+      "disk_headroom_bytes": 268435456,
+      "service_interruptions": [
+        {
+          "service": "axiom-graphd",
+          "action": "restart",
+          "max_seconds": 30
+        },
+        {
+          "service": "axiom-mcp",
+          "action": "none",
+          "max_seconds": 0
+        }
+      ],
+      "host_reconnect": {
+        "required": true,
+        "reason": "the shared core version changes, so host adapters re-read the local control endpoint"
+      },
+      "bootstrap_changes": [
+        {
+          "repo_id": "auth-api",
+          "template_version": "0.2.0",
+          "destinations": [
+            "AGENTS.md",
+            ".axiom/agent/POLICY.md"
+          ]
+        }
+      ],
+      "rollback": {
+        "supported": true,
+        "restores_previous_versions": true,
+        "limits": [
+          "a queue schema migration is not reversible in place; rollback restores the pre-upgrade backup and must not run the old binary against schema 2"
+        ]
+      },
+      "trust": {
+        "metadata_version": 7,
+        "metadata_expiry": "2026-09-25T02:00:00Z",
+        "trust_root": "5555555555555555555555555555555555555555555555555555555555555555",
+        "signature_present": true
+      },
+      "approval": {
+        "state": "approved",
+        "approved_digest": "b1938dd0652de5cd76d1a4934fd39d5a7d83012eb3a8e8c0c6139e1bc1d77b00",
+        "approved_by": "maintainer@example.invalid",
+        "approved_at": "2026-09-18T02:05:00Z"
+      },
+      "plan_digest": "b1938dd0652de5cd76d1a4934fd39d5a7d83012eb3a8e8c0c6139e1bc1d77b00"
+    }
+  }
+}

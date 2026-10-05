@@ -1,0 +1,4 @@
+{
+  "purpose": "rejection sample: UNC share path",
+  "path": "\\\\fileserver\\share\\project\\src\\main.rs"
+}

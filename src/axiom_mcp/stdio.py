@@ -386,11 +386,17 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     import anyio
 
-    server = build_stdio_server(args.name)
+    from axiom_mcp.runtime import Runtime, compose
+
+    runtime = Runtime.configured()
+    server = compose(build_stdio_server(args.name), runtime, transport="stdio")
     banner = not args.no_banner
     # ``serve_stdio`` takes ``banner`` as a keyword-only argument, and ``anyio.run``
     # forwards only positional arguments to the callable it is given.
-    return anyio.run(functools.partial(serve_stdio, server, banner=banner))
+    try:
+        return anyio.run(functools.partial(serve_stdio, server, banner=banner))
+    finally:
+        runtime.close()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,38 @@
+{
+  "status": "completed",
+  "conclusion": "success",
+  "headSha": "39f163a6bb8bb8101e0186af00045d1e20486f28",
+  "url": "https://github.com/orchex006/axiom-mcp/actions/runs/37267724441",
+  "jobs": [
+    {
+      "name": "package",
+      "status": "completed",
+      "conclusion": "success",
+      "databaseId": 111627953573,
+      "url": "https://github.com/orchex006/axiom-mcp/actions/runs/37267724441/job/111627953573"
+    },
+    {
+      "name": "native (linux-x64)",
+      "status": "completed",
+      "conclusion": "success",
+      "databaseId": 111627995856,
+      "url": "https://github.com/orchex006/axiom-mcp/actions/runs/37267724441/job/111627995856"
+    },
+    {
+      "name": "native (macos-x64)",
+      "status": "completed",
+      "conclusion": "success",
+      "databaseId": 111627995869,
+      "url": "https://github.com/orchex006/axiom-mcp/actions/runs/37267724441/job/111627995869"
+    },
+    {
+      "name": "native (windows-x64)",
+      "status": "completed",
+      "conclusion": "success",
+      "databaseId": 111627995924,
+      "url": "https://github.com/orchex006/axiom-mcp/actions/runs/37267724441/job/111627995924"
+    }
+  ],
+  "capture_command": "gh run view 37267724441 --repo orchex006/axiom-mcp --json status,conclusion,headSha,url,jobs",
+  "original_response_sha256": "754496bfe06a0eed33aec2063a410a6691d210070d7a98a40f05194d64ef2325"
+}

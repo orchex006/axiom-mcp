@@ -1,0 +1,20 @@
+{
+  "task_id": "K-610",
+  "status": "done",
+  "branch": "feature/k-610-portable-mcp-readiness",
+  "checked_source_revision": "39f163a6bb8bb8101e0186af00045d1e20486f28",
+  "ci_url": "https://github.com/orchex006/axiom-mcp/actions/runs/37267724441",
+  "wheel_sha256": "7e2a07407df946e7b6158f9283fa795f295d30a011f469ad3f21472cb0cab304",
+  "portable_owner_wheels": 1,
+  "native_lanes": [
+    "linux-x64",
+    "macos-x64",
+    "windows-x64"
+  ],
+  "native_proof_cases_per_lane": 14,
+  "rust_python_guard_verified": true,
+  "mac_arm": "deferred",
+  "certification_required": false,
+  "published": false,
+  "delivery_state": "pushed"
+}

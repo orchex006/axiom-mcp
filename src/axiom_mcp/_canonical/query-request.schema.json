@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:axiom:graph:query-request:1",
+  "title": "query-request",
+  "type": "object",
+  "properties": {
+    "solution_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,62}$"
+    },
+    "operation": {
+      "enum": [
+        "search",
+        "context",
+        "neighbors",
+        "callers",
+        "dependencies",
+        "impact",
+        "path",
+        "changes"
+      ]
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,62}$"
+    },
+    "target": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_to": {
+      "type": "string",
+      "minLength": 1
+    },
+    "query": {
+      "type": "string",
+      "minLength": 1
+    },
+    "depth": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 8,
+      "default": 2
+    },
+    "max_nodes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 500,
+      "default": 50
+    },
+    "max_edges": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000,
+      "default": 100
+    },
+    "max_bytes": {
+      "type": "integer",
+      "minimum": 512,
+      "maximum": 32768,
+      "default": 8192
+    },
+    "consistency": {
+      "enum": [
+        "allow_stale",
+        "require_fresh",
+        "pinned"
+      ],
+      "default": "allow_stale"
+    },
+    "cursor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]{0,62}$"
+      }
+    },
+    "catalog_generation_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "baseline_catalog_generation_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "edge_kinds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "CONTAINS",
+          "IMPORTS",
+          "REFERENCES",
+          "CALLS",
+          "INHERITS",
+          "IMPLEMENTS",
+          "EXPOSES",
+          "CALLS_ENDPOINT",
+          "READS",
+          "WRITES",
+          "EXECUTES_PROCEDURE",
+          "DEPENDS_ON",
+          "PUBLISHES",
+          "SUBSCRIBES",
+          "TESTS"
+        ]
+      }
+    },
+    "direction": {
+      "enum": [
+        "incoming",
+        "outgoing",
+        "both"
+      ],
+      "default": "both"
+    },
+    "projection": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "identity",
+          "relations",
+          "source_locations",
+          "coverage"
+        ]
+      }
+    }
+  },
+  "required": [
+    "solution_id",
+    "operation"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "not": {
+        "required": [
+          "project_id",
+          "project_ids"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "consistency": {
+            "const": "pinned"
+          }
+        },
+        "required": [
+          "consistency"
+        ]
+      },
+      "then": {
+        "required": [
+          "catalog_generation_id"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "search"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "enum": [
+              "context",
+              "neighbors",
+              "callers",
+              "dependencies",
+              "impact",
+              "path"
+            ]
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "required": [
+          "target"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "path"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "required": [
+          "target_to"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "const": "changes"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "required": [
+          "baseline_catalog_generation_id"
+        ]
+      }
+    }
+  ]
+}

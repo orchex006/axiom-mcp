@@ -11,3 +11,6 @@
 # The Windows stderr/stdout captures legitimately contain CR bytes; normalization would
 # change the committed bytes and invalidate every SHA256 in tests/native/evidence/*/SHA256SUMS.
 tests/native/evidence/** -text
+
+# K-610 native guard proof hashes bind the exact captured bytes.
+evidence/K-610/*-foreign-guard.txt -text

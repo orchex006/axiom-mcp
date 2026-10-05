@@ -1,0 +1,4 @@
+{
+  "purpose": "rejection sample: connection string with credentials",
+  "connection": "Data Source=graph.example.invalid;Initial Catalog=graph;Password=example-only-not-a-secret"
+}
