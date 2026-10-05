@@ -44,6 +44,7 @@ def build(wheel: Path, lock: Path, lane: str, revision: str, output: Path):
             check=True,
         )
         shutil.copyfile(wheel, house / wheel.name)
+        shutil.copyfile(wheel, stage / wheel.name)
         lock_name = lane + "-py313-requirements.txt"
         complete_lock = lock.read_text(encoding="utf-8").rstrip() + (
             f"\naxiom-mcp=={version} --hash=sha256:{digest(wheel)}\n"
