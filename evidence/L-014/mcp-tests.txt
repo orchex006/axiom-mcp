@@ -1,0 +1,9 @@
+$ PYTHONPATH=src PYTHONUTF8=1 python -m pytest tests -q -p no:cacheprovider --basetemp <scratch>
+ERROR tests/test_entrypoints.py::test_the_module_cli_prints_one_launch_document
+ERROR tests/test_entrypoints.py::test_the_module_cli_records_and_then_verifies_the_lock
+ERROR tests/test_entrypoints.py::test_the_module_entrypoint_is_reachable_as_a_process
+147 failed, 625 passed, 10 skipped, 12 errors, 274 subtests passed in 67.56s (0:01:07)
+exit=1
+# Local Windows run of the full mcp suite (PYTHONPATH=src, PYTHONUTF8=1).
+# Failing/erroring tests on unmodified origin/main 2a702a2: 168; on this branch: 158; present on the branch but not on main: 0.
+# The version bump introduces no new failure; the pre-existing local failures are environment-specific (native CI lanes are the gate).
