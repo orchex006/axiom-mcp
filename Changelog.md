@@ -1,3 +1,7 @@
+## 0.1.3 — one-line install release
+
+- Version 0.1.3 to keep one release version across the ADR-0033 one-line install; no functional change.
+
 ## 0.1.2 — K-614
 
 - Publish one portable MCP wheel with current core 0.1.2 native proofs and hash-pinned offline dependency inputs for the distribution; no certification or Mac ARM gate.
