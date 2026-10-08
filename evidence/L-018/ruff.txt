@@ -1,0 +1,5 @@
+$ python -m ruff check . && python -m ruff format --check .
+All checks passed!
+check-exit=0
+172 files already formatted
+format-exit=0

@@ -207,7 +207,8 @@ surface installs; the answer always states the boundary explicitly:
 "installation": {
   "implicit_install": false,
   "reason": "no_install_path_on_the_mcp_surface",
-  "applies_via": "cli_or_skill_workflow"
+  "applies_via": "cli_or_skill_workflow",
+  "commands": {"short_command": "axm", "long_form": "axiom-cli", "update": "axm update", "doctor": "axm doctor", "version": "axm version", "uninstall": "axm uninstall", "update_one_liner": {"windows": "…update.ps1 | iex", "posix": "…update.sh | sh"}, "install_one_liner": {"…": "…"}, "note": "…"}
 }
 ```
 
@@ -251,7 +252,8 @@ than promised.
   "installation": {
     "implicit_install": false,
     "reason": "no_install_path_on_the_mcp_surface",
-    "applies_via": "cli_or_skill_workflow"
+    "applies_via": "cli_or_skill_workflow",
+  "commands": {"short_command": "axm", "long_form": "axiom-cli", "update": "axm update", "doctor": "axm doctor", "version": "axm version", "uninstall": "axm uninstall", "update_one_liner": {"windows": "…update.ps1 | iex", "posix": "…update.sh | sh"}, "install_one_liner": {"…": "…"}, "note": "…"}
   },
   "warnings": []
 }

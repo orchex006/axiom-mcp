@@ -1,0 +1,5 @@
+$ PYTHONPATH=src PYTHONUTF8=1 python -m pytest tests -q -p no:cacheprovider --basetemp <short temp>
+ERROR tests/test_entrypoints.py::test_the_module_entrypoint_is_reachable_as_a_process
+4 failed, 769 passed, 10 skipped, 12 errors, 274 subtests passed in 175.30s (0:02:55)
+exit=1
+# Short-path (MAX_PATH-safe) full suite: failing/erroring on unmodified origin/main 470a350: 15; on this branch: 15; only on the branch: 0 (test_entrypoints process/venv and test_shards symlink cases, environment-specific).

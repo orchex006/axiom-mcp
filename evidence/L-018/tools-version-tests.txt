@@ -1,0 +1,20 @@
+$ PYTHONPATH=src PYTHONUTF8=1 python -m pytest tests/test_tools_version.py -v -p no:cacheprovider --basetemp <short temp>
+tests/test_tools_version.py::test_reports_the_closed_field_set PASSED    [  5%]
+tests/test_tools_version.py::test_only_this_component_is_observable PASSED [ 11%]
+tests/test_tools_version.py::test_unobservable_components_say_so PASSED  [ 17%]
+tests/test_tools_version.py::test_graphd_is_observed_only_when_control_is_wired PASSED [ 23%]
+tests/test_tools_version.py::test_installation_block_claims_no_install_path PASSED [ 29%]
+tests/test_tools_version.py::test_installation_commands_are_text_for_humans_only PASSED [ 35%]
+tests/test_tools_version.py::test_a_graph_query_cannot_trigger_installation PASSED [ 41%]
+tests/test_tools_version.py::test_update_is_not_checked_unless_asked PASSED [ 47%]
+tests/test_tools_version.py::test_check_update_true_uses_the_read_only_check PASSED [ 52%]
+tests/test_tools_version.py::test_unknown_component_is_refused_with_allowed PASSED [ 58%]
+tests/test_tools_version.py::test_components_must_be_a_list_not_a_string PASSED [ 64%]
+tests/test_tools_version.py::test_empty_component_list_is_refused PASSED [ 70%]
+tests/test_tools_version.py::test_duplicate_components_are_deduplicated PASSED [ 76%]
+tests/test_tools_version.py::test_check_update_must_be_a_boolean PASSED  [ 82%]
+tests/test_tools_version.py::test_unexpected_field_is_refused PASSED     [ 88%]
+tests/test_tools_version.py::test_read_capability_is_required PASSED     [ 94%]
+tests/test_tools_version.py::test_a_pin_mismatch_becomes_a_warning PASSED [100%]
+============================= 17 passed in 2.65s ==============================
+exit=0
