@@ -14,7 +14,8 @@ So this tool *reports* and never *acts*:
 * it reports update ``status`` through :func:`axiom_mcp.update.check_update`, which is a read-only
   check that never installs, and only when the caller asks for it (``check_update: true``);
 * the answer carries an explicit ``installation`` block saying that no install path exists on this
-  surface, and ``tests/test_tools_version.py` proves it by replacing
+  surface and naming, as plain text, the commands a human runs instead (``axm update`` and the
+  one-line scripts, ADR-0036 / L-018), and ``tests/test_tools_version.py` proves it by replacing
   :func:`axiom_mcp.update.apply_plan` with a tripwire that fails the test if this tool reaches it.
 
 A component this process cannot observe is reported as unobserved rather than guessed: only
@@ -33,7 +34,7 @@ from axiom_mcp.errors import AxiomError
 from axiom_mcp.query.envelope import SCHEMA_VERSION
 from axiom_mcp.tools.context import ToolContext, closed_arguments, optional_bool
 
-__all__ = ["KNOWN_COMPONENTS", "OBSERVABLE_COMPONENTS", "VERSION_FIELDS", "graph_version"]
+__all__ = ["HUMAN_COMMANDS", "KNOWN_COMPONENTS", "OBSERVABLE_COMPONENTS", "VERSION_FIELDS", "graph_version"]
 
 #: The workspace components the catalog may name. Task/specs additions are explicit here.
 KNOWN_COMPONENTS = ("axiom-mcp", "axiom-graphd", "axiom-specs", "axiom-skills")
@@ -53,6 +54,27 @@ VERSION_FIELDS = (
 )
 
 _ARGUMENTS = ("components", "check_update")
+
+#: ADR-0036 / L-018: the commands a *human* runs to install, check or update Axiom. They are
+#: reported as text so an agent can tell the user exactly what to type; this tool never runs them.
+_RELEASES = "https://github.com/orchex006/axiom-cli/releases/latest/download"
+HUMAN_COMMANDS = {
+    "short_command": "axm",
+    "long_form": "axiom-cli",
+    "update": "axm update",
+    "doctor": "axm doctor",
+    "version": "axm version",
+    "uninstall": "axm uninstall",
+    "update_one_liner": {
+        "windows": f'powershell -ExecutionPolicy Bypass -c "irm {_RELEASES}/update.ps1 | iex"',
+        "posix": f"curl -fsSL {_RELEASES}/update.sh | sh",
+    },
+    "install_one_liner": {
+        "windows": f'powershell -ExecutionPolicy Bypass -c "irm {_RELEASES}/install.ps1 | iex"',
+        "posix": f"curl -fsSL {_RELEASES}/install.sh | sh",
+    },
+    "note": "axm is the short name of axiom-cli from 0.1.5; on 0.1.4 or older use axiom-cli with the same verbs",
+}
 
 
 def _components_argument(arguments: Mapping[str, Any]) -> list[str]:
@@ -193,6 +215,10 @@ def graph_version(
             "implicit_install": False,
             "reason": "no_install_path_on_the_mcp_surface",
             "applies_via": "cli_or_skill_workflow",
+            "commands": {
+                key: dict(value) if isinstance(value, dict) else value
+                for key, value in HUMAN_COMMANDS.items()
+            },
         },
         "warnings": warnings,
     }

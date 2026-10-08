@@ -84,11 +84,31 @@ def test_graphd_is_observed_only_when_control_is_wired(tmp_path):
 
 def test_installation_block_claims_no_install_path(tmp_path):
     answer = call(context_for(tmp_path))
-    assert answer["installation"] == {
+    installation = dict(answer["installation"])
+    commands = installation.pop("commands")
+    assert installation == {
         "implicit_install": False,
         "reason": "no_install_path_on_the_mcp_surface",
         "applies_via": "cli_or_skill_workflow",
     }
+    assert commands["short_command"] == "axm"
+    assert commands["long_form"] == "axiom-cli"
+    assert commands["update"] == "axm update"
+    assert commands["doctor"] == "axm doctor"
+    assert commands["version"] == "axm version"
+
+
+def test_installation_commands_are_text_for_humans_only(tmp_path):
+    """L-018 (ADR-0036): the tool names the commands and the one-liners; it executes none of them."""
+    commands = call(context_for(tmp_path))["installation"]["commands"]
+    one_liner = commands["update_one_liner"]
+    assert one_liner["windows"].endswith('releases/latest/download/update.ps1 | iex"')
+    assert one_liner["posix"].endswith("releases/latest/download/update.sh | sh")
+    assert commands["install_one_liner"]["posix"].endswith("install.sh | sh")
+    assert "0.1.4" in commands["note"]
+    # The reported block is a copy: mutating it cannot change what the next call reports.
+    commands["update_one_liner"]["windows"] = "changed"
+    assert call(context_for(tmp_path))["installation"]["commands"]["update_one_liner"]["windows"] != "changed"
 
 
 def test_a_graph_query_cannot_trigger_installation(tmp_path, monkeypatch):
