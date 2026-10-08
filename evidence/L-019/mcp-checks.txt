@@ -1,0 +1,4 @@
+$ ruff check; pytest tests/test_tools_version.py tests/test_release_package.py
+All checks passed!
+38 passed in 51.84s
+exit=0
