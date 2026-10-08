@@ -1,3 +1,7 @@
+## 0.1.5 — short command axm release
+
+- Version 0.1.5; carries L-018 (`graph_version` names the `axm` commands, ADR-0036) [L-019].
+
 ## Unreleased — L-018 graph_version names the axm commands
 
 - The read-only `graph_version` tool adds `installation.commands` (ADR-0036): `axm` as the short command, `axiom-cli` as the long form, `axm update` / `doctor` / `version` / `uninstall`, and the install and update one-liners, so an agent can tell the user exactly what to run. The tool still never installs or updates; the apply tripwire stays (R07, R16).
