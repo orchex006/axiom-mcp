@@ -100,7 +100,8 @@ def test_installation_block_claims_no_install_path(tmp_path):
 
 def test_installation_commands_are_text_for_humans_only(tmp_path):
     """L-018 (ADR-0036): the tool names the commands and the one-liners; it executes none of them."""
-    commands = call(context_for(tmp_path))["installation"]["commands"]
+    context = context_for(tmp_path)
+    commands = call(context)["installation"]["commands"]
     one_liner = commands["update_one_liner"]
     assert one_liner["windows"].endswith('releases/latest/download/update.ps1 | iex"')
     assert one_liner["posix"].endswith("releases/latest/download/update.sh | sh")
@@ -108,7 +109,7 @@ def test_installation_commands_are_text_for_humans_only(tmp_path):
     assert "0.1.4" in commands["note"]
     # The reported block is a copy: mutating it cannot change what the next call reports.
     commands["update_one_liner"]["windows"] = "changed"
-    assert call(context_for(tmp_path))["installation"]["commands"]["update_one_liner"]["windows"] != "changed"
+    assert call(context)["installation"]["commands"]["update_one_liner"]["windows"] != "changed"
 
 
 def test_a_graph_query_cannot_trigger_installation(tmp_path, monkeypatch):
