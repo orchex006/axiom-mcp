@@ -16,5 +16,5 @@ tests/test_tools_version.py::test_check_update_must_be_a_boolean PASSED  [ 82%]
 tests/test_tools_version.py::test_unexpected_field_is_refused PASSED     [ 88%]
 tests/test_tools_version.py::test_read_capability_is_required PASSED     [ 94%]
 tests/test_tools_version.py::test_a_pin_mismatch_becomes_a_warning PASSED [100%]
-============================= 17 passed in 8.25s ==============================
+============================= 17 passed in 2.65s ==============================
 exit=0

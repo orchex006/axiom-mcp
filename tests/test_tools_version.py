@@ -99,7 +99,7 @@ def test_installation_block_claims_no_install_path(tmp_path):
 
 
 def test_installation_commands_are_text_for_humans_only(tmp_path):
-    """L-018 (ADR-0036): the tool names the commands and the one-liners; it executes none of them."""
+    """L-018 (ADR-0036): the tool names the commands and one-liners; it runs none of them."""
     context = context_for(tmp_path)
     commands = call(context)["installation"]["commands"]
     one_liner = commands["update_one_liner"]

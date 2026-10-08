@@ -34,7 +34,13 @@ from axiom_mcp.errors import AxiomError
 from axiom_mcp.query.envelope import SCHEMA_VERSION
 from axiom_mcp.tools.context import ToolContext, closed_arguments, optional_bool
 
-__all__ = ["HUMAN_COMMANDS", "KNOWN_COMPONENTS", "OBSERVABLE_COMPONENTS", "VERSION_FIELDS", "graph_version"]
+__all__ = [
+    "HUMAN_COMMANDS",
+    "KNOWN_COMPONENTS",
+    "OBSERVABLE_COMPONENTS",
+    "VERSION_FIELDS",
+    "graph_version",
+]
 
 #: The workspace components the catalog may name. Task/specs additions are explicit here.
 KNOWN_COMPONENTS = ("axiom-mcp", "axiom-graphd", "axiom-specs", "axiom-skills")
@@ -73,7 +79,10 @@ HUMAN_COMMANDS = {
         "windows": f'powershell -ExecutionPolicy Bypass -c "irm {_RELEASES}/install.ps1 | iex"',
         "posix": f"curl -fsSL {_RELEASES}/install.sh | sh",
     },
-    "note": "axm is the short name of axiom-cli from 0.1.5; on 0.1.4 or older use axiom-cli with the same verbs",
+    "note": (
+        "axm is the short name of axiom-cli from 0.1.5; "
+        "on 0.1.4 or older use axiom-cli with the same verbs"
+    ),
 }
 
 
